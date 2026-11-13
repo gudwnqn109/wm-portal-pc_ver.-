@@ -79,36 +79,16 @@
     }
 
     /* 1분할(넓은 화면) vs 2분할(1160px 이하 좁은 패널) 브랜드 반반/토글 자동 전환 */
-    .brand-split-only {
-      display: none;
-    }
-    .brand-wide-only {
-      display: grid;
-    }
+    .brand-split-only { display: none; }
+    .brand-wide-only { display: grid; }
 
     @media (max-width: 1160px) {
-      .hide-in-split {
-        display: none !important;
-      }
-      .compact-cell {
-        padding-left: 0.375rem !important;
-        padding-right: 0.375rem !important;
-        font-size: 11px !important;
-      }
-      .compact-head {
-        padding-left: 0.375rem !important;
-        padding-right: 0.375rem !important;
-        font-size: 10.5px !important;
-      }
-      .brand-wide-only {
-        display: none !important;
-      }
-      .brand-split-only {
-        display: block !important;
-      }
-      .brand-split-toggle {
-        display: flex !important;
-      }
+      .hide-in-split { display: none !important; }
+      .compact-cell { padding-left: 0.375rem !important; padding-right: 0.375rem !important; font-size: 11px !important; }
+      .compact-head { padding-left: 0.375rem !important; padding-right: 0.375rem !important; font-size: 10.5px !important; }
+      .brand-wide-only { display: none !important; }
+      .brand-split-only { display: block !important; }
+      .brand-split-toggle { display: flex !important; }
     }
   </style>
 </head>
@@ -489,7 +469,6 @@
       <div class="overflow-x-auto max-h-[540px] overflow-y-auto">
         <table class="w-full text-left border-collapse">
           <thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
-            <!-- 2분할 숨김(.hide-in-split) 반영하여 colspans 최적화 (3 / 4 / 4 / 4 / 2) -->
             <tr class="text-[10.5px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
               <th colspan="3" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700">매장 정보</th>
               <th colspan="4" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">주간 매출 실적 (천원)</th>
@@ -596,24 +575,24 @@
       };
     }
 
-    // DB에 벤치마크(중부영업팀, 각 지점 평균) 저장용 객체 추가
+    // DB에 벤치마크(중부영업팀, 각 지점 평균) 저장용 객체 및 초기 목업데이터 갱신 (에러 대비)
     let DB = {
       benchmarks: {
         'ALL': {
-          brandMonth: { indian: 0.50, bruno: 0.15, daily: 0.25, label: 0.05, duani: 0.05 },
-          brandYear: { indian: 0.48, bruno: 0.16, daily: 0.26, label: 0.06, duani: 0.04 }
+          brandMonth: { indian: {sh: 0.52, gr: 0.1}, bruno: {sh: 0.16, gr: 0.05}, daily: {sh: 0.24, gr: -0.02}, label: {sh: 0.03, gr: 0.12}, duani: {sh: 0.04, gr: -0.01} },
+          brandYear: { indian: {sh: 0.44, gr: 0.1}, bruno: {sh: 0.16, gr: 0.05}, daily: {sh: 0.30, gr: 0.08}, label: {sh: 0.05, gr: 0.12}, duani: {sh: 0.06, gr: 0.02} }
         },
         '서울': {
-          brandMonth: { indian: 0.52, bruno: 0.14, daily: 0.24, label: 0.06, duani: 0.04 },
-          brandYear: { indian: 0.49, bruno: 0.15, daily: 0.25, label: 0.06, duani: 0.05 }
+          brandMonth: { indian: {sh: 0.52, gr: 0.15}, bruno: {sh: 0.14, gr: 0.02}, daily: {sh: 0.24, gr: -0.01}, label: {sh: 0.06, gr: 0.08}, duani: {sh: 0.04, gr: -0.02} },
+          brandYear: { indian: {sh: 0.49, gr: 0.12}, bruno: {sh: 0.15, gr: 0.06}, daily: {sh: 0.25, gr: 0.05}, label: {sh: 0.06, gr: 0.04}, duani: {sh: 0.05, gr: 0.01} }
         },
         '경기': {
-          brandMonth: { indian: 0.55, bruno: 0.15, daily: 0.20, label: 0.05, duani: 0.05 },
-          brandYear: { indian: 0.50, bruno: 0.14, daily: 0.24, label: 0.06, duani: 0.06 }
+          brandMonth: { indian: {sh: 0.55, gr: 0.1}, bruno: {sh: 0.15, gr: 0.03}, daily: {sh: 0.20, gr: 0.05}, label: {sh: 0.05, gr: 0.01}, duani: {sh: 0.05, gr: -0.05} },
+          brandYear: { indian: {sh: 0.50, gr: 0.11}, bruno: {sh: 0.14, gr: 0.04}, daily: {sh: 0.24, gr: 0.07}, label: {sh: 0.06, gr: 0.02}, duani: {sh: 0.06, gr: -0.02} }
         },
         '강원': {
-          brandMonth: { indian: 0.48, bruno: 0.19, daily: 0.23, label: 0.05, duani: 0.05 },
-          brandYear: { indian: 0.46, bruno: 0.18, daily: 0.25, label: 0.05, duani: 0.06 }
+          brandMonth: { indian: {sh: 0.48, gr: 0.08}, bruno: {sh: 0.19, gr: -0.02}, daily: {sh: 0.23, gr: 0.01}, label: {sh: 0.05, gr: 0.09}, duani: {sh: 0.05, gr: 0.05} },
+          brandYear: { indian: {sh: 0.46, gr: 0.09}, bruno: {sh: 0.18, gr: -0.01}, daily: {sh: 0.25, gr: 0.03}, label: {sh: 0.05, gr: 0.08}, duani: {sh: 0.06, gr: 0.04} }
         }
       },
       stores: [
@@ -765,11 +744,22 @@
           const rawBranch = String(getVal(0)).trim();
           const sName = String(getVal(2)).trim();
 
-          // 기본 스킵 조건
           if (!sName || sName === '매장명' || sName === '매장' || rawBranch === '지점') continue;
 
-          // 벤치마크, 평균 데이터 추출 및 저장 (지점 전체나 중부영업팀 데이터)
-          let isBench = rawBranch.includes('평균') || sName.includes('평균') || sName.includes('합계') || rawBranch.includes('합계') || sName.includes('벤치마크') || sName.includes('중부') || rawBranch.includes('중부');
+          // 벤치마크, 평균 데이터 추출 및 저장 (지점 전체나 중부영업팀 데이터) - 103~106열(행) 타겟팅 강화
+          let isBench = rawBranch.includes('평균') || sName.includes('평균') || 
+                        rawBranch.includes('합계') || sName.includes('합계') || 
+                        rawBranch.includes('총계') || sName.includes('총계') || 
+                        rawBranch.includes('전체') || sName.includes('전체') ||
+                        rawBranch.includes('중부') || sName.includes('중부');
+                        
+          // 시트의 마지막 요약행 부분(100열 이후)인 경우의 예외처리 강화
+          if (!isBench && i >= rows.length - 6) {
+             if (sName.includes('서울') || sName.includes('경기') || sName.includes('강원')) {
+                 isBench = true;
+             }
+          }
+
           if (isBench) {
             let bKey = 'ALL';
             if (sName.includes('서울') || rawBranch.includes('서울')) bKey = '서울';
@@ -778,10 +768,18 @@
             
             DB.benchmarks[bKey] = {
               brandMonth: {
-                indian: toNum(getVal(23)), bruno: toNum(getVal(24)), daily: toNum(getVal(25)), label: toNum(getVal(26)), duani: toNum(getVal(27))
+                indian: { sh: toNum(getVal(23)), gr: toNum(getVal(39)) }, 
+                bruno:  { sh: toNum(getVal(24)), gr: toNum(getVal(40)) },
+                daily:  { sh: toNum(getVal(25)), gr: toNum(getVal(41)) }, 
+                label:  { sh: toNum(getVal(26)), gr: toNum(getVal(42)) }, 
+                duani:  { sh: toNum(getVal(27)), gr: toNum(getVal(43)) }
               },
               brandYear: {
-                indian: toNum(getVal(45)), bruno: toNum(getVal(46)), daily: toNum(getVal(47)), label: toNum(getVal(48)), duani: toNum(getVal(49))
+                indian: { sh: toNum(getVal(45)), gr: toNum(getVal(55)) }, 
+                bruno:  { sh: toNum(getVal(46)), gr: toNum(getVal(56)) },
+                daily:  { sh: toNum(getVal(47)), gr: toNum(getVal(57)) }, 
+                label:  { sh: toNum(getVal(48)), gr: toNum(getVal(58)) }, 
+                duani:  { sh: toNum(getVal(49)), gr: toNum(getVal(59)) }
               }
             };
             continue;
@@ -1027,7 +1025,7 @@
     }
 
     // =========================================================================
-    // 메인 화면 전체 렌더링
+    // 메신저 공유 요약문 및 UI 렌더링
     // =========================================================================
     function renderAll() {
       if (!currentStore) return;
@@ -1095,16 +1093,26 @@
       document.getElementById('s2FirstYearVal').innerHTML = `${fmt(s.firstYear)}명 ${fmtGrowthParen(s.firstYearGr)}`;
     }
 
-    // 벤치마크 데이터를 포함하여 렌더링하도록 인자 추가
+    // 벤치마크 데이터를 포함하여 렌더링하고, 포맷을 "비중 52%(▲10%)" 형식으로 출력
     function buildBrandCardsHTML(bObj, brandDefs, branchBenchObj, teamBenchObj) {
+      
+      const fmtBenchText = (bench) => {
+        if (!bench || bench.sh == null) return '-';
+        const sh = fmtPct(bench.sh);
+        let grStr = '<span class="text-slate-400">0%</span>';
+        if (bench.gr > 0.005) grStr = `<span class="text-red-500 dark:text-red-400">▲${Math.abs(Math.round(bench.gr * 100))}%</span>`;
+        else if (bench.gr < -0.005) grStr = `<span class="text-blue-500 dark:text-blue-400">▼${Math.abs(Math.round(bench.gr * 100))}%</span>`;
+        return `${sh}(${grStr})`;
+      };
+
       return brandDefs.map(b => {
         const detail = (bObj.details && bObj.details[b.key]) ? bObj.details[b.key] : null;
         const bSales = detail ? detail.sales : Math.round(bObj.total * b.sh);
         const bGr = detail ? detail.gr : bObj.gr;
         const barWidth = Math.min(Math.max(b.sh * 100, 0), 100);
 
-        const branchSh = branchBenchObj ? branchBenchObj[b.key] : null;
-        const teamSh = teamBenchObj ? teamBenchObj[b.key] : null;
+        const branchBench = branchBenchObj ? branchBenchObj[b.key] : null;
+        const teamBench = teamBenchObj ? teamBenchObj[b.key] : null;
 
         return `
           <div class="bg-white dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
@@ -1124,9 +1132,9 @@
             </div>
             
             <!-- 지점 평균 및 중부 평균 벤치마크 데이터 비교 바 -->
-            <div class="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 font-medium px-0.5 pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-700/50">
-              <span>지점 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtPct(branchSh)}</strong></span>
-              <span>중부 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtPct(teamSh)}</strong></span>
+            <div class="flex justify-between items-center text-[10.5px] text-slate-500 dark:text-slate-400 font-medium px-0.5 pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-700/50">
+              <span>지점 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtBenchText(branchBench)}</strong></span>
+              <span>중부 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtBenchText(teamBench)}</strong></span>
             </div>
           </div>
         `;
@@ -1304,9 +1312,6 @@
       }).join('');
     }
 
-    // =========================================================================
-    // 메신저 공유 요약문 복사
-    // =========================================================================
     function copyBriefingText() {
       if (!currentStore) return;
       const s = currentStore;
