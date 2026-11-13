@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="ko" class="light">
+<head>
+  <!-- [직접 접속 차단 보안 코드 - 실제 배포 시 주석 해제]
+  <script>
+    if (window.self === window.top) {
+      window.location.replace('./index.html');
+    }
+  </script>
+  -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>WM중부 일일 매출장</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'Roboto', 'Noto Sans KR', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Pretendard & Inter Fonts -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Phosphor Icons CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+    html, body {
+      word-break: keep-all;
+      overflow-wrap: normal;
+      font-feature-settings: "tnum" on, "lnum" on;
+      font-variant-numeric: tabular-nums;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.6); }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* index.html 2분할(좌·우 비교) 좁은 패널(1160px 이하) 자동 컴팩트 최적화 */
+    @media (max-width: 1160px) {
+      .hide-in-split {
+        display: none !important;
+      }
+      .compact-cell {
+        padding-left: 0.375rem !important;
+        padding-right: 0.375rem !important;
+        font-size: 11px !important;
+      }
+      .compact-head {
+        padding-left: 0.375rem !important;
+        padding-right: 0.375rem !important;
+        font-size: 10.5px !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#F4F5F7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen antialiased transition-colors duration-200">
+
+  <!-- ================= 1. 상단 PC 통합 커맨드 헤더 ================= -->
+  <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-2xs">
+    <div class="max-w-[1720px] mx-auto px-4 lg:px-5 py-2.5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5">
+      
+      <!-- 좌측: 브랜드 + 기준일 + 실시간 동기화 -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs tracking-tighter shrink-0 shadow-xs">
+          WM
+        </div>
+        <div class="flex items-center gap-2 whitespace-nowrap">
+          <h1 class="text-[15px] font-extrabold tracking-tight text-slate-900 dark:text-white">
+            WM중부 일일 매출장
+          </h1>
+          <span class="text-slate-300 dark:text-slate-700">|</span>
+          <span id="current-date-text" class="text-xs font-bold text-slate-600 dark:text-slate-300">데이터 확인중...</span>
+          <button id="sync-btn" onclick="loadGoogleSheetData(true)" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-200 transition whitespace-nowrap" title="구글 시트 실시간 동기화">
+            <span id="sheetStatusDot" class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span id="currentSheetLabel">동기화중</span>
+            <i id="refreshIcon" class="ph-bold ph-arrows-clockwise text-[10px] animate-spin"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 중앙: 4개 권역/지점 세그먼트 탭 -->
+      <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70 shrink-0">
+        <button class="branch-tab-btn px-3 py-1 text-xs font-extrabold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs transition whitespace-nowrap" data-branch="중부">
+          중부영업팀
+        </button>
+        <button class="branch-tab-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap" data-branch="서울">
+          서울지점
+        </button>
+        <button class="branch-tab-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap" data-branch="경기">
+          경기지점
+        </button>
+        <button class="branch-tab-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap" data-branch="강원">
+          강원지점
+        </button>
+      </div>
+
+      <!-- 우측: 날짜 스텝퍼 + 매장수 + 다크모드 -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-1 py-0.5 border border-slate-200/80 dark:border-slate-700/80">
+          <button id="prev-day-btn" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition" title="이전 날짜">
+            <i class="ph-bold ph-caret-left text-xs"></i>
+          </button>
+          <select id="day-select-dropdown" class="bg-transparent font-extrabold text-slate-900 dark:text-white text-xs focus:outline-none cursor-pointer px-1.5 text-center whitespace-nowrap">
+          </select>
+          <button id="next-day-btn" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition" title="다음 날짜">
+            <i class="ph-bold ph-caret-right text-xs"></i>
+          </button>
+        </div>
+
+        <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-600 dark:text-slate-300 whitespace-nowrap">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          총 <strong id="branch-store-count" class="text-slate-900 dark:text-white font-black">-개점</strong>
+        </span>
+
+        <button id="theme-toggle-btn" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0" title="다크 모드 전환">
+          <i id="theme-icon" class="ph-bold ph-moon text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= 2. 메인 PC 대시보드 컨테이너 ================= -->
+  <main class="max-w-[1720px] mx-auto px-4 lg:px-5 py-3.5 space-y-3.5">
+
+    <!-- [SECTION 1] 1분할 PC 1줄(4열) / 2분할 비교 2줄(2열) 핵심 KPI 스트립 -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      
+      <!-- KPI 1: 당일 매출 -->
+      <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 shadow-sm border border-slate-800 flex flex-col justify-between relative overflow-hidden">
+        <div class="absolute -right-3 -bottom-3 text-white/[0.05] pointer-events-none">
+          <i class="ph-fill ph-trend-up text-7xl"></i>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span id="hero-branch-badge" class="text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-slate-950 whitespace-nowrap shrink-0">중부영업팀</span>
+            <span id="hero-day-label" class="text-xs font-bold text-slate-300 whitespace-nowrap truncate">당일 매출 (-일)</span>
+          </div>
+          <span id="hero-day-rate-badge" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-white/15 text-amber-300 whitespace-nowrap shrink-0">
+            -% 달성
+          </span>
+        </div>
+
+        <div class="my-2 flex items-baseline gap-1.5 whitespace-nowrap">
+          <span id="hero-day-actual" class="text-2xl xl:text-3xl font-black tracking-tight text-white">-</span>
+          <span class="text-xs font-bold text-slate-300">백만원</span>
+        </div>
+
+        <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
+          <span class="text-slate-300">일목표 <strong id="hero-day-target" class="text-white font-extrabold">-백만</strong></span>
+          <span id="hero-day-diff" class="font-extrabold text-amber-300">-</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: 당월 누계 -->
+      <div class="rounded-2xl bg-white dark:bg-slate-900 p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-1.5">
+          <span id="strip-month-label" class="text-xs font-extrabold text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">11월 누계</span>
+          <div class="flex items-center gap-1 shrink-0">
+            <span id="strip-month-achieve-badge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-blue-50 text-blue-700 border-blue-200/80 whitespace-nowrap">
+              -% 달성
+            </span>
+            <span id="strip-month-growth-badge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-slate-50 text-slate-600 border-slate-200/80 whitespace-nowrap">
+              -% 신장
+            </span>
+          </div>
+        </div>
+
+        <div class="my-2 flex items-baseline justify-between gap-2 whitespace-nowrap">
+          <div class="flex items-baseline gap-1">
+            <span id="strip-month-actual" class="text-2xl xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white">-</span>
+            <span class="text-xs font-bold text-slate-400">백만원</span>
+          </div>
+          <span id="detail-month-progress" class="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-950/60 px-2 py-0.5 rounded whitespace-nowrap">월진척 -%</span>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
+          <span class="text-slate-500 dark:text-slate-400">누계목표 <strong id="detail-month-target" class="text-slate-800 dark:text-slate-200 font-extrabold">-백만</strong></span>
+          <span id="detail-month-diff" class="font-extrabold text-rose-500">-</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: 연간 누계 -->
+      <div class="rounded-2xl bg-white dark:bg-slate-900 p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-1.5">
+          <span id="strip-year-label" class="text-xs font-extrabold text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">26년 연누계</span>
+          <div class="flex items-center gap-1 shrink-0">
+            <span id="strip-year-achieve-badge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-blue-50 text-blue-700 border-blue-200/80 whitespace-nowrap">
+              -% 달성
+            </span>
+            <span id="strip-year-growth-badge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-slate-50 text-slate-600 border-slate-200/80 whitespace-nowrap">
+              -% 신장
+            </span>
+          </div>
+        </div>
+
+        <div class="my-2 flex items-baseline gap-1 whitespace-nowrap">
+          <span id="strip-year-actual" class="text-2xl xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white">-</span>
+          <span class="text-xs font-bold text-slate-400">백만원</span>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
+          <span class="text-slate-500 dark:text-slate-400">연누계목표 <strong id="detail-year-target" class="text-slate-800 dark:text-slate-200 font-extrabold">-백만</strong></span>
+          <span id="detail-year-diff" class="font-extrabold text-rose-500">-</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: 주말·평일 비중 & 첫구매(신규고객) 유치 -->
+      <div class="rounded-2xl bg-white dark:bg-slate-900 p-4 border border-slate-200/90 dark:border-slate-800 shadow-2xs flex flex-col justify-between">
+        <div class="flex items-center justify-between gap-2 whitespace-nowrap">
+          <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200">주말·평일 비중</span>
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+            주말 <strong id="kpi-weekend-pct" class="text-blue-600 dark:text-blue-400">0.0%</strong> : 평일 <strong id="kpi-weekday-pct" class="text-slate-700 dark:text-slate-200">0.0%</strong>
+          </span>
+        </div>
+
+        <div class="my-2 space-y-1.5">
+          <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+            <div id="kpi-weekend-bar" class="bg-blue-600 h-full transition-all duration-300" style="width: 50%"></div>
+            <div id="kpi-weekday-bar" class="bg-slate-400 dark:bg-slate-600 h-full transition-all duration-300" style="width: 50%"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            <span>주말(금~일) <strong id="kpi-weekend-val" class="text-slate-800 dark:text-slate-200">-백만</strong></span>
+            <span>평일(월~목) <strong id="kpi-weekday-val" class="text-slate-800 dark:text-slate-200">-백만</strong></span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
+          <span class="text-slate-500 dark:text-slate-400">당월 첫구매 <strong id="kpi-cust-actual" class="text-amber-600 dark:text-amber-400 font-extrabold">-명</strong> / <span id="kpi-cust-target">-명</span></span>
+          <span id="kpi-cust-rate" class="font-extrabold text-blue-600 dark:text-blue-400">-% 달성</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- [SECTION 2] 지점 · 담당별 실적 요약 (1분할 1줄 통합 / 2분할 2줄 자동 전환) -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-3.5 shadow-2xs space-y-2.5">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2 min-w-0">
+          <h2 id="summary-section-title" class="text-[13px] font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-1.5 whitespace-nowrap">
+            <i class="ph-fill ph-buildings text-blue-600 dark:text-blue-400"></i>
+            <span>지점별 실적 요약</span>
+          </h2>
+          <span class="hidden sm:inline text-[11px] text-slate-400 whitespace-nowrap truncate">· 카드를 클릭하면 아래 매장 테이블이 즉시 필터링됩니다</span>
+        </div>
+        <button id="reset-sv-filter" class="hidden inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 text-xs font-extrabold hover:bg-blue-100 transition whitespace-nowrap">
+          <i class="ph-bold ph-arrow-counter-clockwise"></i>
+          <span>필터 해제</span>
+        </button>
+      </div>
+
+      <div id="summary-card-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+        <!-- JS 동적 렌더링 -->
+      </div>
+    </section>
+
+    <!-- [SECTION 3] 일 · 월 · 연 2단 그룹 헤더 통합 데이터 테이블 (15컬럼 한 화면 완결형) -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs overflow-hidden">
+      
+      <!-- 테이블 상단 컨트롤 툴바 -->
+      <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-900/70">
+        
+        <!-- 좌측: 검색창 + 달성률 상태 칩 -->
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto flex-1 min-w-0">
+          <div class="relative w-full sm:w-52 shrink-0">
+            <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="store-search-input" placeholder="매장명, 점코드, 담당자 검색"
+                   class="w-full pl-8 pr-8 py-1.5 bg-white dark:bg-slate-800 text-xs font-medium text-slate-900 dark:text-white rounded-xl border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
+            <button id="clear-search-btn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <i class="ph-fill ph-x-circle text-sm"></i>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar" id="status-chips">
+            <button class="status-chip px-2.5 py-1.5 text-xs font-extrabold rounded-xl bg-slate-900 dark:bg-blue-700 text-white whitespace-nowrap transition" data-filter="ALL">
+              전체 (<span id="chip-all-count">0</span>)
+            </button>
+            <button class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition" data-filter="OVER_100">
+              100% 초과
+            </button>
+            <button class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition" data-filter="OVER_80">
+              80~100%
+            </button>
+            <button class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition" data-filter="UNDER_80">
+              80% 미달
+            </button>
+          </div>
+        </div>
+
+        <!-- 우측: 조회 건수 + 정렬 선택 + 단위 안내 -->
+        <div class="flex items-center justify-between sm:justify-end gap-2.5 w-full lg:w-auto shrink-0 text-xs">
+          <span class="text-slate-500 dark:text-slate-400 whitespace-nowrap">
+            조회 <strong id="match-count" class="text-slate-900 dark:text-white font-black">0</strong>개점
+          </span>
+
+          <div class="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+            <i class="ph-bold ph-arrows-down-up text-slate-400"></i>
+            <select id="sort-select" class="bg-transparent font-bold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer whitespace-nowrap">
+              <option value="month_desc" selected>월 누계순</option>
+              <option value="daily_desc">당일 실적순</option>
+              <option value="achieve_desc">월 달성률순</option>
+              <option value="growth_desc">월 신장률순</option>
+              <option value="year_desc">연 누계순</option>
+              <option value="year_achieve_desc">연 달성률순</option>
+              <option value="year_growth_desc">연 신장률순</option>
+              <option value="cust_desc">첫구매 실적순</option>
+            </select>
+          </div>
+
+          <span class="text-[11px] font-semibold text-slate-400 whitespace-nowrap hidden sm:inline">단위: 백만·명</span>
+        </div>
+      </div>
+
+      <!-- 일 · 월 · 연 2단 그룹 헤더 통합 데이터 그리드 -->
+      <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
+            <!-- 1단 그룹 헤더: 매장 정보 / 일 데이터 / 월 데이터 / 연 데이터 / 고객 -->
+            <tr class="text-[10.5px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
+              <th colspan="4" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700">
+                매장 정보
+              </th>
+              <th colspan="2" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">
+                당일 실적 (일)
+              </th>
+              <th colspan="4" class="py-1.5 px-2 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700">
+                당월 누계 실적 (월)
+              </th>
+              <th colspan="4" class="py-1.5 px-2 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700">
+                연간 누계 실적 (연)
+              </th>
+              <th class="py-1.5 px-2 text-center bg-slate-100/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-300">
+                고객
+              </th>
+            </tr>
+
+            <!-- 2단 세부 컬럼 헤더 -->
+            <tr class="text-[11px] font-extrabold border-b border-slate-200 dark:border-slate-700 bg-slate-50/95 dark:bg-slate-900/95 text-slate-600 dark:text-slate-300">
+              <!-- 매장 정보 (4개) -->
+              <th class="compact-head py-2 pl-3 pr-1.5 w-10 text-center">순위</th>
+              <th class="hide-in-split py-2 px-1.5 w-16">점코드</th>
+              <th class="compact-head py-2 px-2 min-w-[118px]">매장명</th>
+              <th class="compact-head py-2 px-2 border-r border-slate-200 dark:border-slate-700">지점·담당</th>
+
+              <!-- 일 데이터 (2개) -->
+              <th onclick="toggleColumnSort('daily')" class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 cursor-pointer hover:text-indigo-600 transition select-none">
+                당일 실적 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 border-r border-slate-200 dark:border-slate-700">
+                일 달성
+              </th>
+
+              <!-- 월 데이터 (4개) -->
+              <th onclick="toggleColumnSort('month')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 cursor-pointer hover:text-blue-600 transition select-none">
+                월 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200">
+                월 목표
+              </th>
+              <th onclick="toggleColumnSort('achieve')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 cursor-pointer hover:text-blue-600 transition select-none">
+                월 달성 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th onclick="toggleColumnSort('growth')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 border-r border-slate-200 dark:border-slate-700 cursor-pointer hover:text-blue-600 transition select-none">
+                신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+
+              <!-- 연 데이터 (4개) -->
+              <th onclick="toggleColumnSort('year')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
+                연 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200">
+                연 목표
+              </th>
+              <th onclick="toggleColumnSort('year_achieve')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
+                연 달성 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th onclick="toggleColumnSort('year_growth')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 border-r border-slate-200 dark:border-slate-700 cursor-pointer hover:text-amber-600 transition select-none">
+                신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+
+              <!-- 고객 데이터 (1개) -->
+              <th onclick="toggleColumnSort('cust')" class="compact-head py-2 pl-2 pr-3 text-right cursor-pointer hover:text-blue-600 transition select-none">
+                첫구매(목표) <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="store-table-body" class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+            <tr>
+              <td colspan="15" class="py-16 text-center text-slate-400 text-xs">
+                <i class="ph-bold ph-spinner animate-spin text-xl inline-block mb-1.5"></i>
+                <div>실적 데이터를 불러오는 중입니다...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= 모달: 매장 상세 분석 PC 다이얼로그 ================= -->
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- 모달 헤더 -->
+      <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 bg-slate-50/70 dark:bg-slate-900">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 id="modal-store-name" class="text-lg font-black text-slate-900 dark:text-white whitespace-nowrap">매장명</h3>
+            <span id="modal-store-code" class="text-xs font-mono px-2 py-0.5 rounded-md bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold whitespace-nowrap">CODE</span>
+            <span id="modal-store-sv" class="text-xs px-2 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-extrabold whitespace-nowrap">담당 · 지점</span>
+          </div>
+          <p id="modal-open-info" class="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">당일목표: - · 월계획: - · 연목표: -</p>
+        </div>
+        <button id="close-detail-modal-btn" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition shrink-0">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <!-- 모달 본문 -->
+      <div class="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+        
+        <!-- 5컬럼 핵심 실적 요약표 -->
+        <div class="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-2xs">
+          <div class="bg-slate-900 text-white px-4 py-2 text-xs font-extrabold flex items-center justify-between whitespace-nowrap">
+            <span><i class="ph-bold ph-table mr-1.5 text-amber-400"></i>핵심 실적 요약</span>
+            <span class="text-[11px] text-slate-300 font-normal">단위: 백만원 · 명</span>
+          </div>
+          <table class="w-full text-center border-collapse text-xs bg-white dark:bg-slate-800 table-fixed">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-slate-900/60 text-[11px] text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-700 whitespace-nowrap">
+                <th class="py-2 px-1.5 font-bold">당일 실적</th>
+                <th class="py-2 px-1.5 font-bold">당월 누계</th>
+                <th class="py-2 px-1.5 font-bold">월 달성·신장</th>
+                <th class="py-2 px-1.5 font-bold">연 달성·신장</th>
+                <th class="py-2 px-1.5 font-bold">당월 첫구매</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="divide-x divide-slate-100 dark:divide-slate-700 whitespace-nowrap">
+                <td class="py-3 px-1.5 font-black text-blue-600 dark:text-blue-400 align-middle" id="modal-tbl-daily">-</td>
+                <td class="py-2.5 px-1.5 align-middle" id="modal-tbl-cum-target">-</td>
+                <td class="py-2.5 px-1.5 align-middle" id="modal-tbl-month-pct">-</td>
+                <td class="py-2.5 px-1.5 align-middle" id="modal-tbl-year-pct">-</td>
+                <td class="py-2.5 px-1.5 align-middle" id="modal-tbl-cust">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 3컬럼 기간 비교 카드 (일 / 월 / 연) -->
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="p-3 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200/70 dark:border-indigo-800/60 flex flex-col justify-between">
+            <span class="text-[11px] text-indigo-700 dark:text-indigo-300 font-extrabold whitespace-nowrap" id="modal-daily-title">당일 (일)</span>
+            <div id="modal-daily-val" class="text-base font-black text-indigo-700 dark:text-indigo-300 my-1 whitespace-nowrap">-</div>
+            <div id="modal-daily-rate" class="text-[11px] text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap">-</div>
+          </div>
+          <div class="p-3 rounded-2xl bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-800/60 flex flex-col justify-between">
+            <span class="text-[11px] text-blue-700 dark:text-blue-300 font-extrabold whitespace-nowrap" id="modal-month-title">당월 누계 (월)</span>
+            <div id="modal-month-val" class="text-base font-black text-slate-900 dark:text-white my-1 whitespace-nowrap">-</div>
+            <div class="flex items-center justify-center gap-2 text-[11px] whitespace-nowrap">
+              <span id="modal-month-rate" class="font-extrabold text-emerald-600 dark:text-emerald-400">-</span>
+              <span class="text-slate-300">|</span>
+              <span id="modal-month-growth" class="font-bold text-slate-500">-</span>
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/60 flex flex-col justify-between">
+            <span class="text-[11px] text-amber-800 dark:text-amber-300 font-extrabold whitespace-nowrap" id="modal-year-title">연간 누계 (연)</span>
+            <div id="modal-year-cum-val" class="text-base font-black text-slate-900 dark:text-white my-1 whitespace-nowrap">-</div>
+            <div class="flex items-center justify-center gap-2 text-[11px] whitespace-nowrap">
+              <span id="modal-year-cum-rate" class="font-extrabold text-emerald-600 dark:text-emerald-400">-</span>
+              <span class="text-slate-300">|</span>
+              <span id="modal-year-cum-growth" class="font-bold text-rose-600 dark:text-rose-400">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 하단 2단: 좌측(주말 vs 평일 매출 비중) / 우측(첫구매 및 고객 현황) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div class="bg-blue-50/60 dark:bg-slate-800/80 p-3.5 rounded-2xl border border-blue-100 dark:border-slate-700 space-y-2.5">
+            <div class="flex items-center justify-between whitespace-nowrap">
+              <span class="font-extrabold text-slate-800 dark:text-slate-200 text-xs flex items-center gap-1.5">
+                <i class="ph-fill ph-calendar-check text-blue-600"></i>
+                <span id="modal-weekend-title">주말 vs 평일 비중</span>
+              </span>
+              <span id="modal-weekend-ratio-badge" class="text-[10.5px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">주말 -%</span>
+            </div>
+
+            <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden flex">
+              <div id="modal-weekend-bar" class="bg-blue-600 h-full transition-all duration-300" style="width: 50%"></div>
+              <div id="modal-weekday-bar" class="bg-slate-400 dark:bg-slate-500 h-full transition-all duration-300" style="width: 50%"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-center text-[11px] whitespace-nowrap">
+              <div class="bg-white dark:bg-slate-900 p-2 rounded-xl border border-blue-200/80 dark:border-blue-800">
+                <div class="flex items-center justify-between text-[10px] text-blue-600 dark:text-blue-400 font-bold mb-0.5">
+                  <span>주말(금~일)</span>
+                  <span id="modal-weekend-share-pct">0.0%</span>
+                </div>
+                <div id="modal-weekend-month-val" class="font-black text-slate-900 dark:text-white text-xs">-</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">목표 <span id="modal-weekend-target">-</span></div>
+              </div>
+              <div class="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200/80 dark:border-slate-700">
+                <div class="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-0.5">
+                  <span>평일(월~목)</span>
+                  <span id="modal-weekday-share-pct">0.0%</span>
+                </div>
+                <div id="modal-weekday-month-val" class="font-extrabold text-slate-800 dark:text-slate-200 text-xs">-</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">목표 <span id="modal-weekday-target">-</span></div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-blue-100 dark:border-slate-700 text-[10.5px]">
+              <div class="flex items-center justify-between mb-1.5 whitespace-nowrap">
+                <span class="text-slate-500 dark:text-slate-400 font-bold" id="modal-recent-weekend-title">최근 주말 3일 실적 / 목표</span>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 text-center whitespace-nowrap">
+                <div class="bg-white/90 dark:bg-slate-900/90 p-1.5 rounded-xl">
+                  <span class="text-slate-400 block" id="modal-fri-label">금</span>
+                  <div id="modal-d-fri" class="font-bold text-slate-800 dark:text-slate-200 mt-0.5">-</div>
+                </div>
+                <div class="bg-white/90 dark:bg-slate-900/90 p-1.5 rounded-xl">
+                  <span class="text-slate-400 block" id="modal-sat-label">토</span>
+                  <div id="modal-d-sat" class="font-bold text-slate-800 dark:text-slate-200 mt-0.5">-</div>
+                </div>
+                <div class="bg-white/90 dark:bg-slate-900/90 p-1.5 rounded-xl border border-blue-200/70 dark:border-blue-800">
+                  <span class="text-blue-600 dark:text-blue-400 font-bold block" id="modal-sun-label">일</span>
+                  <div id="modal-d-sun" class="font-black text-blue-600 dark:text-blue-400 mt-0.5">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200/70 dark:border-slate-700/70 flex flex-col justify-between space-y-2.5">
+            <div class="flex items-center justify-between whitespace-nowrap">
+              <span class="font-extrabold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <i class="ph-fill ph-user-plus text-emerald-600"></i>
+                <span>첫구매 · 고객 현황</span>
+              </span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">월목표 <strong id="modal-cust-target-val" class="text-blue-600 dark:text-blue-400 font-extrabold">-</strong>명</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] whitespace-nowrap flex-1 content-center">
+              <div class="flex flex-col justify-center bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-slate-400 text-[10px]">당월 첫구매</span>
+                <span id="modal-new-month" class="text-sm font-black text-amber-600 mt-0.5">-</span>
+              </div>
+              <div class="flex flex-col justify-center bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-slate-400 text-[10px]">목표 달성률</span>
+                <span id="modal-month-plan-rate" class="text-sm font-black text-emerald-600 mt-0.5">-</span>
+              </div>
+              <div class="flex flex-col justify-center bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-slate-400 text-[10px]">연간 누적 첫구매</span>
+                <span id="modal-new-year" class="text-sm font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">-</span>
+              </div>
+              <div class="flex flex-col justify-center bg-white dark:bg-slate-900 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+                <span class="text-slate-400 text-[10px]">총 등록 고객수</span>
+                <span id="modal-total-cust" class="text-sm font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 shrink-0 flex justify-end">
+        <button id="modal-close-action-btn" class="px-6 py-2 bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white rounded-xl font-bold transition text-xs whitespace-nowrap">
+          닫기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 토스트 알림 ================= -->
+  <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-4 py-2.5 rounded-full text-xs font-bold shadow-xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-2 whitespace-nowrap">
+    <i class="ph-fill ph-check-circle text-emerald-400 text-base"></i>
+    <span id="toast-msg">완료되었습니다.</span>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    // 1. 구글 스프레드시트 연동 설정
+    const SPREADSHEET_ID = '1F0l1o6Vr7oCRULK0RZNTGEwZpdZ6Zpf45PkdH4N82y4';
+    const SALES_TAB_NAME = '일자별_통합매출';
+    const TARGET_TAB_NAME = '일자별_통합목표';
+    const DAILY_TAB_NAME = '일일_통합매출장';
+    const SUMMARY_TAB_NAME = '지점_담당별_요약';
+
+    const SV_ORDER_MAP = {
+      '서울': ['신현호', '문경영', '우경태', '박형주'],
+      '경기': ['신순호', '이두원', '신현호'],
+      '강원': ['김동하', '우경태', '박형주']
+    };
+
+    const BRANCH_TITLE_MAP = {
+      '중부': '중부영업팀',
+      '서울': '서울지점',
+      '경기': '경기지점',
+      '강원': '강원지점'
+    };
+
+    // 2. 상태 변수
+    let currentStoreDB = [];
+    let rawSalesStores = [];
+    let rawTargetMap = {};
+    let rawDailyMap = {};
+    let rawSummaryMap = { branches: {}, managers: {} };
+
+    const nowInit = new Date();
+    let currentYear = nowInit.getFullYear();
+    let currentMonth = 11;
+    let currentDay = 12;
+    let latestDetectedDay = 12;
+
+    let currentBranch = '중부';
+    let currentFilter = 'ALL';
+    let currentSvFilter = null;
+    let searchQuery = '';
+    let currentSort = 'month_desc';
+    let isUsingFallback = false;
+
+    let salesLoaded = false;
+    let targetsLoaded = false;
+    let dailyLoaded = false;
+    let summaryLoaded = false;
+    let syncTimeoutId = null;
+
+    function cleanManagerName(raw) {
+      return String(raw || '').replace(/\s*담당$/, '').trim();
+    }
+
+    function getShortYear() {
+      return String(currentYear).slice(-2);
+    }
+
+    function getDaysInMonth(year = currentYear, month = currentMonth) {
+      return new Date(year, month, 0).getDate();
+    }
+
+    function getDayOfWeek(day, year = currentYear, month = currentMonth) {
+      const date = new Date(year, month - 1, day);
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      return days[date.getDay()];
+    }
+
+    function detectYearAndMonthFromTable(table) {
+      if (!table) return;
+      const texts = [];
+
+      if (Array.isArray(table.cols)) {
+        table.cols.forEach(col => {
+          if (col && col.label) texts.push(String(col.label));
+        });
+      }
+
+      if (Array.isArray(table.rows)) {
+        for (let r = 0; r < Math.min(table.rows.length, 5); r++) {
+          const cells = table.rows[r].c || [];
+          cells.forEach(cell => {
+            if (cell) {
+              const val = cell.v !== undefined && cell.v !== null ? String(cell.v) : (cell.f ? String(cell.f) : '');
+              if (val) texts.push(val);
+            }
+          });
+        }
+      }
+
+      for (const text of texts) {
+        const monthMatch = text.match(/(\d{1,2})\s*월\s*(?:누계|계획|목표|달성|실적|진척)/);
+        if (monthMatch) {
+          const m = parseInt(monthMatch[1], 10);
+          if (m >= 1 && m <= 12) {
+            currentMonth = m;
+            break;
+          }
+        }
+      }
+
+      for (const text of texts) {
+        if (text.includes('전년')) continue;
+        const yearMatch = text.match(/(\d{2,4})\s*년\s*(?:연?누계|연?목표)/);
+        if (yearMatch) {
+          let y = parseInt(yearMatch[1], 10);
+          if (y < 100) y += 2000;
+          if (y >= 2020 && y <= 2099) {
+            currentYear = y;
+            break;
+          }
+        }
+      }
+    }
+
+    function getRecentWeekendDays(day = currentDay) {
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+      const dow = new Date(currentYear, currentMonth - 1, day).getDay();
+      let fri, sat, sun;
+
+      if (dow === 5) {
+        fri = day; sat = day + 1; sun = day + 2;
+      } else if (dow === 6) {
+        fri = day - 1; sat = day; sun = day + 1;
+      } else if (dow === 0) {
+        fri = day - 2; sat = day - 1; sun = day;
+      } else {
+        const prevSun = day - dow;
+        if (prevSun >= 1) {
+          sun = prevSun; sat = prevSun - 1; fri = prevSun - 2;
+        } else {
+          fri = day + (5 - dow); sat = fri + 1; sun = fri + 2;
+        }
+      }
+
+      const validDays = [fri, sat, sun].filter(d => d >= 1 && d <= daysInMonth);
+      const rangeText = validDays.length > 1
+        ? `${validDays[0]}~${validDays[validDays.length - 1]}일`
+        : (validDays.length === 1 ? `${validDays[0]}일` : '');
+
+      return { fri, sat, sun, rangeText, daysInMonth };
+    }
+
+    const toMillion = (val) => {
+      const num = Number(val || 0) / 1000;
+      return num.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    };
+
+    const toMillionInt = (val) => {
+      const num = Math.round(Number(val || 0) / 1000);
+      return num.toLocaleString('ko-KR');
+    };
+
+    function getRateBadgeClass(rate) {
+      if (rate >= 100) return 'text-emerald-700 bg-emerald-50 border-emerald-200/80 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/60';
+      if (rate >= 80) return 'text-blue-700 bg-blue-50 border-blue-200/80 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800/60';
+      return 'text-rose-700 bg-rose-50 border-rose-200/80 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
+    }
+
+    function getGrowthBadgeClass(growth) {
+      if (growth > 0) return 'text-rose-700 bg-rose-50 border-rose-200/80 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/60';
+      if (growth < 0) return 'text-blue-700 bg-blue-50 border-blue-200/80 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800/60';
+      return 'text-slate-600 bg-slate-100 border-slate-200/80 dark:bg-slate-700/70 dark:text-slate-300 dark:border-slate-600/60';
+    }
+
+    function formatSignedPct(val) {
+      const num = Number(val || 0);
+      return `${num > 0 ? '+' : ''}${num.toFixed(1)}%`;
+    }
+
+    const toNum = (cell) => {
+      if (!cell) return 0;
+      let v = cell.v !== undefined && cell.v !== null ? cell.v : cell.f;
+      if (v === null || v === undefined || v === '') return 0;
+      if (typeof v === 'number') return v;
+      let s = String(v).replace(/,/g, '').replace(/%/g, '').trim();
+      let n = parseFloat(s);
+      return isNaN(n) ? 0 : n;
+    };
+
+    const toPct = (cell, actual, target, isGrowth = false) => {
+      if (cell) {
+        if (cell.f && typeof cell.f === 'string' && cell.f.includes('%')) {
+          const num = parseFloat(cell.f.replace(/,/g, '').replace(/%/g, '').trim());
+          if (!isNaN(num)) return Math.round(num * 10) / 10;
+        }
+        let v = cell.v;
+        if (v !== null && v !== undefined && v !== '') {
+          if (typeof v === 'string') v = parseFloat(v.replace(/,/g, '').replace(/%/g, '').trim());
+          if (!isNaN(v)) {
+            if (Math.abs(v) > 0 && Math.abs(v) <= 1.5 && (!cell.f || !String(cell.f).includes('.'))) {
+              v = v * 100;
+            }
+            return Math.round(v * 10) / 10;
+          }
+        }
+      }
+      if (actual !== undefined && target !== undefined && target > 0) {
+        return isGrowth ? Math.round(((actual - target) / target) * 1000) / 10 : Math.round((actual / target) * 1000) / 10;
+      }
+      return 0;
+    };
+
+    // 3. 샌드박스/차단 환경 대비 100개 매장 폴백 데이터 생성기
+    function activateFallbackData(showNotice = false) {
+      if (salesLoaded && targetsLoaded && dailyLoaded && summaryLoaded && !isUsingFallback) {
+        return;
+      }
+
+      isUsingFallback = true;
+      currentYear = 2026;
+      currentMonth = 11;
+      currentDay = 12;
+      latestDetectedDay = 12;
+
+      const branchGroups = [
+        {
+          branch: '서울',
+          codeStart: 1001,
+          managers: [
+            { sv: '신현호', names: ['강남역직영점', '잠실롯데점', '목동현대점', '역삼테헤란점', '서초교대점', '송파문정점', '강동천호점'] },
+            { sv: '문경영', names: ['노원역점', '미아사거리점', '수유역점', '성신여대점', '창동역점', '상계중계점', '도봉방학점'] },
+            { sv: '우경태', names: ['영등포타임점', '신도림디큐브점', '구로디지털점', '여의도IFC점', '당산역점', '가산마리오점'] },
+            { sv: '박형주', names: ['홍대입구직영점', '은평연신내점', '신촌현대점', '합정메세나점', '마포공덕점', '불광역점'] }
+          ]
+        },
+        {
+          branch: '경기',
+          codeStart: 2001,
+          managers: [
+            { sv: '신순호', names: ['용인보라직영점', '분당서현점', '수원인계점', '성남모란점', '판교알파돔점', '수지죽전점', '동탄센트럴점', '영통역점', '광교아브뉴점', '평택역점', '안성스타필드점', '오산운암점'] },
+            { sv: '이두원', names: ['일산라페스타점', '부천중동점', '안양범계점', '파주운정점', '김포구래점', '화정역점', '산본중심점', '광명철산점', '시흥배곧점', '안산중앙점', '의왕포일점'] },
+            { sv: '신현호', names: ['하남미사직영점', '구리돌다리점', '남양주다산점', '별내역점', '의정부중앙점', '양주옥정점', '포천송우점', '이천터미널점', '여주아울렛점', '광주경안점'] }
+          ]
+        },
+        {
+          branch: '강원',
+          codeStart: 3001,
+          managers: [
+            { sv: '김동하', names: ['춘천명동직영점', '원주단계점', '강릉중앙점', '춘천퇴계점', '원주혁신점', '강릉교동점', '홍천읍내점', '횡성중앙점', '영월역점', '평창진부점', '정선고한점', '철원동송점', '화천중앙점', '양구읍내점', '인제원통점'] },
+            { sv: '우경태', names: ['속초조양점', '양양읍내점', '고성거진점', '속초중앙점', '주문진항점', '강릉포남점', '춘천후평점', '원주무실점', '원주태장점', '춘천석사점', '강릉옥천점', '홍천남면점', '횡성둔내점'] },
+            { sv: '박형주', names: ['동해천곡점', '삼척남양점', '태백황지점', '동해북평점', '삼척도계점', '태백장성점', '동해묵호점', '삼척근덕점', '정선사북점', '영월상동점', '평창대화점', '강릉연곡점', '속초교동점'] }
+          ]
+        }
+      ];
+
+      const sampleSpecs = [];
+      branchGroups.forEach((bg, bIdx) => {
+        let localCounter = 0;
+        bg.managers.forEach((mg, mIdx) => {
+          mg.names.forEach((storeName, sIdx) => {
+            const seed = bIdx * 37 + mIdx * 13 + sIdx * 7;
+            const isDirect = storeName.includes('직영');
+            const baseScale = bg.branch === '서울' ? 1280 : (bg.branch === '경기' ? 1050 : 680);
+            const dayBase = Math.round(baseScale * (isDirect ? 1.32 : (0.76 + (seed % 45) / 100)));
+            const achieveRatio = 0.72 + ((seed * 11) % 42) / 100;
+            const targetBase = Math.round(dayBase / achieveRatio);
+            const growth = Math.round((((seed * 17) % 240) - 135)) / 10;
+            const yearGrowth = Math.round((((seed * 19) % 180) - 85)) / 10;
+            const custT = 22 + (seed % 28);
+            const custM = Math.max(8, Math.round(custT * (0.45 + ((seed * 13) % 75) / 100)));
+            const openY = 2017 + (seed % 7);
+            const openM = String(1 + (seed % 12)).padStart(2, '0');
+            const openD = String(1 + (seed % 27)).padStart(2, '0');
+
+            sampleSpecs.push({
+              branch: bg.branch,
+              code: `H${bg.codeStart + localCounter}`,
+              name: storeName,
+              sv: mg.sv,
+              openDate: `${openY}.${openM}.${openD}`,
+              dayBase,
+              targetBase,
+              growth,
+              yearGrowth,
+              custM,
+              custT
+            });
+            localCounter++;
+          });
+        });
+      });
+
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+      const dowMultipliers = [1.22, 0.80, 0.84, 0.86, 0.90, 1.16, 1.34];
+
+      currentStoreDB = sampleSpecs.map((spec, idx) => {
+        const dailySales = {};
+        const dailyTargets = {};
+        let monthActual = 0;
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dow = new Date(currentYear, currentMonth - 1, d).getDay();
+          const mult = dowMultipliers[dow];
+          const tVal = Math.round(spec.targetBase * mult);
+          dailyTargets[d] = tVal;
+
+          if (d <= currentDay) {
+            const jitter = 0.93 + (((idx * 7 + d * 13) % 15) / 100);
+            const sVal = Math.round(spec.dayBase * mult * jitter);
+            dailySales[d] = sVal;
+            monthActual += sVal;
+          } else {
+            dailySales[d] = 0;
+          }
+        }
+
+        const monthTarget = Object.values(dailyTargets).reduce((a, b) => a + b, 0);
+        const monthRatePlan = monthTarget > 0 ? Math.round((monthActual / monthTarget) * 1000) / 10 : 0;
+        const lastYearVal = Math.round(monthActual / (1 + spec.growth / 100));
+        const actual26Cum = Math.round(monthActual * 21.6);
+        const target26 = Math.round(monthTarget * 9.5);
+        const rate26Cum = target26 > 0 ? Math.round((actual26Cum / target26) * 1000) / 10 : 0;
+        const lastYearYear = Math.round(actual26Cum / (1 + spec.yearGrowth / 100));
+
+        return {
+          id: idx + 1,
+          branch: spec.branch,
+          code: spec.code,
+          name: spec.name,
+          sv: spec.sv,
+          openDate: spec.openDate,
+          dailySales,
+          dailyTargets,
+          custTargetMonth: spec.custT,
+          sheetMonthActual: monthActual,
+          monthActual,
+          monthTarget,
+          monthRatePlan,
+          monthCumTarget: 0,
+          monthCumRate: 0,
+          lastYearVal,
+          growthRate: spec.growth,
+          actual26Cum,
+          target26,
+          rate26Cum,
+          lastYearYear,
+          yearGrowthRate: spec.yearGrowth,
+          weekendMonthSum: 0,
+          weekdayMonthSum: 0,
+          weekendTargetSum: 0,
+          weekdayTargetSum: 0,
+          weekendShare: 0,
+          weekdayShare: 0,
+          newCustMonth: spec.custM,
+          newCustYear: spec.custM * 10 + 12,
+          totalCust: 620 + idx * 19,
+          custAchieveRate: spec.custT > 0 ? Math.round((spec.custM / spec.custT) * 1000) / 10 : 0
+        };
+      });
+
+      rawSummaryMap = { branches: {}, managers: {} };
+      recalculateDynamicStoreMetrics();
+
+      const icon = document.getElementById('refreshIcon');
+      const statusDot = document.getElementById('sheetStatusDot');
+      const statusLabel = document.getElementById('currentSheetLabel');
+
+      if (icon) icon.classList.remove('animate-spin');
+      if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+      if (statusLabel) statusLabel.innerText = '데이터 연동됨';
+
+      buildDayDropdown();
+      updateBranchView();
+
+      if (showNotice) {
+        showToast('미리보기 환경 제한으로 내장 실적 데이터를 표시합니다.');
+      }
+    }
+
+    // 4. 4개 시트 동시 JSONP 로드
+    function loadGoogleSheetData(isManual = false) {
+      const icon = document.getElementById('refreshIcon');
+      const statusDot = document.getElementById('sheetStatusDot');
+      const statusLabel = document.getElementById('currentSheetLabel');
+
+      if (icon) icon.classList.add('animate-spin');
+      if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+      if (statusLabel) statusLabel.innerText = '동기화중';
+
+      salesLoaded = false;
+      targetsLoaded = false;
+      dailyLoaded = false;
+      summaryLoaded = false;
+      isUsingFallback = false;
+
+      if (syncTimeoutId) clearTimeout(syncTimeoutId);
+      syncTimeoutId = setTimeout(() => {
+        if (!salesLoaded || !targetsLoaded || !dailyLoaded || !summaryLoaded) {
+          activateFallbackData(isManual);
+        }
+      }, 3500);
+
+      const sheets = [
+        { id: 'gviz_sales_script', handler: 'handleGoogleSheetSalesJSONP', tab: SALES_TAB_NAME },
+        { id: 'gviz_target_script', handler: 'handleGoogleSheetTargetsJSONP', tab: TARGET_TAB_NAME },
+        { id: 'gviz_daily_script', handler: 'handleGoogleSheetDailyJSONP', tab: DAILY_TAB_NAME },
+        { id: 'gviz_summary_script', handler: 'handleGoogleSheetSummaryJSONP', tab: SUMMARY_TAB_NAME }
+      ];
+
+      sheets.forEach(s => {
+        const oldScript = document.getElementById(s.id);
+        if (oldScript) oldScript.remove();
+        const script = document.createElement('script');
+        script.id = s.id;
+        script.src = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?headers=1&tqx=responseHandler:${s.handler}&sheet=${encodeURIComponent(s.tab)}&t=${Date.now()}`;
+        script.onerror = () => {
+          if (!isUsingFallback) {
+            activateFallbackData(isManual);
+          }
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    window.handleGoogleSheetSalesJSONP = function(response) {
+      try {
+        if (!response || !response.table || !response.table.rows) return;
+        detectYearAndMonthFromTable(response.table);
+
+        const rows = response.table.rows;
+        const cols = response.table.cols || [];
+        const parsed = [];
+        let day1ColIdx = 4;
+
+        cols.forEach((col, c) => {
+          if (col && col.label && String(col.label).trim() === '1일') day1ColIdx = c;
+        });
+
+        for (let r = 0; r < Math.min(rows.length, 3); r++) {
+          const cells = rows[r].c || [];
+          for (let c = 0; c < cells.length; c++) {
+            const val = cells[c] ? String(cells[c].v || cells[c].f || '') : '';
+            if (val.trim() === '1일') day1ColIdx = c;
+          }
+        }
+
+        const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+        const daySumMap = {};
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const getVal = (idx) => (cells[idx] && cells[idx].v !== null && cells[idx].v !== undefined) ? cells[idx].v : '';
+
+          const sName = String(getVal(2)).trim();
+          const sCode = String(getVal(1)).trim();
+
+          if (!sName || sName === '매장명' || sName === '매장' || sCode === '점코드' || sName.includes('계획') || sName.includes('합계') || sName.includes('소계')) {
+            continue;
+          }
+
+          const rawBranch = String(getVal(0)).trim();
+          const branch = rawBranch.replace('지점', '').trim() || '중부';
+          const code = sCode || `H${1000 + i}`;
+          const sv = cleanManagerName(getVal(3)) || '미지정';
+
+          const dailySales = {};
+          for (let d = 1; d <= 31; d++) {
+            const colIdx = day1ColIdx + (d - 1);
+            const salesVal = d <= daysInMonth ? toNum(cells[colIdx]) : 0;
+            dailySales[d] = salesVal;
+            if (d <= daysInMonth) {
+              daySumMap[d] = (daySumMap[d] || 0) + salesVal;
+            }
+          }
+
+          const baseOffset = day1ColIdx + 31;
+          const sheetMonthActual = toNum(cells[baseOffset]);
+          const monthTarget = toNum(cells[baseOffset + 1]);
+          const monthRatePlan = toPct(cells[baseOffset + 2], sheetMonthActual, monthTarget);
+
+          const lastYearVal = toNum(cells[baseOffset + 3]);
+          const growthRate = toPct(cells[baseOffset + 4], sheetMonthActual, lastYearVal, true);
+
+          const actual26Cum = toNum(cells[baseOffset + 5]);
+          const target26 = toNum(cells[baseOffset + 6]);
+          const rate26Cum = toPct(cells[baseOffset + 7], actual26Cum, target26);
+
+          const newCustMonth = parseInt(toNum(cells[baseOffset + 8])) || 0;
+          const newCustYear = parseInt(toNum(cells[baseOffset + 9])) || 0;
+          const totalCust = parseInt(toNum(cells[baseOffset + 10])) || 0;
+
+          parsed.push({
+            id: i + 1,
+            branch,
+            code,
+            name: sName,
+            sv,
+            openDate: '',
+            dailySales,
+            dailyTargets: {},
+            custTargetMonth: 0,
+            sheetMonthActual,
+            monthActual: sheetMonthActual,
+            monthTarget,
+            monthRatePlan,
+            monthCumTarget: 0,
+            monthCumRate: 0,
+            lastYearVal,
+            growthRate,
+            actual26Cum,
+            target26,
+            rate26Cum,
+            lastYearYear: 0,
+            yearGrowthRate: 0,
+            weekendMonthSum: 0,
+            weekdayMonthSum: 0,
+            weekendTargetSum: 0,
+            weekdayTargetSum: 0,
+            weekendShare: 0,
+            weekdayShare: 0,
+            newCustMonth,
+            newCustYear,
+            totalCust
+          });
+        }
+
+        let detectedLatestDay = 1;
+        for (let d = 1; d <= daysInMonth; d++) {
+          if ((daySumMap[d] || 0) >= 1000) {
+            detectedLatestDay = d;
+          }
+        }
+
+        rawSalesStores = parsed;
+        currentDay = detectedLatestDay;
+        latestDetectedDay = detectedLatestDay;
+        salesLoaded = true;
+        checkAndMergeSheets();
+      } catch (err) {
+        console.error('Sales sheet parse error:', err);
+      }
+    };
+
+    window.handleGoogleSheetTargetsJSONP = function(response) {
+      try {
+        if (!response || !response.table || !response.table.rows) {
+          targetsLoaded = true;
+          checkAndMergeSheets();
+          return;
+        }
+
+        const rows = response.table.rows;
+        const cols = response.table.cols || [];
+        const targetMap = {};
+        let day1ColIdx = 5;
+        let custTargetColIdx = 4;
+
+        cols.forEach((col, c) => {
+          const val = col && col.label ? String(col.label) : '';
+          if (val.includes('신규고객') || val.includes('고객 목표') || val.includes('고객목표') || val.includes('첫구매')) custTargetColIdx = c;
+          if (val.trim() === '1일') day1ColIdx = c;
+        });
+
+        for (let r = 0; r < Math.min(rows.length, 3); r++) {
+          const cells = rows[r].c || [];
+          for (let c = 0; c < cells.length; c++) {
+            const val = cells[c] ? String(cells[c].v || cells[c].f || '') : '';
+            if (val.includes('신규고객') || val.includes('고객 목표') || val.includes('고객목표') || val.includes('첫구매')) custTargetColIdx = c;
+            if (val.trim() === '1일') day1ColIdx = c;
+          }
+        }
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const getVal = (idx) => (cells[idx] && cells[idx].v !== null && cells[idx].v !== undefined) ? cells[idx].v : '';
+
+          const code = String(getVal(1)).trim();
+          const sName = String(getVal(2)).trim();
+          if (!code && !sName) continue;
+          if (sName === '매장명' || code === '점코드') continue;
+
+          const custTargetMonth = parseInt(toNum(cells[custTargetColIdx])) || 0;
+          const dayTargets = {};
+          for (let d = 1; d <= 31; d++) {
+            const colIdx = day1ColIdx + (d - 1);
+            dayTargets[d] = toNum(cells[colIdx]);
+          }
+
+          const targetObj = { custTargetMonth, dayTargets };
+          if (code) targetMap[code] = targetObj;
+          if (sName) targetMap[sName] = targetObj;
+        }
+
+        rawTargetMap = targetMap;
+        targetsLoaded = true;
+        checkAndMergeSheets();
+      } catch (err) {
+        console.error('Target sheet parse error:', err);
+        targetsLoaded = true;
+        checkAndMergeSheets();
+      }
+    };
+
+    window.handleGoogleSheetDailyJSONP = function(response) {
+      try {
+        if (!response || !response.table || !response.table.rows) {
+          dailyLoaded = true;
+          checkAndMergeSheets();
+          return;
+        }
+
+        detectYearAndMonthFromTable(response.table);
+
+        const rows = response.table.rows;
+        const dailyMap = {};
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const getVal = (idx) => (cells[idx] && cells[idx].v !== null && cells[idx].v !== undefined) ? cells[idx].v : '';
+          const getFmt = (idx) => (cells[idx] && (cells[idx].f || cells[idx].v !== null)) ? String(cells[idx].f || cells[idx].v).trim() : '';
+
+          const code = String(getVal(1)).trim();
+          const sName = String(getVal(2)).trim();
+          if (!code && !sName) continue;
+          if (sName === '매장명' || code === '점코드') continue;
+
+          const openDate = getFmt(4);
+          const sheetDayActual = toNum(cells[5]);
+          const sheetDayTarget = toNum(cells[6]);
+          const sheetDayRate = toPct(cells[7], sheetDayActual, sheetDayTarget);
+
+          const lastYearYear = toNum(cells[16]);
+          const yearGrowthRate = toPct(cells[17]);
+
+          const newCustMonth = parseInt(toNum(cells[23])) || 0;
+          const newCustYear = parseInt(toNum(cells[24])) || 0;
+          const totalCust = parseInt(toNum(cells[25])) || 0;
+
+          const obj = {
+            openDate,
+            sheetDayActual,
+            sheetDayTarget,
+            sheetDayRate,
+            lastYearYear,
+            yearGrowthRate,
+            newCustMonth,
+            newCustYear,
+            totalCust
+          };
+
+          if (code) dailyMap[code] = obj;
+          if (sName) dailyMap[sName] = obj;
+        }
+
+        rawDailyMap = dailyMap;
+        dailyLoaded = true;
+        checkAndMergeSheets();
+      } catch (err) {
+        console.error('Daily sheet parse error:', err);
+        dailyLoaded = true;
+        checkAndMergeSheets();
+      }
+    };
+
+    window.handleGoogleSheetSummaryJSONP = function(response) {
+      try {
+        if (!response || !response.table || !response.table.rows) {
+          summaryLoaded = true;
+          checkAndMergeSheets();
+          return;
+        }
+
+        detectYearAndMonthFromTable(response.table);
+
+        const rows = response.table.rows;
+        const summaryMap = { branches: {}, managers: {} };
+        let isManagerSection = false;
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const getVal = (idx) => (cells[idx] && cells[idx].v !== null && cells[idx].v !== undefined) ? cells[idx].v : '';
+          const name = String(getVal(0)).trim();
+          if (!name) continue;
+
+          if (name.includes('담당자')) {
+            isManagerSection = true;
+            continue;
+          }
+          if (name.includes('구분')) continue;
+
+          if (!isManagerSection) {
+            const key = name.replace('지점', '').replace(' 합산', '').replace('영업팀', '').trim();
+            summaryMap.branches[key] = {
+              rawName: name,
+              storeCount: parseInt(toNum(cells[1])) || 0,
+              dayActual: toNum(cells[2]),
+              dayTarget: toNum(cells[3]),
+              dayRate: toPct(cells[4]),
+              monthActual: toNum(cells[5]),
+              monthCumTarget: toNum(cells[6]),
+              monthCumRate: toPct(cells[7]),
+              lastYearMonth: toNum(cells[8]),
+              growthRateMonth: toPct(cells[9]),
+              yearActual: toNum(cells[10]),
+              yearTarget: toNum(cells[11]),
+              yearRate: toPct(cells[12]),
+              lastYearYear: toNum(cells[13]),
+              growthRateYear: toPct(cells[14]),
+              monthFullTarget: toNum(cells[15]),
+              monthProgressRate: toPct(cells[16])
+            };
+          } else {
+            const cleanName = cleanManagerName(name);
+            summaryMap.managers[cleanName] = {
+              name: cleanName,
+              storeCount: parseInt(toNum(cells[1])) || 0,
+              dayActual: toNum(cells[2]),
+              monthActual: toNum(cells[3]),
+              rate: toPct(cells[4]),
+              growth: toPct(cells[5])
+            };
+          }
+        }
+
+        rawSummaryMap = summaryMap;
+        summaryLoaded = true;
+        checkAndMergeSheets();
+      } catch (err) {
+        console.error('Summary sheet parse error:', err);
+        summaryLoaded = true;
+        checkAndMergeSheets();
+      }
+    };
+
+    // 5. 선택된 날짜 기준 동적 지표 재계산
+    function recalculateDynamicStoreMetrics() {
+      const isLatestDay = (currentDay === latestDetectedDay);
+
+      currentStoreDB.forEach(s => {
+        let cumSales = 0;
+        let cumTarget = 0;
+        let weekendMonthSum = 0;
+        let weekdayMonthSum = 0;
+        let weekendTargetSum = 0;
+        let weekdayTargetSum = 0;
+
+        for (let d = 1; d <= currentDay; d++) {
+          const salesVal = (s.dailySales && s.dailySales[d]) ? s.dailySales[d] : 0;
+          const targetVal = (s.dailyTargets && s.dailyTargets[d]) ? s.dailyTargets[d] : 0;
+          cumSales += salesVal;
+          cumTarget += targetVal;
+
+          const dow = new Date(currentYear, currentMonth - 1, d).getDay();
+          if (dow === 0 || dow === 5 || dow === 6) {
+            weekendMonthSum += salesVal;
+            weekendTargetSum += targetVal;
+          } else {
+            weekdayMonthSum += salesVal;
+            weekdayTargetSum += targetVal;
+          }
+        }
+
+        s.monthActual = isLatestDay ? s.sheetMonthActual : (cumSales > 0 ? cumSales : s.sheetMonthActual);
+        s.monthCumTarget = cumTarget;
+        s.monthCumRate = cumTarget > 0 ? Math.round((s.monthActual / cumTarget) * 1000) / 10 : 0;
+        s.monthRatePlan = s.monthTarget > 0 ? Math.round((s.monthActual / s.monthTarget) * 1000) / 10 : s.monthRatePlan;
+
+        s.weekendMonthSum = weekendMonthSum;
+        s.weekdayMonthSum = weekdayMonthSum;
+        s.weekendTargetSum = weekendTargetSum;
+        s.weekdayTargetSum = weekdayTargetSum;
+
+        const totalCalculated = (weekendMonthSum + weekdayMonthSum) > 0 ? (weekendMonthSum + weekdayMonthSum) : s.monthActual;
+        s.weekendShare = totalCalculated > 0 ? Math.round((weekendMonthSum / totalCalculated) * 1000) / 10 : 0;
+        s.weekdayShare = totalCalculated > 0 ? Math.round((weekdayMonthSum / totalCalculated) * 1000) / 10 : 0;
+        s.custAchieveRate = s.custTargetMonth > 0 ? Math.round((s.newCustMonth / s.custTargetMonth) * 1000) / 10 : 0;
+      });
+    }
+
+    // 6. 4개 시트 병합
+    function checkAndMergeSheets() {
+      if (!salesLoaded || !targetsLoaded || !dailyLoaded || !summaryLoaded) return;
+
+      if (syncTimeoutId) clearTimeout(syncTimeoutId);
+      isUsingFallback = false;
+
+      const icon = document.getElementById('refreshIcon');
+      const statusDot = document.getElementById('sheetStatusDot');
+      const statusLabel = document.getElementById('currentSheetLabel');
+
+      if (icon) icon.classList.remove('animate-spin');
+
+      if (rawSalesStores.length === 0) {
+        activateFallbackData(false);
+        return;
+      }
+
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+      const dayTotals = {};
+
+      rawSalesStores.forEach(s => {
+        const t = rawTargetMap[s.code] || rawTargetMap[s.name];
+        if (t && t.dayTargets) {
+          s.dailyTargets = t.dayTargets;
+          s.custTargetMonth = t.custTargetMonth || 0;
+        } else {
+          const avgTarget = Math.round(s.monthTarget / daysInMonth);
+          s.dailyTargets = {};
+          for (let d = 1; d <= daysInMonth; d++) s.dailyTargets[d] = avgTarget;
+          s.custTargetMonth = 0;
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+          const salesVal = (s.dailySales && s.dailySales[d]) ? s.dailySales[d] : 0;
+          dayTotals[d] = (dayTotals[d] || 0) + salesVal;
+        }
+
+        const dInfo = rawDailyMap[s.code] || rawDailyMap[s.name];
+        if (dInfo) {
+          s.openDate = dInfo.openDate || '';
+          s.lastYearYear = dInfo.lastYearYear || 0;
+          s.yearGrowthRate = dInfo.yearGrowthRate !== undefined
+            ? dInfo.yearGrowthRate
+            : (s.lastYearYear > 0 ? Math.round(((s.actual26Cum - s.lastYearYear) / s.lastYearYear) * 1000) / 10 : 0);
+
+          if (dInfo.newCustMonth !== undefined) s.newCustMonth = dInfo.newCustMonth;
+          if (dInfo.newCustYear !== undefined) s.newCustYear = dInfo.newCustYear;
+          if (dInfo.totalCust !== undefined) s.totalCust = dInfo.totalCust;
+        }
+
+        s.custAchieveRate = s.custTargetMonth > 0
+          ? Math.round((s.newCustMonth / s.custTargetMonth) * 1000) / 10
+          : 0;
+      });
+
+      let latestActiveDay = 1;
+      for (let d = 1; d <= daysInMonth; d++) {
+        if ((dayTotals[d] || 0) >= 1000) {
+          latestActiveDay = d;
+        }
+      }
+
+      currentDay = Math.min(latestActiveDay, daysInMonth);
+      latestDetectedDay = currentDay;
+      currentStoreDB = rawSalesStores;
+
+      recalculateDynamicStoreMetrics();
+
+      if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+      if (statusLabel) statusLabel.innerText = '실시간 연동';
+
+      buildDayDropdown();
+      updateBranchView();
+    }
+
+    function buildDayDropdown() {
+      const select = document.getElementById('day-select-dropdown');
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+      if (currentDay > daysInMonth) currentDay = daysInMonth;
+
+      select.innerHTML = '';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow = getDayOfWeek(d);
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.innerText = `${currentMonth}월 ${d}일 (${dow})`;
+        if (d === currentDay) opt.selected = true;
+        select.appendChild(opt);
+      }
+    }
+
+    // 7. 지점 / 권역별 통계 집계
+    function getBranchStats(branchName) {
+      const stores = branchName === '중부' ? currentStoreDB : currentStoreDB.filter(s => s.branch === branchName);
+      const sumInfo = rawSummaryMap.branches ? rawSummaryMap.branches[branchName] : null;
+      const isLatestDay = (currentDay === latestDetectedDay);
+
+      let dayActual = 0, dayTarget = 0;
+      let monthActual = 0, monthCumTarget = 0, monthFullTarget = 0, lastYearVal = 0;
+      let yearActual = 0, yearTarget = 0, lastYearYearSum = 0;
+      let weekendTotal = 0, weekdayTotal = 0;
+      let weekendTargetTotal = 0, weekdayTargetTotal = 0;
+      let totalNewCustMonth = 0, totalNewCustYear = 0, totalCustTarget = 0;
+
+      const managerMap = {};
+
+      stores.forEach(s => {
+        const curDaySales = (s.dailySales && s.dailySales[currentDay]) ? s.dailySales[currentDay] : 0;
+        const curDayTarget = (s.dailyTargets && s.dailyTargets[currentDay]) ? s.dailyTargets[currentDay] : 0;
+
+        dayActual += curDaySales;
+        dayTarget += curDayTarget;
+
+        monthActual += (s.monthActual || 0);
+        monthCumTarget += (s.monthCumTarget || 0);
+        monthFullTarget += (s.monthTarget || 0);
+        lastYearVal += (s.lastYearVal || 0);
+        yearActual += (s.actual26Cum || 0);
+        yearTarget += (s.target26 || 0);
+        lastYearYearSum += (s.lastYearYear || 0);
+
+        totalNewCustMonth += (s.newCustMonth || 0);
+        totalNewCustYear += (s.newCustYear || 0);
+        totalCustTarget += (s.custTargetMonth || 0);
+
+        weekendTotal += (s.weekendMonthSum || 0);
+        weekdayTotal += (s.weekdayMonthSum || 0);
+        weekendTargetTotal += (s.weekendTargetSum || 0);
+        weekdayTargetTotal += (s.weekdayTargetSum || 0);
+
+        const mgrKey = branchName === '중부' ? `${s.branch}지점` : s.sv;
+        if (!managerMap[mgrKey]) {
+          managerMap[mgrKey] = {
+            name: mgrKey,
+            storeCount: 0,
+            actual: 0,
+            cumTarget: 0,
+            fullTarget: 0,
+            dayActual: 0,
+            dayTarget: 0,
+            lastYear: 0,
+            custActual: 0,
+            custTarget: 0
+          };
+        }
+        managerMap[mgrKey].storeCount++;
+        managerMap[mgrKey].actual += (s.monthActual || 0);
+        managerMap[mgrKey].cumTarget += (s.monthCumTarget || 0);
+        managerMap[mgrKey].fullTarget += (s.monthTarget || 0);
+        managerMap[mgrKey].dayActual += curDaySales;
+        managerMap[mgrKey].dayTarget += curDayTarget;
+        managerMap[mgrKey].lastYear += (s.lastYearVal || 0);
+        managerMap[mgrKey].custActual += (s.newCustMonth || 0);
+        managerMap[mgrKey].custTarget += (s.custTargetMonth || 0);
+      });
+
+      let dayRate = dayTarget > 0 ? Math.round((dayActual / dayTarget) * 1000) / 10 : 0;
+      let monthCumRate = monthCumTarget > 0 ? Math.round((monthActual / monthCumTarget) * 1000) / 10 : 0;
+      let monthProgressRate = monthFullTarget > 0 ? Math.round((monthActual / monthFullTarget) * 1000) / 10 : 0;
+      let growthRateMonth = lastYearVal > 0 ? Math.round(((monthActual - lastYearVal) / lastYearVal) * 1000) / 10 : 0;
+      let yearCumRate = yearTarget > 0 ? Math.round((yearActual / yearTarget) * 1000) / 10 : 0;
+      let lastYearYear = lastYearYearSum;
+      let growthRateYear = lastYearYearSum > 0 ? Math.round(((yearActual - lastYearYearSum) / lastYearYearSum) * 1000) / 10 : 0;
+
+      if (sumInfo) {
+        if (isLatestDay) {
+          dayActual = sumInfo.dayActual || dayActual;
+          dayTarget = sumInfo.dayTarget || dayTarget;
+          dayRate = sumInfo.dayRate || dayRate;
+
+          monthActual = sumInfo.monthActual || monthActual;
+          monthCumTarget = sumInfo.monthCumTarget || monthCumTarget;
+          monthCumRate = sumInfo.monthCumRate || monthCumRate;
+          monthFullTarget = sumInfo.monthFullTarget || monthFullTarget;
+          monthProgressRate = sumInfo.monthProgressRate || monthProgressRate;
+
+          lastYearVal = sumInfo.lastYearMonth || lastYearVal;
+          growthRateMonth = sumInfo.growthRateMonth !== undefined ? sumInfo.growthRateMonth : growthRateMonth;
+        }
+
+        yearActual = sumInfo.yearActual || yearActual;
+        yearTarget = sumInfo.yearTarget || yearTarget;
+        yearCumRate = sumInfo.yearRate || yearCumRate;
+        lastYearYear = sumInfo.lastYearYear || lastYearYear;
+        growthRateYear = sumInfo.growthRateYear !== undefined ? sumInfo.growthRateYear : growthRateYear;
+      }
+
+      const totalSplit = (weekendTotal + weekdayTotal) > 0 ? (weekendTotal + weekdayTotal) : monthActual;
+      const weekendRate = totalSplit > 0 ? (weekendTotal / totalSplit) * 100 : 0;
+      const weekdayRate = totalSplit > 0 ? (weekdayTotal / totalSplit) * 100 : 0;
+
+      let managers = [];
+      if (branchName === '중부') {
+        const branchKeys = ['서울', '경기', '강원'];
+        managers = branchKeys.map(k => {
+          const bInfo = rawSummaryMap.branches ? rawSummaryMap.branches[k] : null;
+          const fallback = managerMap[`${k}지점`] || { storeCount: 0, actual: 0, dayActual: 0, cumTarget: 0, dayTarget: 0, lastYear: 0, custActual: 0, custTarget: 0 };
+          const dActual = (isLatestDay && bInfo) ? bInfo.dayActual : fallback.dayActual;
+          const dRate = (isLatestDay && bInfo) ? bInfo.dayRate : (fallback.dayTarget > 0 ? Math.round((fallback.dayActual / fallback.dayTarget) * 1000) / 10 : 0);
+          const mActual = (isLatestDay && bInfo) ? bInfo.monthActual : fallback.actual;
+          const mRate = (isLatestDay && bInfo) ? bInfo.monthCumRate : (fallback.cumTarget > 0 ? Math.round((fallback.actual / fallback.cumTarget) * 1000) / 10 : 0);
+          const mGrowth = (isLatestDay && bInfo && bInfo.growthRateMonth !== undefined)
+            ? bInfo.growthRateMonth
+            : (fallback.lastYear > 0 ? Math.round(((fallback.actual - fallback.lastYear) / fallback.lastYear) * 1000) / 10 : 0);
+
+          return {
+            name: `${k}지점`,
+            storeCount: bInfo ? bInfo.storeCount : fallback.storeCount,
+            actual: mActual,
+            rate: mRate,
+            dayActual: dActual,
+            dayRate: dRate,
+            growth: mGrowth,
+            custActual: fallback.custActual,
+            custTarget: fallback.custTarget
+          };
+        });
+      } else {
+        const orderList = SV_ORDER_MAP[branchName] || Object.keys(managerMap);
+
+        managers = orderList.map(mgrName => {
+          const m = managerMap[mgrName];
+          if (!m || m.storeCount === 0) return null;
+
+          const sMgr = rawSummaryMap.managers ? rawSummaryMap.managers[mgrName] : null;
+          const useSummaryMgr = sMgr && sMgr.storeCount === m.storeCount && isLatestDay;
+
+          const rate = useSummaryMgr ? sMgr.rate : (m.cumTarget > 0 ? Math.round((m.actual / m.cumTarget) * 1000) / 10 : 0);
+          const dayRate = m.dayTarget > 0 ? Math.round((m.dayActual / m.dayTarget) * 1000) / 10 : 0;
+          const growth = useSummaryMgr ? sMgr.growth : (m.lastYear > 0 ? Math.round(((m.actual - m.lastYear) / m.lastYear) * 1000) / 10 : 0);
+
+          return {
+            name: mgrName,
+            storeCount: m.storeCount,
+            actual: useSummaryMgr ? sMgr.monthActual : m.actual,
+            target: m.cumTarget,
+            rate,
+            dayActual: useSummaryMgr ? sMgr.dayActual : m.dayActual,
+            dayTarget: m.dayTarget,
+            dayRate,
+            growth,
+            custActual: m.custActual,
+            custTarget: m.custTarget
+          };
+        }).filter(Boolean);
+
+        Object.keys(managerMap).forEach(mgrName => {
+          if (!orderList.includes(mgrName) && managerMap[mgrName].storeCount > 0) {
+            const m = managerMap[mgrName];
+            const rate = m.cumTarget > 0 ? Math.round((m.actual / m.cumTarget) * 1000) / 10 : 0;
+            const dayRate = m.dayTarget > 0 ? Math.round((m.dayActual / m.dayTarget) * 1000) / 10 : 0;
+            const growth = m.lastYear > 0 ? Math.round(((m.actual - m.lastYear) / m.lastYear) * 1000) / 10 : 0;
+            managers.push({
+              name: mgrName,
+              storeCount: m.storeCount,
+              actual: m.actual,
+              target: m.cumTarget,
+              rate,
+              dayActual: m.dayActual,
+              dayTarget: m.dayTarget,
+              dayRate,
+              growth,
+              custActual: m.custActual,
+              custTarget: m.custTarget
+            });
+          }
+        });
+      }
+
+      return {
+        name: BRANCH_TITLE_MAP[branchName] || `${branchName}지점`,
+        storeCount: sumInfo ? sumInfo.storeCount : stores.length,
+        kpi: {
+          dayActual, dayTarget, dayRate,
+          monthActual, monthCumTarget, monthCumRate,
+          monthFullTarget, monthProgressRate,
+          growthRateMonth, lastYearVal,
+          yearActual, yearTarget, yearCumRate,
+          lastYearYear, growthRateYear,
+          weekendTotal, weekdayTotal, weekendRate, weekdayRate,
+          weekendTargetTotal, weekdayTargetTotal,
+          totalNewCustMonth, totalNewCustYear, totalCustTarget
+        },
+        managers
+      };
+    }
+
+    // 8. 전체 뷰 업데이트
+    function updateBranchView() {
+      recalculateDynamicStoreMetrics();
+
+      const stats = getBranchStats(currentBranch);
+      const kpi = stats.kpi;
+      const dayOfWeek = getDayOfWeek(currentDay);
+      const shortYear = getShortYear();
+      const padMonth = String(currentMonth).padStart(2, '0');
+      const padDay = String(currentDay).padStart(2, '0');
+
+      document.getElementById('current-date-text').innerText = `${currentYear}.${padMonth}.${padDay} (${dayOfWeek}) 마감`;
+      document.getElementById('branch-store-count').innerText = `${stats.storeCount}개점`;
+      document.getElementById('chip-all-count').innerText = stats.storeCount;
+
+      const daySelect = document.getElementById('day-select-dropdown');
+      if (daySelect && daySelect.value != currentDay) {
+        daySelect.value = currentDay;
+      }
+
+      // KPI 1: 당일 매출
+      document.getElementById('hero-branch-badge').innerText = stats.name;
+      document.getElementById('hero-day-label').innerText = `당일 매출 (${currentDay}일)`;
+      document.getElementById('hero-day-rate-badge').innerText = `${kpi.dayRate.toFixed(1)}% 달성`;
+      document.getElementById('hero-day-actual').innerText = toMillion(kpi.dayActual);
+      document.getElementById('hero-day-target').innerText = `${toMillion(kpi.dayTarget)}백만`;
+
+      const dayDiff = (kpi.dayActual - kpi.dayTarget) / 1000;
+      const heroDiffEl = document.getElementById('hero-day-diff');
+      if (dayDiff >= 0) {
+        heroDiffEl.innerText = `+${dayDiff.toFixed(1)}백만 초과`;
+        heroDiffEl.className = 'font-extrabold text-amber-300';
+      } else {
+        heroDiffEl.innerText = `${dayDiff.toFixed(1)}백만 미달`;
+        heroDiffEl.className = 'font-extrabold text-rose-300';
+      }
+
+      // KPI 2: 당월 누계
+      document.getElementById('strip-month-label').innerText = `${currentMonth}월 누계`;
+      document.getElementById('strip-month-actual').innerText = toMillionInt(kpi.monthActual);
+
+      const mAchieveBadge = document.getElementById('strip-month-achieve-badge');
+      mAchieveBadge.innerText = `${kpi.monthCumRate.toFixed(1)}% 달성`;
+      mAchieveBadge.className = `text-[11px] font-extrabold px-2 py-0.5 rounded-md border whitespace-nowrap ${getRateBadgeClass(kpi.monthCumRate)}`;
+
+      const mGrowthBadge = document.getElementById('strip-month-growth-badge');
+      mGrowthBadge.innerText = `${formatSignedPct(kpi.growthRateMonth)} 신장`;
+      mGrowthBadge.className = `text-[11px] font-extrabold px-2 py-0.5 rounded-md border whitespace-nowrap ${getGrowthBadgeClass(kpi.growthRateMonth)}`;
+
+      document.getElementById('detail-month-progress').innerText = `월진척 ${kpi.monthProgressRate.toFixed(1)}%`;
+      document.getElementById('detail-month-target').innerText = `${toMillionInt(kpi.monthCumTarget)}백만`;
+      const monthDiff = Math.round((kpi.monthActual - kpi.monthCumTarget) / 1000);
+      const dMonthDiff = document.getElementById('detail-month-diff');
+      dMonthDiff.innerText = `${monthDiff >= 0 ? '+' : ''}${monthDiff.toLocaleString('ko-KR')}백만`;
+      dMonthDiff.className = `font-extrabold ${monthDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`;
+
+      // KPI 3: 연간 누계
+      document.getElementById('strip-year-label').innerText = `${shortYear}년 연누계`;
+      document.getElementById('strip-year-actual').innerText = toMillionInt(kpi.yearActual);
+
+      const yAchieveBadge = document.getElementById('strip-year-achieve-badge');
+      yAchieveBadge.innerText = `${kpi.yearCumRate.toFixed(1)}% 달성`;
+      yAchieveBadge.className = `text-[11px] font-extrabold px-2 py-0.5 rounded-md border whitespace-nowrap ${getRateBadgeClass(kpi.yearCumRate)}`;
+
+      const yGrowthBadge = document.getElementById('strip-year-growth-badge');
+      yGrowthBadge.innerText = `${formatSignedPct(kpi.growthRateYear)} 신장`;
+      yGrowthBadge.className = `text-[11px] font-extrabold px-2 py-0.5 rounded-md border whitespace-nowrap ${getGrowthBadgeClass(kpi.growthRateYear)}`;
+
+      document.getElementById('detail-year-target').innerText = `${toMillionInt(kpi.yearTarget)}백만`;
+      const yearDiff = Math.round((kpi.yearActual - kpi.yearTarget) / 1000);
+      const dYearDiff = document.getElementById('detail-year-diff');
+      dYearDiff.innerText = `${yearDiff >= 0 ? '+' : ''}${yearDiff.toLocaleString('ko-KR')}백만`;
+      dYearDiff.className = `font-extrabold ${yearDiff >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`;
+
+      // KPI 4: 주말·평일 비중 & 첫구매(신규고객)
+      document.getElementById('kpi-weekend-pct').innerText = `${kpi.weekendRate.toFixed(1)}%`;
+      document.getElementById('kpi-weekday-pct').innerText = `${kpi.weekdayRate.toFixed(1)}%`;
+      document.getElementById('kpi-weekend-bar').style.width = `${Math.min(kpi.weekendRate, 100)}%`;
+      document.getElementById('kpi-weekday-bar').style.width = `${Math.min(kpi.weekdayRate, 100)}%`;
+      document.getElementById('kpi-weekend-val').innerText = `${toMillionInt(kpi.weekendTotal)}백만`;
+      document.getElementById('kpi-weekday-val').innerText = `${toMillionInt(kpi.weekdayTotal)}백만`;
+
+      document.getElementById('kpi-cust-actual').innerText = `${kpi.totalNewCustMonth.toLocaleString('ko-KR')}명`;
+      document.getElementById('kpi-cust-target').innerText = `${kpi.totalCustTarget.toLocaleString('ko-KR')}명`;
+      const custRate = kpi.totalCustTarget > 0 ? (kpi.totalNewCustMonth / kpi.totalCustTarget) * 100 : 0;
+      document.getElementById('kpi-cust-rate').innerText = kpi.totalCustTarget > 0 ? `${custRate.toFixed(1)}% 달성` : '-';
+
+      // 섹션 2: 지점 · 담당별 요약
+      const summaryTitle = document.getElementById('summary-section-title');
+      summaryTitle.innerHTML = currentBranch === '중부'
+        ? `<i class="ph-fill ph-buildings text-blue-600 dark:text-blue-400"></i><span>지점별 실적 요약 (${stats.storeCount}개점)</span>`
+        : `<i class="ph-fill ph-users-three text-blue-600 dark:text-blue-400"></i><span>${stats.name} 담당별 요약 (${stats.storeCount}개점)</span>`;
+
+      const resetBtn = document.getElementById('reset-sv-filter');
+      if (currentSvFilter) {
+        resetBtn.classList.remove('hidden');
+      } else {
+        resetBtn.classList.add('hidden');
+      }
+
+      const gridContainer = document.getElementById('summary-card-grid');
+      if (stats.managers.length >= 4) {
+        gridContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5';
+      } else {
+        gridContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5';
+      }
+
+      if (stats.managers.length === 0) {
+        gridContainer.innerHTML = `<div class="col-span-full py-6 text-center text-xs text-slate-400">요약 데이터가 없습니다.</div>`;
+      } else {
+        gridContainer.innerHTML = stats.managers.map(m => {
+          const isSelected = currentSvFilter === m.name;
+          const growthBadge = getGrowthBadgeClass(m.growth);
+          const monthAchieveColor = m.rate >= 100
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : (m.rate >= 80 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400');
+          const dayAchieveColor = m.dayRate >= 100
+            ? 'text-emerald-600 dark:text-emerald-400'
+            : (m.dayRate >= 80 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-600 dark:text-rose-400');
+          const custPct = m.custTarget > 0 ? ((m.custActual / m.custTarget) * 100).toFixed(1) : '-';
+
+          return `
+            <div data-sv="${m.name}"
+                 class="sv-filter-btn cursor-pointer rounded-xl p-3 border transition-all flex flex-col justify-between ${
+                   isSelected
+                     ? 'bg-blue-50/90 dark:bg-blue-950/50 border-blue-600 ring-2 ring-blue-500/20 shadow-xs'
+                     : 'bg-slate-50/70 dark:bg-slate-800/70 border-slate-200/80 dark:border-slate-700/80 hover:border-blue-400 hover:bg-white dark:hover:bg-slate-800'
+                 }">
+              <div class="flex items-center justify-between gap-1.5 whitespace-nowrap">
+                <div class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-[13px] font-black text-slate-900 dark:text-white truncate">${m.name}</span>
+                  <span class="text-[10.5px] font-bold px-1.5 py-0.5 rounded bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/70 dark:border-slate-600 shrink-0">${m.storeCount}개점</span>
+                </div>
+                <span class="text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border shrink-0 ${growthBadge}">
+                  ${formatSignedPct(m.growth)} 신장
+                </span>
+              </div>
+
+              <div class="mt-2.5 pt-2 border-t border-slate-200/70 dark:border-slate-700/70 space-y-1 text-xs whitespace-nowrap">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500 dark:text-slate-400 font-semibold">당월 누계</span>
+                  <div>
+                    <strong class="font-black text-slate-900 dark:text-white">${toMillion(m.actual)}백만</strong>
+                    <span class="font-extrabold ${monthAchieveColor} ml-1">(${m.rate.toFixed(1)}%)</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500 dark:text-slate-400 font-semibold">당일 실적</span>
+                  <div>
+                    <strong class="font-black text-blue-600 dark:text-blue-400">${toMillion(m.dayActual)}백만</strong>
+                    <span class="font-extrabold ${dayAchieveColor} ml-1">(${m.dayRate.toFixed(1)}%)</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500 dark:text-slate-400 font-semibold">당월 첫구매</span>
+                  <div>
+                    <strong class="font-extrabold text-amber-600 dark:text-amber-400">${m.custActual}명</strong>
+                    <span class="text-[11px] text-slate-400 ml-0.5">/ ${m.custTarget}명 (${custPct}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        gridContainer.querySelectorAll('.sv-filter-btn').forEach(card => {
+          card.addEventListener('click', () => {
+            const sv = card.getAttribute('data-sv');
+            if (currentSvFilter === sv) {
+              currentSvFilter = null;
+              showToast('전체 매장으로 필터가 해제되었습니다.');
+            } else {
+              currentSvFilter = sv;
+              showToast(`${sv} 매장만 필터링합니다.`);
+            }
+            updateBranchView();
+          });
+        });
+      }
+
+      renderTable();
+    }
+
+    // 9. 매장 필터링 & 정렬
+    function getFilteredData() {
+      let data = currentBranch === '중부' ? [...currentStoreDB] : currentStoreDB.filter(s => s.branch === currentBranch);
+
+      if (searchQuery.trim() !== '') {
+        const q = searchQuery.toLowerCase().trim();
+        data = data.filter(s =>
+          s.name.toLowerCase().includes(q) ||
+          s.code.toLowerCase().includes(q) ||
+          s.sv.toLowerCase().includes(q)
+        );
+      }
+
+      if (currentSvFilter) {
+        if (currentBranch === '중부') {
+          const branchTarget = currentSvFilter.replace('지점', '').trim();
+          data = data.filter(s => s.branch === branchTarget);
+        } else {
+          data = data.filter(s => s.sv === currentSvFilter);
+        }
+      }
+
+      if (currentFilter === 'OVER_100') {
+        data = data.filter(s => s.monthCumRate > 100);
+      } else if (currentFilter === 'OVER_80') {
+        data = data.filter(s => s.monthCumRate >= 80 && s.monthCumRate <= 100);
+      } else if (currentFilter === 'UNDER_80') {
+        data = data.filter(s => s.monthCumRate < 80);
+      }
+
+      data.sort((a, b) => {
+        const aDaySales = (a.dailySales && a.dailySales[currentDay]) ? a.dailySales[currentDay] : 0;
+        const bDaySales = (b.dailySales && b.dailySales[currentDay]) ? b.dailySales[currentDay] : 0;
+
+        if (currentSort === 'month_desc') return b.monthActual - a.monthActual;
+        if (currentSort === 'month_asc') return a.monthActual - b.monthActual;
+        if (currentSort === 'daily_desc') return bDaySales - aDaySales;
+        if (currentSort === 'daily_asc') return aDaySales - bDaySales;
+        if (currentSort === 'achieve_desc') return b.monthCumRate - a.monthCumRate;
+        if (currentSort === 'achieve_asc') return a.monthCumRate - b.monthCumRate;
+        if (currentSort === 'growth_desc') return b.growthRate - a.growthRate;
+        if (currentSort === 'growth_asc') return a.growthRate - b.growthRate;
+        if (currentSort === 'year_desc') return b.actual26Cum - a.actual26Cum;
+        if (currentSort === 'year_asc') return a.actual26Cum - b.actual26Cum;
+        if (currentSort === 'year_achieve_desc') return b.rate26Cum - a.rate26Cum;
+        if (currentSort === 'year_achieve_asc') return a.rate26Cum - b.rate26Cum;
+        if (currentSort === 'year_growth_desc') return (b.yearGrowthRate || 0) - (a.yearGrowthRate || 0);
+        if (currentSort === 'year_growth_asc') return (a.yearGrowthRate || 0) - (b.yearGrowthRate || 0);
+        if (currentSort === 'cust_desc') return b.newCustMonth - a.newCustMonth;
+        if (currentSort === 'cust_asc') return a.newCustMonth - b.newCustMonth;
+        return 0;
+      });
+
+      return data;
+    }
+
+    function toggleColumnSort(field) {
+      const descKey = `${field}_desc`;
+      const ascKey = `${field}_asc`;
+      currentSort = (currentSort === descKey) ? ascKey : descKey;
+      const sortSelect = document.getElementById('sort-select');
+      if (sortSelect && [...sortSelect.options].some(o => o.value === currentSort)) {
+        sortSelect.value = currentSort;
+      }
+      renderTable();
+    }
+
+    // 10. 일 · 월 · 연 구분 15컬럼 고밀도 테이블 렌더링
+    function renderTable() {
+      const data = getFilteredData();
+      document.getElementById('match-count').innerText = data.length;
+      const tbody = document.getElementById('store-table-body');
+
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="15" class="py-16 text-center text-slate-400 text-xs">일치하는 매장 데이터가 없습니다.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map((s, idx) => {
+        const curDaySales = (s.dailySales && s.dailySales[currentDay]) ? s.dailySales[currentDay] : 0;
+        const curDayTarget = (s.dailyTargets && s.dailyTargets[currentDay]) ? s.dailyTargets[currentDay] : 0;
+        const curDayRate = curDayTarget > 0 ? (curDaySales / curDayTarget) * 100 : 0;
+
+        const dayRateColor = curDayRate >= 100
+          ? 'text-emerald-600 dark:text-emerald-400'
+          : (curDayRate >= 80 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400');
+
+        const monthRateBadge = getRateBadgeClass(s.monthCumRate);
+        const monthGrowthColor = s.growthRate > 0
+          ? 'text-rose-600 dark:text-rose-400'
+          : (s.growthRate < 0 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400');
+
+        const yearRateBadge = getRateBadgeClass(s.rate26Cum);
+        const yGrowth = s.yearGrowthRate !== undefined ? s.yearGrowthRate : 0;
+        const yearGrowthColor = yGrowth > 0
+          ? 'text-rose-600 dark:text-rose-400'
+          : (yGrowth < 0 ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400');
+
+        const isDirect = s.name.includes('직영');
+        const custRate = s.custTargetMonth > 0 ? ((s.newCustMonth / s.custTargetMonth) * 100) : 0;
+        const custColor = custRate >= 100
+          ? 'text-emerald-600 dark:text-emerald-400'
+          : (custRate >= 80 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400');
+
+        return `
+          <tr onclick="openDetailModal(${s.id})" class="hover:bg-slate-100/70 dark:hover:bg-slate-800/80 transition cursor-pointer whitespace-nowrap group">
+            <!-- 1. 순위 -->
+            <td class="compact-cell py-2 pl-3 pr-1.5 text-center font-mono text-[11px] font-bold text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">
+              ${idx + 1}
+            </td>
+
+            <!-- 2. 점코드 -->
+            <td class="hide-in-split py-2 px-1.5 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+              ${s.code}
+            </td>
+
+            <!-- 3. 매장명 -->
+            <td class="compact-cell py-2 px-2">
+              <div class="flex items-center gap-1">
+                <span class="font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-amber-400 transition">${s.name}</span>
+                ${isDirect ? '<span class="text-[9.5px] font-extrabold px-1 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">직영</span>' : ''}
+              </div>
+            </td>
+
+            <!-- 4. 지점·담당 -->
+            <td class="compact-cell py-2 px-2 border-r border-slate-200/80 dark:border-slate-800">
+              <span class="text-slate-500 dark:text-slate-400">${s.branch}</span>
+              <span class="text-slate-300 dark:text-slate-700 mx-0.5">·</span>
+              <span class="font-bold text-slate-700 dark:text-slate-200">${s.sv}</span>
+            </td>
+
+            <!-- 5. 당일 실적 (일) -->
+            <td class="compact-cell py-2 px-2 text-right font-black bg-indigo-50/20 dark:bg-indigo-950/10 text-indigo-700 dark:text-indigo-300">
+              ${toMillion(curDaySales)}
+            </td>
+
+            <!-- 6. 일 달성 (일) -->
+            <td class="compact-cell py-2 px-2 text-right font-bold bg-indigo-50/20 dark:bg-indigo-950/10 ${dayRateColor} border-r border-slate-200/80 dark:border-slate-800">
+              ${curDayRate.toFixed(1)}%
+            </td>
+
+            <!-- 7. 월 누계 (월) -->
+            <td class="compact-cell py-2 px-2 text-right font-black bg-blue-50/20 dark:bg-blue-950/10 text-slate-900 dark:text-white">
+              ${toMillion(s.monthActual)}
+            </td>
+
+            <!-- 8. 월 목표 (월) -->
+            <td class="compact-cell py-2 px-2 text-right font-medium bg-blue-50/20 dark:bg-blue-950/10 text-slate-500 dark:text-slate-400">
+              ${toMillion(s.monthCumTarget)}
+            </td>
+
+            <!-- 9. 월 달성 (월) -->
+            <td class="compact-cell py-2 px-2 text-right bg-blue-50/20 dark:bg-blue-950/10">
+              <span class="inline-block text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border ${monthRateBadge}">
+                ${s.monthCumRate.toFixed(1)}%
+              </span>
+            </td>
+
+            <!-- 10. 월 신장률 (월) -->
+            <td class="compact-cell py-2 px-2 text-right font-extrabold bg-blue-50/20 dark:bg-blue-950/10 ${monthGrowthColor} border-r border-slate-200/80 dark:border-slate-800">
+              ${formatSignedPct(s.growthRate)}
+            </td>
+
+            <!-- 11. 연 누계 (연) -->
+            <td class="compact-cell py-2 px-2 text-right font-extrabold bg-amber-50/20 dark:bg-amber-950/10 text-slate-900 dark:text-slate-100">
+              ${toMillionInt(s.actual26Cum)}
+            </td>
+
+            <!-- 12. 연 목표 (연) -->
+            <td class="hide-in-split py-2 px-2 text-right font-medium bg-amber-50/20 dark:bg-amber-950/10 text-slate-500 dark:text-slate-400">
+              ${toMillionInt(s.target26)}
+            </td>
+
+            <!-- 13. 연 달성 (연) -->
+            <td class="compact-cell py-2 px-2 text-right bg-amber-50/20 dark:bg-amber-950/10">
+              <span class="inline-block text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border ${yearRateBadge}">
+                ${s.rate26Cum.toFixed(1)}%
+              </span>
+            </td>
+
+            <!-- 14. 연 신장률 (연) -->
+            <td class="compact-cell py-2 px-2 text-right font-extrabold bg-amber-50/20 dark:bg-amber-950/10 ${yearGrowthColor} border-r border-slate-200/80 dark:border-slate-800">
+              ${formatSignedPct(yGrowth)}
+            </td>
+
+            <!-- 15. 첫구매 (목표) -->
+            <td class="compact-cell py-2 pl-2 pr-3 text-right">
+              <span class="font-extrabold ${custColor}">${s.newCustMonth}명</span>
+              <span class="text-[10px] text-slate-400">/${s.custTargetMonth}</span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // 11. 매장 상세 분석 모달
+    function openDetailModal(storeId) {
+      const s = currentStoreDB.find(item => item.id === storeId);
+      if (!s) return;
+
+      const shortYear = getShortYear();
+      const curDaySales = (s.dailySales && s.dailySales[currentDay]) ? s.dailySales[currentDay] : 0;
+      const curDayTarget = (s.dailyTargets && s.dailyTargets[currentDay]) ? s.dailyTargets[currentDay] : 0;
+      const curDayRate = curDayTarget > 0 ? (curDaySales / curDayTarget) * 100 : 0;
+
+      document.getElementById('modal-store-name').innerText = s.name;
+      document.getElementById('modal-store-code').innerText = s.code;
+      document.getElementById('modal-store-sv').innerText = `${s.sv} · ${s.branch}`;
+
+      const openDateStr = s.openDate ? `개점 ${s.openDate} · ` : '';
+      document.getElementById('modal-open-info').innerText = `${openDateStr}당일목표 ${toMillion(curDayTarget)}백만 · 월목표 ${toMillion(s.monthCumTarget)}백만 · 연목표 ${toMillionInt(s.target26)}백만`;
+
+      document.getElementById('modal-tbl-daily').innerText = `${toMillion(curDaySales)}백만`;
+      document.getElementById('modal-tbl-cum-target').innerHTML = `
+        <div class="font-extrabold text-slate-900 dark:text-white text-xs">${toMillion(s.monthActual)}백만</div>
+        <div class="text-[10.5px] text-slate-400 mt-0.5">목표 ${toMillion(s.monthCumTarget)}</div>
+      `;
+
+      document.getElementById('modal-tbl-month-pct').innerHTML = `
+        <div class="font-extrabold ${s.monthCumRate >= 100 ? 'text-emerald-600' : (s.monthCumRate >= 80 ? 'text-blue-600' : 'text-rose-600')}">${s.monthCumRate.toFixed(1)}% 달성</div>
+        <div class="text-[10.5px] font-bold ${s.growthRate > 0 ? 'text-rose-500' : 'text-blue-500'} mt-0.5">${formatSignedPct(s.growthRate)} 신장</div>
+      `;
+
+      const yGrowth = s.yearGrowthRate !== undefined ? s.yearGrowthRate : 0;
+      document.getElementById('modal-tbl-year-pct').innerHTML = `
+        <div class="font-extrabold ${s.rate26Cum >= 100 ? 'text-emerald-600' : (s.rate26Cum >= 80 ? 'text-blue-600' : 'text-rose-600')}">${s.rate26Cum.toFixed(1)}% 달성</div>
+        <div class="text-[10.5px] font-bold ${yGrowth > 0 ? 'text-rose-500' : 'text-blue-500'} mt-0.5">${formatSignedPct(yGrowth)} 신장</div>
+      `;
+
+      const targetCust = s.custTargetMonth || 0;
+      const custPctStr = targetCust > 0 ? `${((s.newCustMonth / targetCust) * 100).toFixed(1)}% 달성` : '-';
+      document.getElementById('modal-tbl-cust').innerHTML = `
+        <div class="font-extrabold text-amber-600 dark:text-amber-400 text-xs">${s.newCustMonth}명 / ${targetCust}명</div>
+        <div class="text-[10.5px] text-slate-400 mt-0.5">${custPctStr}</div>
+      `;
+
+      document.getElementById('modal-daily-title').innerText = `당일 (${currentDay}일)`;
+      document.getElementById('modal-daily-val').innerText = `${toMillion(curDaySales)}백만`;
+      document.getElementById('modal-daily-rate').innerText = `${curDayRate.toFixed(1)}% 달성 (목표 ${toMillion(curDayTarget)})`;
+
+      document.getElementById('modal-month-title').innerText = `${currentMonth}월 누계`;
+      document.getElementById('modal-month-val').innerText = `${toMillion(s.monthActual)}백만`;
+      const monthRateElem = document.getElementById('modal-month-rate');
+      monthRateElem.innerText = `${s.monthCumRate.toFixed(1)}% 달성`;
+      monthRateElem.className = s.monthCumRate >= 100 ? 'font-extrabold text-emerald-600 dark:text-emerald-400' : (s.monthCumRate >= 80 ? 'font-extrabold text-blue-600 dark:text-blue-400' : 'font-extrabold text-rose-600 dark:text-rose-400');
+
+      const monthGrowthElem = document.getElementById('modal-month-growth');
+      monthGrowthElem.innerText = `${formatSignedPct(s.growthRate)} 신장`;
+      monthGrowthElem.className = s.growthRate > 0 ? 'font-bold text-rose-600 dark:text-rose-400' : (s.growthRate < 0 ? 'font-bold text-blue-600 dark:text-blue-400' : 'font-bold text-slate-500');
+
+      document.getElementById('modal-year-title').innerText = `${shortYear}년 누계 (목표 ${toMillionInt(s.target26)})`;
+      document.getElementById('modal-year-cum-val').innerText = `${toMillionInt(s.actual26Cum)}백만`;
+      const yearRateElem = document.getElementById('modal-year-cum-rate');
+      yearRateElem.innerText = `${s.rate26Cum.toFixed(1)}% 달성`;
+      yearRateElem.className = s.rate26Cum >= 100 ? 'font-extrabold text-emerald-600 dark:text-emerald-400' : (s.rate26Cum >= 80 ? 'font-extrabold text-blue-600 dark:text-blue-400' : 'font-extrabold text-rose-600 dark:text-rose-400');
+
+      const yearGrowthElem = document.getElementById('modal-year-cum-growth');
+      yearGrowthElem.innerText = `${formatSignedPct(yGrowth)} 신장`;
+      yearGrowthElem.className = yGrowth > 0 ? 'font-bold text-rose-600 dark:text-rose-400' : (yGrowth < 0 ? 'font-bold text-blue-600 dark:text-blue-400' : 'font-bold text-slate-500');
+
+      document.getElementById('modal-weekend-title').innerText = `${currentMonth}월 주말 vs 평일 비중`;
+      document.getElementById('modal-weekend-ratio-badge').innerText = `주말 ${s.weekendShare.toFixed(1)}%`;
+      document.getElementById('modal-weekend-bar').style.width = `${Math.min(s.weekendShare, 100)}%`;
+      document.getElementById('modal-weekday-bar').style.width = `${Math.min(s.weekdayShare, 100)}%`;
+
+      document.getElementById('modal-weekend-share-pct').innerText = `${s.weekendShare.toFixed(1)}%`;
+      document.getElementById('modal-weekend-month-val').innerText = `${toMillion(s.weekendMonthSum)}백만`;
+      document.getElementById('modal-weekend-target').innerText = `${toMillion(s.weekendTargetSum)}백만`;
+
+      document.getElementById('modal-weekday-share-pct').innerText = `${s.weekdayShare.toFixed(1)}%`;
+      document.getElementById('modal-weekday-month-val').innerText = `${toMillion(s.weekdayMonthSum)}백만`;
+      document.getElementById('modal-weekday-target').innerText = `${toMillion(s.weekdayTargetSum)}백만`;
+
+      const wk = getRecentWeekendDays(currentDay);
+      document.getElementById('modal-recent-weekend-title').innerText = wk.rangeText
+        ? `최근 주말(${wk.rangeText}) 실적 / 목표`
+        : `최근 주말 실적 / 목표`;
+
+      const formatWeekendCell = (d, dowLabel, labelElemId, valElemId) => {
+        const labelEl = document.getElementById(labelElemId);
+        const valEl = document.getElementById(valElemId);
+        if (d >= 1 && d <= wk.daysInMonth) {
+          labelEl.innerText = `${d}일(${dowLabel})`;
+          valEl.innerText = `${toMillion(s.dailySales[d] || 0)} / ${toMillion(s.dailyTargets[d] || 0)}`;
+        } else {
+          labelEl.innerText = `${dowLabel}(타월)`;
+          valEl.innerText = `- / -`;
+        }
+      };
+
+      formatWeekendCell(wk.fri, '금', 'modal-fri-label', 'modal-d-fri');
+      formatWeekendCell(wk.sat, '토', 'modal-sat-label', 'modal-d-sat');
+      formatWeekendCell(wk.sun, '일', 'modal-sun-label', 'modal-d-sun');
+
+      document.getElementById('modal-new-month').innerText = `${s.newCustMonth}명`;
+      document.getElementById('modal-new-year').innerText = `${s.newCustYear}명`;
+      document.getElementById('modal-total-cust').innerText = `${(s.totalCust || 0).toLocaleString('ko-KR')}명`;
+
+      document.getElementById('modal-cust-target-val').innerText = targetCust > 0 ? targetCust.toLocaleString('ko-KR') : '-';
+
+      const custRateElem = document.getElementById('modal-month-plan-rate');
+      if (targetCust > 0) {
+        const custRate = ((s.newCustMonth / targetCust) * 100).toFixed(1);
+        custRateElem.innerText = `${custRate}% 달성`;
+        custRateElem.className = custRate >= 100
+          ? 'text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5'
+          : (custRate >= 80 ? 'text-sm font-black text-blue-600 dark:text-blue-400 mt-0.5' : 'text-sm font-black text-amber-600 dark:text-amber-400 mt-0.5');
+      } else {
+        custRateElem.innerText = '-';
+        custRateElem.className = 'text-sm font-bold text-slate-400 mt-0.5';
+      }
+
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detail-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // 12. 토스트 알림
+    let toastTimer = null;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('opacity-0', '-translate-y-2', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-2', 'pointer-events-none');
+      }, 2200);
+    }
+
+    // 13. 이벤트 리스너
+    function setupEventListeners() {
+      document.querySelectorAll('.branch-tab-btn').forEach(tabBtn => {
+        tabBtn.addEventListener('click', () => {
+          document.querySelectorAll('.branch-tab-btn').forEach(btn => {
+            btn.classList.remove('bg-white', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white', 'shadow-2xs', 'font-extrabold');
+            btn.classList.add('text-slate-500', 'dark:text-slate-400', 'font-semibold');
+          });
+
+          tabBtn.classList.add('bg-white', 'dark:bg-slate-700', 'text-slate-900', 'dark:text-white', 'shadow-2xs', 'font-extrabold');
+          tabBtn.classList.remove('text-slate-500', 'dark:text-slate-400', 'font-semibold');
+
+          currentBranch = tabBtn.getAttribute('data-branch');
+          currentSvFilter = null;
+          updateBranchView();
+        });
+      });
+
+      document.getElementById('day-select-dropdown').addEventListener('change', (e) => {
+        currentDay = parseInt(e.target.value, 10);
+        updateBranchView();
+      });
+
+      document.getElementById('prev-day-btn').addEventListener('click', () => {
+        if (currentDay > 1) {
+          currentDay--;
+          updateBranchView();
+        } else {
+          showToast(`${currentMonth}월 1일이 첫 시작일입니다.`);
+        }
+      });
+
+      document.getElementById('next-day-btn').addEventListener('click', () => {
+        const maxDay = getDaysInMonth(currentYear, currentMonth);
+        if (currentDay < maxDay) {
+          currentDay++;
+          updateBranchView();
+        } else {
+          showToast(`${currentMonth}월 ${maxDay}일이 마지막 일자입니다.`);
+        }
+      });
+
+      document.getElementById('reset-sv-filter').addEventListener('click', () => {
+        currentSvFilter = null;
+        updateBranchView();
+        showToast('전체 매장으로 필터가 해제되었습니다.');
+      });
+
+      const searchInput = document.getElementById('store-search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        clearBtn.classList.toggle('hidden', searchQuery.length === 0);
+        renderTable();
+      });
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        clearBtn.classList.add('hidden');
+        renderTable();
+      });
+
+      document.querySelectorAll('.status-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.status-chip').forEach(c => {
+            c.classList.remove('bg-slate-900', 'dark:bg-blue-700', 'text-white', 'font-extrabold');
+            c.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'border', 'border-slate-200', 'dark:border-slate-700', 'font-semibold');
+          });
+          btn.classList.add('bg-slate-900', 'dark:bg-blue-700', 'text-white', 'font-extrabold');
+          btn.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300', 'border', 'border-slate-200', 'dark:border-slate-700', 'font-semibold');
+          currentFilter = btn.getAttribute('data-filter');
+          renderTable();
+        });
+      });
+
+      document.getElementById('sort-select').addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        renderTable();
+      });
+
+      document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        const themeIcon = document.getElementById('theme-icon');
+        themeIcon.className = isDark ? 'ph-bold ph-sun text-sm text-amber-400' : 'ph-bold ph-moon text-sm';
+        showToast(isDark ? '다크 모드가 적용되었습니다.' : '라이트 모드가 적용되었습니다.');
+      });
+
+      document.getElementById('close-detail-modal-btn').addEventListener('click', closeDetailModal);
+      document.getElementById('modal-close-action-btn').addEventListener('click', closeDetailModal);
+      document.getElementById('detail-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'detail-modal') closeDetailModal();
+      });
+    }
+
+    window.onload = function () {
+      setupEventListeners();
+      buildDayDropdown();
+      loadGoogleSheetData(false);
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>WM중부 통합 영업 포털</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 6.4 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Pretendard Web Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <!-- Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #E7E5DF;
+      color: #18181B;
+      overflow: hidden;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .thin-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .thin-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .thin-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(161, 161, 170, 0.35);
+      border-radius: 9999px;
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-view {
+      animation: fadeSlideUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes sheetSlideUp {
+      from {
+        transform: translateY(100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+    .animate-sheet {
+      animation: sheetSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background-color: #FFFFFF;
+    }
+  </style>
+</head>
+<body class="bg-[#E7E5DF] h-screen w-screen flex justify-center items-center overflow-hidden">
+
+  <!-- =====================================================================
+       [메인 포털 프레임 컨테이너]
+       ===================================================================== -->
+  <div id="portalShell" class="w-full h-full bg-[#F7F6F2] flex flex-col lg:flex-row relative overflow-hidden">
+
+    <!-- ===================================================================
+         [1. Google OAuth 2.0 보안 잠금 화면 (#authOverlay)]
+         - 실제 Vercel 배포 환경에서 인가된 계정 로그인 전까지 화면 보호
+         =================================================================== -->
+    <div id="authOverlay" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-6 text-white text-center">
+      <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl mx-auto mb-5 shadow-lg shadow-amber-500/30 tracking-tight">
+          WM
+        </div>
+        <h2 class="text-xl font-extrabold tracking-tight">WM중부 통합 영업 포털</h2>
+        <p class="text-xs text-slate-400 mt-2 mb-7 leading-relaxed">
+          승인된 본사 Google 계정으로 로그인 후<br>이용 가능합니다.
+        </p>
+
+        <!-- 구글 공식 로그인 버튼 렌더링 컨테이너 -->
+        <div id="googleBtnWrapper" class="flex justify-center w-full min-h-[44px]"></div>
+
+        <!-- 인증 오류 안내 메시지 -->
+        <p id="authErrorMsg" class="text-xs text-rose-400 font-semibold mt-4 hidden"></p>
+      </div>
+
+      <div class="mt-6 text-[11px] text-slate-500">
+        <i class="fa-solid fa-shield-halved mr-1"></i> 사내 인가 사용자 전용 보안 시스템
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         [2. PC 전용 좌측 고정 사이드바 (250px)]
+         =================================================================== -->
+    <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20">
+      <!-- 브랜드 로고 -->
+      <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
+        <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition">
+            WM
+          </div>
+          <div class="min-w-0">
+            <div class="text-[14.5px] font-extrabold tracking-tight text-white truncate">WM중부 통합 포털</div>
+            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES DASHBOARD</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 홈 대시보드 버튼 & 메뉴 검색창 -->
+      <div class="px-3 pt-3.5 pb-2 space-y-2.5">
+        <button
+          id="sidebarHomeBtn"
+          onclick="goHome()"
+          class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition"
+        >
+          <span class="flex items-center gap-2.5">
+            <i class="fa-solid fa-house text-xs w-4 text-center"></i>
+            <span>홈 대시보드</span>
+          </span>
+          <span class="text-[9.5px] font-black px-1.5 py-0.5 rounded bg-zinc-950/15">HOME</span>
+        </button>
+
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input
+            type="text"
+            id="sidebarSearchInput"
+            oninput="renderDesktopSidebar()"
+            placeholder="메뉴 검색..."
+            class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none transition"
+          />
+        </div>
+      </div>
+
+      <!-- 카테고리별 메뉴 리스트 -->
+      <div id="sidebarMenuGroups" class="flex-1 overflow-y-auto thin-scrollbar px-3 py-2 space-y-4"></div>
+
+      <!-- 하단 로그인 사용자 정보 및 로그아웃 -->
+      <div class="p-3.5 border-t border-zinc-800/90 bg-zinc-900/60">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 text-amber-400 flex items-center justify-center text-xs font-black shrink-0">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <div class="min-w-0">
+              <div id="sidebarUserName" class="text-xs font-bold text-zinc-200 truncate">WM중부 관리자</div>
+              <div id="sidebarUserEmail" class="text-[10.5px] font-mono text-zinc-400 truncate">-</div>
+            </div>
+          </div>
+          <button
+            onclick="handleLogout()"
+            class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition shrink-0"
+            title="로그아웃"
+          >
+            <i class="fa-solid fa-right-from-bracket text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================================================================
+         [3. 우측 메인 영역]
+         =================================================================== -->
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2]">
+
+      <!-- 상단 헤더 바 -->
+      <header class="bg-[#F7F6F2]/95 backdrop-blur-md px-4 lg:px-6 py-3 border-b border-[#E6E4DD] flex items-center justify-between gap-3 shrink-0 z-20">
+        <!-- 좌측: 모바일 로고/홈 버튼 + 현재 페이지 타이틀 -->
+        <div class="flex items-center gap-2.5 min-w-0">
+          <button
+            onclick="goHome()"
+            class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md tracking-tight shrink-0 active:scale-95 transition"
+          >
+            WM중부
+          </button>
+          <button
+            id="mobileHomeBtn"
+            onclick="goHome()"
+            class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0"
+            title="홈으로 이동"
+          >
+            <i class="fa-solid fa-house text-xs"></i>
+          </button>
+          <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight truncate">
+            WM중부 통합 영업 포털
+          </h1>
+          <span id="headerSubtitle" class="hidden sm:inline-block text-xs font-medium text-zinc-500 truncate">
+            영업 리포트 허브
+          </span>
+        </div>
+
+        <!-- 우측: 심플 분할 모드 토글 ([1분할(단독)] / [2분할(좌·우 비교)]) + 모바일 전체 메뉴 -->
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="bg-[#E9E7E0] p-1 rounded-xl flex items-center gap-1 border border-[#DFDDD4]">
+            <button
+              id="btnModeSingle"
+              onclick="setViewSplitMode(1)"
+              class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition"
+            >
+              <i class="fa-regular fa-square text-[11px]"></i>
+              <span>1분할 (단독)</span>
+            </button>
+            <button
+              id="btnModeSplit"
+              onclick="setViewSplitMode(2)"
+              class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition"
+            >
+              <i class="fa-solid fa-table-columns text-[11px]"></i>
+              <span>2분할 (좌·우 비교)</span>
+            </button>
+          </div>
+
+          <button
+            onclick="openAllMenusDrawer()"
+            class="lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-white hover:bg-zinc-800 flex items-center justify-center text-xs transition active:scale-95"
+            title="전체 메뉴"
+          >
+            <i class="fa-solid fa-bars"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- =================================================================
+           [4. 홈 화면 (#homeView) - 3열 모듈형 벤토 그리드]
+           ================================================================= -->
+      <main id="homeView" class="flex-1 overflow-y-auto thin-scrollbar bg-[#F7F6F2] p-4 lg:p-6">
+        <div class="max-w-6xl mx-auto space-y-4 pb-8">
+          <div class="flex flex-wrap items-center justify-between gap-2 px-0.5">
+            <div id="categoryPillsContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
+            <span class="text-[11px] font-medium text-zinc-500">
+              ★ 즐겨찾기 상단 우선 배치 · 카드 클릭 시 현재 설정된 분할 모드로 열립니다
+            </span>
+          </div>
+
+          <!-- PC 3열 / 모바일 2열 벤토 그리드 -->
+          <div id="bentoGridContainer" class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4"></div>
+        </div>
+      </main>
+
+      <!-- =================================================================
+           [5. 뷰어 화면 (#viewerView) - 1분할 단독 & 2분할 좌우 비교]
+           ================================================================= -->
+      <section id="viewerView" class="hidden flex-1 flex flex-col min-h-0 h-full overflow-hidden bg-white">
+
+        <!-- [5-A. 1분할 모드 컨테이너] -->
+        <div id="singleViewContainer" class="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
+          <!-- 상단 가로 퀵 스위처 -->
+          <div id="quickSwitcherBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 scroll-smooth"></div>
+
+          <!-- 단일 뷰어 본문 -->
+          <div id="singleViewerBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
+        </div>
+
+        <!-- [5-B. 2분할 모드 컨테이너 (정확히 좌·우 2열 균등 분할)] -->
+        <div
+          id="splitViewContainer"
+          class="hidden flex-1 min-h-0 h-full grid gap-3 p-3 bg-[#E7E5DF] overflow-hidden"
+          style="grid-template-columns: repeat(2, minmax(0, 1fr));"
+        >
+          <!-- 좌측 패널 (Left Pane) -->
+          <div class="min-h-0 flex flex-col bg-white rounded-2xl border border-[#DFDDD4] shadow-sm overflow-hidden animate-view">
+            <div class="bg-[#18181B] text-white px-3 py-2 flex items-center justify-between gap-2 shrink-0">
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <span class="px-2 py-0.5 rounded bg-amber-400 text-zinc-950 font-black text-[10.5px] shrink-0">좌측</span>
+                <div class="relative flex-1 min-w-0 max-w-[230px]">
+                  <select
+                    id="leftPaneSelect"
+                    onchange="changeSplitPaneMenu('left', this.value)"
+                    class="w-full appearance-none bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-extrabold pl-2.5 pr-7 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-amber-400 truncate cursor-pointer transition"
+                  ></select>
+                  <i class="fa-solid fa-chevron-down text-[10px] text-amber-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  onclick="swapSplitPanes()"
+                  class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-300 flex items-center justify-center text-xs transition"
+                  title="좌·우 화면 위치 맞바꾸기"
+                >
+                  <i class="fa-solid fa-right-left"></i>
+                </button>
+                <button
+                  onclick="expandPaneToSingle('left')"
+                  class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center text-xs transition"
+                  title="1분할로 크게 보기"
+                >
+                  <i class="fa-solid fa-expand"></i>
+                </button>
+              </div>
+            </div>
+            <div id="leftPaneBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
+          </div>
+
+          <!-- 우측 패널 (Right Pane) -->
+          <div class="min-h-0 flex flex-col bg-white rounded-2xl border border-[#DFDDD4] shadow-sm overflow-hidden animate-view">
+            <div class="bg-[#18181B] text-white px-3 py-2 flex items-center justify-between gap-2 shrink-0">
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <span class="px-2 py-0.5 rounded bg-zinc-700 text-amber-300 font-black text-[10.5px] shrink-0">우측</span>
+                <div class="relative flex-1 min-w-0 max-w-[230px]">
+                  <select
+                    id="rightPaneSelect"
+                    onchange="changeSplitPaneMenu('right', this.value)"
+                    class="w-full appearance-none bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-extrabold pl-2.5 pr-7 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-amber-400 truncate cursor-pointer transition"
+                  ></select>
+                  <i class="fa-solid fa-chevron-down text-[10px] text-amber-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-1 shrink-0">
+                <button
+                  onclick="swapSplitPanes()"
+                  class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-300 flex items-center justify-center text-xs transition"
+                  title="좌·우 화면 위치 맞바꾸기"
+                >
+                  <i class="fa-solid fa-right-left"></i>
+                </button>
+                <button
+                  onclick="expandPaneToSingle('right')"
+                  class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center text-xs transition"
+                  title="1분할로 크게 보기"
+                >
+                  <i class="fa-solid fa-expand"></i>
+                </button>
+              </div>
+            </div>
+            <div id="rightPaneBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- ===================================================================
+         [6. 모바일용 전체 메뉴 드로어 (#allMenusDrawer)]
+         =================================================================== -->
+    <div id="allMenusDrawer" class="hidden fixed inset-0 z-40 flex flex-col justify-end bg-zinc-950/45 backdrop-blur-[2px]" onclick="closeAllMenusDrawer()">
+      <div class="bg-[#F7F6F2] rounded-t-3xl border-t border-[#E6E4DD] max-h-[85%] flex flex-col shadow-2xl animate-sheet" onclick="event.stopPropagation()">
+        <div class="pt-3 pb-1 flex justify-center shrink-0">
+          <div class="w-10 h-1 rounded-full bg-zinc-300"></div>
+        </div>
+
+        <div class="px-5 pt-1.5 pb-3 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <h3 class="text-[17px] font-extrabold text-[#18181B] tracking-tight">전체 메뉴</h3>
+            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full">6개</span>
+          </div>
+          <button onclick="closeAllMenusDrawer()" class="w-8 h-8 rounded-full bg-white border border-[#E6E4DD] text-zinc-500 hover:text-[#18181B] flex items-center justify-center transition active:scale-95">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <div id="drawerMenuList" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-4 space-y-4"></div>
+
+        <div class="px-5 py-3.5 bg-white border-t border-[#E6E4DD] flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-7 h-7 rounded-full bg-zinc-900 text-amber-400 flex items-center justify-center text-[11px] font-black shrink-0">
+              <i class="fa-solid fa-user-check"></i>
+            </div>
+            <span id="drawerUserEmail" class="text-xs font-mono font-semibold text-zinc-600 truncate"></span>
+          </div>
+          <button onclick="closeAllMenusDrawer(); handleLogout();" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0">
+            <i class="fa-solid fa-right-from-bracket text-[11px]"></i>
+            <span>로그아웃</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================
+         [7. 로그아웃 확인 모달 (#logoutModal)]
+         =================================================================== -->
+    <div id="logoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-[2px] p-5" onclick="closeLogoutModal()">
+      <div class="w-full max-w-xs bg-white border border-[#E6E4DD] rounded-2xl p-5 shadow-2xl text-center animate-view" onclick="event.stopPropagation()">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3">
+          <i class="fa-solid fa-right-from-bracket text-sm"></i>
+        </div>
+        <h3 class="text-[15px] font-extrabold text-[#18181B]">로그아웃 하시겠습니까?</h3>
+        <p class="text-xs text-zinc-500 mt-1">다시 이용하려면 인가된 Google 계정으로 로그인해야 합니다.</p>
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <button onclick="closeLogoutModal()" class="py-2 rounded-xl bg-[#F7F6F2] hover:bg-zinc-200/70 text-zinc-700 text-xs font-bold transition">
+            취소
+          </button>
+          <button onclick="confirmLogout()" class="py-2 rounded-xl bg-[#18181B] hover:bg-zinc-800 text-white text-xs font-bold transition">
+            로그아웃
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // [보안 설정: 구글 클라이언트 ID & 접근 허용 계정 목록]
+    // =========================================================================
+    const GOOGLE_CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
+
+    const ALLOWED_EMAILS = [
+      "gudwnqn109@gmail.com",
+      "doowon0623@gmail.com",
+      "ablejuno@gmail.com"
+    ];
+
+    // =========================================================================
+    // [메뉴 설정 배열 (MENU_ITEMS)]
+    // =========================================================================
+    const MENU_ITEMS = [
+      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
+      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
+      { id: 'sellthru', title: 'FW 판매율', subtitle: '시즌·브랜드·복종별 수량/금액 판매율', url: './sellthru.html', category: '시장·상품', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'emerald' },
+      { id: 'investment', title: '매장 투자비 현황', subtitle: '보증금·권리금·인테리어·마진 구조', url: './investment.html', category: '매장·운영', badge: 'STORE', icon: 'fa-solid fa-building-columns', accent: 'teal' },
+      { id: 'voc', title: '현장의 소리', subtitle: '매장 VOC·건의사항 실시간 접수 현황', url: './voc.html', category: '매장·운영', badge: 'VOC', icon: 'fa-solid fa-bullhorn', accent: 'rose' }
+    ];
+
+    const ACCENT_STYLES = {
+      amber: { iconBg: 'bg-amber-500/15', iconText: 'text-amber-700', badge: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
+      blue: { iconBg: 'bg-blue-500/12', iconText: 'text-blue-700', badge: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
+      indigo: { iconBg: 'bg-indigo-500/12', iconText: 'text-indigo-700', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' },
+      emerald: { iconBg: 'bg-emerald-500/12', iconText: 'text-emerald-700', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' },
+      teal: { iconBg: 'bg-teal-500/12', iconText: 'text-teal-700', badge: 'bg-teal-500/10 text-teal-700 border-teal-500/20' },
+      rose: { iconBg: 'bg-rose-500/12', iconText: 'text-rose-700', badge: 'bg-rose-500/10 text-rose-700 border-rose-500/20' }
+    };
+
+    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v2';
+    let pinnedMenuIds = ['daily'];
+    let selectedCategory = '전체';
+    let currentView = 'home'; // 'home' | 'viewer'
+    let splitMode = 1; // 1: 1분할(단독) | 2: 2분할(좌·우 비교)
+    let singleMenuId = 'daily';
+    let leftMenuId = 'daily';
+    let rightMenuId = 'competitor';
+    let currentUser = null;
+    let isPreviewEnv = false;
+
+    // =========================================================================
+    // [미리보기 샌드박스 환경 감지]
+    // =========================================================================
+    function detectPreviewEnvironment() {
+      try {
+        const isFramed = window.self !== window.top;
+        const host = window.location.hostname || '';
+        const proto = window.location.protocol || '';
+        return (
+          isFramed ||
+          host.includes('googleusercontent.com') ||
+          host.includes('usercontent.goog') ||
+          host.includes('localhost') ||
+          host === '' ||
+          proto === 'blob:' ||
+          proto === 'about:' ||
+          proto === 'file:'
+        );
+      } catch (e) {
+        return true;
+      }
+    }
+
+    // =========================================================================
+    // [즐겨찾기 핀(★) 저장 및 정렬 유틸리티]
+    // =========================================================================
+    function loadPins() {
+      const validIds = new Set(MENU_ITEMS.map(m => m.id));
+      try {
+        const raw = localStorage.getItem(PIN_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            pinnedMenuIds = parsed.filter(id => validIds.has(id));
+            return;
+          }
+        }
+      } catch (e) {}
+      pinnedMenuIds = validIds.has('daily') ? ['daily'] : [];
+    }
+
+    function savePins() {
+      try {
+        localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(pinnedMenuIds));
+      } catch (e) {}
+    }
+
+    function getAccentStyle(accent) {
+      return ACCENT_STYLES[accent] || ACCENT_STYLES.amber;
+    }
+
+    function isMenuPinned(menuId) {
+      return pinnedMenuIds.includes(menuId);
+    }
+
+    function sortMenusByPin(items) {
+      return [...items].sort((a, b) => {
+        const aPinIdx = pinnedMenuIds.indexOf(a.id);
+        const bPinIdx = pinnedMenuIds.indexOf(b.id);
+        const aPinned = aPinIdx !== -1;
+        const bPinned = bPinIdx !== -1;
+        if (aPinned && bPinned) return aPinIdx - bPinIdx;
+        if (aPinned) return -1;
+        if (bPinned) return 1;
+        return 0;
+      });
+    }
+
+    function toggleMenuPin(menuId, event) {
+      if (event) event.stopPropagation();
+      if (isMenuPinned(menuId)) {
+        pinnedMenuIds = pinnedMenuIds.filter(id => id !== menuId);
+      } else {
+        pinnedMenuIds.push(menuId);
+      }
+      savePins();
+      syncPortalUI();
+    }
+
+    // =========================================================================
+    // [포털 전체 UI 자동 동기화]
+    // =========================================================================
+    function syncPortalUI() {
+      renderDesktopSidebar();
+      renderHome();
+      renderQuickSwitcherBar();
+      populateSplitSelects();
+      updateHeaderAndToggleUI();
+      document.getElementById('drawerMenuCountBadge').innerText = `${MENU_ITEMS.length}개`;
+      if (!document.getElementById('allMenusDrawer').classList.contains('hidden')) {
+        renderDrawerMenuList();
+      }
+    }
+
+    function updateHeaderAndToggleUI() {
+      const btn1 = document.getElementById('btnModeSingle');
+      const btn2 = document.getElementById('btnModeSplit');
+      const sideHomeBtn = document.getElementById('sidebarHomeBtn');
+      const mobileHomeBtn = document.getElementById('mobileHomeBtn');
+      const titleEl = document.getElementById('headerTitle');
+      const subEl = document.getElementById('headerSubtitle');
+
+      if (splitMode === 1) {
+        btn1.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition';
+        btn2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition';
+      } else {
+        btn1.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition';
+        btn2.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-amber-400 shadow-2xs flex items-center gap-1.5 transition';
+      }
+
+      if (currentView === 'home') {
+        sideHomeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition';
+        if (mobileHomeBtn) mobileHomeBtn.className = 'lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-amber-400 border border-[#18181B] flex items-center justify-center transition active:scale-95 shrink-0';
+        titleEl.innerText = 'WM중부 통합 영업 포털';
+        const now = new Date();
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        subEl.innerText = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
+      } else {
+        sideHomeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition';
+        if (mobileHomeBtn) mobileHomeBtn.className = 'lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0';
+
+        if (splitMode === 1) {
+          const m = MENU_ITEMS.find(item => item.id === singleMenuId) || MENU_ITEMS[0];
+          titleEl.innerText = m.title;
+          subEl.innerText = m.subtitle;
+        } else {
+          const lm = MENU_ITEMS.find(item => item.id === leftMenuId) || MENU_ITEMS[0];
+          const rm = MENU_ITEMS.find(item => item.id === rightMenuId) || MENU_ITEMS[2];
+          titleEl.innerText = `${lm.title}  ⇄  ${rm.title}`;
+          subEl.innerText = '2분할 좌·우 비교 모드';
+        }
+      }
+    }
+
+    // =========================================================================
+    // [PC 좌측 고정 사이드바 렌더링]
+    // =========================================================================
+    function renderDesktopSidebar() {
+      const container = document.getElementById('sidebarMenuGroups');
+      if (!container) return;
+
+      const q = (document.getElementById('sidebarSearchInput')?.value || '').trim().toLowerCase();
+      const filtered = MENU_ITEMS.filter(item =>
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q) ||
+        item.subtitle.toLowerCase().includes(q)
+      );
+
+      const grouped = {};
+      filtered.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      container.innerHTML = Object.entries(grouped).map(([categoryName, items]) => {
+        const sortedItems = sortMenusByPin(items);
+        return `
+          <div class="space-y-1">
+            <div class="px-2.5 pb-0.5">
+              <span class="text-[10.5px] font-bold tracking-wider text-zinc-500 uppercase">${categoryName}</span>
+            </div>
+            <div class="space-y-0.5">
+              ${sortedItems.map(item => {
+                const isActive = currentView === 'viewer' && (
+                  splitMode === 1
+                    ? singleMenuId === item.id
+                    : (leftMenuId === item.id || rightMenuId === item.id)
+                );
+                const pinned = isMenuPinned(item.id);
+                return `
+                  <div
+                    onclick="openMenu('${item.id}')"
+                    class="group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition ${
+                      isActive
+                        ? 'bg-zinc-800/95 text-white font-bold ring-1 ring-amber-400/40'
+                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/80 font-medium'
+                    }"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <i class="${item.icon} text-xs w-4 text-center ${isActive ? 'text-amber-400' : 'text-zinc-500 group-hover:text-zinc-300'}"></i>
+                      <span class="text-xs truncate">${item.title}</span>
+                    </div>
+                    <button
+                      onclick="toggleMenuPin('${item.id}', event)"
+                      class="w-6 h-6 rounded-lg flex items-center justify-center transition ${
+                        pinned ? 'text-amber-400' : 'text-zinc-600 opacity-0 group-hover:opacity-100'
+                      }"
+                      title="${pinned ? '즐겨찾기 해제' : '즐겨찾기 고정'}"
+                    >
+                      <i class="fa-solid fa-star text-[10px]"></i>
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // [홈 화면 렌더링 (3열 모듈형 벤토 그리드)]
+    // =========================================================================
+    function renderHome() {
+      const categoryCounts = {};
+      MENU_ITEMS.forEach(item => {
+        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
+      });
+
+      const uniqueCategories = Object.keys(categoryCounts);
+      if (selectedCategory !== '전체' && !uniqueCategories.includes(selectedCategory)) {
+        selectedCategory = '전체';
+      }
+
+      const categories = ['전체', ...uniqueCategories];
+      document.getElementById('categoryPillsContainer').innerHTML = categories.map(cat => {
+        const isActive = selectedCategory === cat;
+        const count = cat === '전체' ? MENU_ITEMS.length : categoryCounts[cat];
+        return `
+          <button
+            onclick="selectCategory('${cat}')"
+            class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition active:scale-95 ${
+              isActive
+                ? 'bg-[#18181B] text-white font-bold shadow-xs'
+                : 'bg-white text-zinc-600 hover:text-[#18181B] border border-[#E6E4DD] font-semibold'
+            }"
+          >
+            <span>${cat}</span>
+            <span class="text-[10.5px] ${isActive ? 'text-amber-400' : 'text-zinc-400'}">${count}</span>
+          </button>
+        `;
+      }).join('');
+
+      let filteredItems = MENU_ITEMS;
+      if (selectedCategory !== '전체') {
+        filteredItems = MENU_ITEMS.filter(m => m.category === selectedCategory);
+      }
+      const gridItems = sortMenusByPin(filteredItems);
+
+      const gridContainer = document.getElementById('bentoGridContainer');
+      gridContainer.innerHTML = gridItems.map(item => {
+        const style = getAccentStyle(item.accent);
+        const pinned = isMenuPinned(item.id);
+        return `
+          <article
+            onclick="openMenu('${item.id}')"
+            class="group bg-white border border-[#E6E4DD] hover:border-[#18181B]/45 hover:shadow-lg rounded-2xl lg:rounded-3xl p-4 lg:p-5 flex flex-col justify-between min-h-[152px] lg:min-h-[176px] cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-[0_2px_8px_rgba(24,24,27,0.03)] animate-view"
+          >
+            <div class="flex items-start justify-between">
+              <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-xl lg:rounded-2xl ${style.iconBg} ${style.iconText} flex items-center justify-center text-[15px] lg:text-base shrink-0 group-hover:scale-105 transition-transform">
+                <i class="${item.icon}"></i>
+              </div>
+
+              <button
+                onclick="toggleMenuPin('${item.id}', event)"
+                class="w-7 h-7 -mr-1 -mt-0.5 rounded-lg flex items-center justify-center hover:bg-[#F7F6F2] transition active:scale-90 ${
+                  pinned ? 'text-amber-500' : 'text-zinc-300 hover:text-zinc-500'
+                }"
+                title="${pinned ? '즐겨찾기 해제' : '즐겨찾기 고정'}"
+              >
+                <i class="fa-solid fa-star text-xs"></i>
+              </button>
+            </div>
+
+            <div class="mt-4">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9.5px] lg:text-[10px] font-extrabold border px-1.5 py-0.5 rounded ${style.badge}">
+                  ${item.badge}
+                </span>
+                <span class="text-[10.5px] lg:text-[11px] font-semibold text-zinc-400 truncate">${item.category}</span>
+              </div>
+              <h3 class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight mt-1.5 truncate group-hover:text-amber-700 transition-colors">
+                ${item.title}
+              </h3>
+              <p class="text-[11px] lg:text-xs font-medium text-zinc-500 truncate mt-1">
+                ${item.subtitle}
+              </p>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function selectCategory(cat) {
+      selectedCategory = cat;
+      renderHome();
+    }
+
+    // =========================================================================
+    // [네비게이션 & 1분할 / 2분할 전환 제어]
+    // =========================================================================
+    function goHome(updateHash = true) {
+      currentView = 'home';
+      document.getElementById('viewerView').classList.add('hidden');
+      document.getElementById('homeView').classList.remove('hidden');
+
+      if (updateHash && window.location.hash) {
+        try {
+          if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          } else {
+            window.location.hash = '';
+          }
+        } catch (e) {
+          window.location.hash = '';
+        }
+      }
+
+      syncPortalUI();
+    }
+
+    function setViewSplitMode(mode) {
+      splitMode = mode;
+
+      if (currentView === 'home') {
+        if (mode === 2) {
+          // 홈 상태에서 2분할 버튼을 누르면 바로 2분할 비교 뷰어로 진입
+          openViewer();
+        } else {
+          updateHeaderAndToggleUI();
+        }
+        return;
+      }
+
+      // 이미 뷰어 화면일 때 1분할 <-> 2분할 즉시 전환
+      if (mode === 2 && leftMenuId === rightMenuId) {
+        const fallback = MENU_ITEMS.find(m => m.id !== leftMenuId);
+        if (fallback) rightMenuId = fallback.id;
+      }
+      openViewer();
+    }
+
+    function openMenu(menuId, updateHash = true) {
+      if (!currentUser || (!isPreviewEnv && !ALLOWED_EMAILS.includes(currentUser.email))) {
+        document.getElementById('authOverlay').classList.remove('hidden');
+        return;
+      }
+
+      const menu = MENU_ITEMS.find(m => m.id === menuId);
+      if (!menu) return;
+
+      closeAllMenusDrawer();
+
+      if (splitMode === 1) {
+        singleMenuId = menu.id;
+        leftMenuId = menu.id;
+      } else {
+        // 2분할 모드에서는 좌측 패널에 선택한 메뉴를 열고, 우측 패널은 다른 비교 메뉴 유지
+        leftMenuId = menu.id;
+        if (rightMenuId === leftMenuId) {
+          const alt = MENU_ITEMS.find(m => m.id !== leftMenuId);
+          if (alt) rightMenuId = alt.id;
+        }
+      }
+
+      if (updateHash && splitMode === 1 && window.location.hash !== `#${menu.id}`) {
+        window.location.hash = menu.id;
+      }
+
+      openViewer();
+    }
+
+    function openViewer() {
+      currentView = 'viewer';
+      document.getElementById('homeView').classList.add('hidden');
+      document.getElementById('viewerView').classList.remove('hidden');
+
+      const singleContainer = document.getElementById('singleViewContainer');
+      const splitContainer = document.getElementById('splitViewContainer');
+
+      if (splitMode === 1) {
+        splitContainer.classList.add('hidden');
+        singleContainer.classList.remove('hidden');
+        renderQuickSwitcherBar();
+        mountViewerContent(document.getElementById('singleViewerBody'), singleMenuId);
+      } else {
+        singleContainer.classList.add('hidden');
+        splitContainer.classList.remove('hidden');
+        populateSplitSelects();
+        mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
+        mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
+      }
+
+      renderDesktopSidebar();
+      updateHeaderAndToggleUI();
+    }
+
+    function populateSplitSelects() {
+      const leftSel = document.getElementById('leftPaneSelect');
+      const rightSel = document.getElementById('rightPaneSelect');
+      if (!leftSel || !rightSel) return;
+
+      leftSel.innerHTML = MENU_ITEMS.map(m =>
+        `<option value="${m.id}" ${m.id === leftMenuId ? 'selected' : ''}>${m.title} (${m.category})</option>`
+      ).join('');
+
+      rightSel.innerHTML = MENU_ITEMS.map(m =>
+        `<option value="${m.id}" ${m.id === rightMenuId ? 'selected' : ''}>${m.title} (${m.category})</option>`
+      ).join('');
+    }
+
+    function changeSplitPaneMenu(side, newMenuId) {
+      if (side === 'left') {
+        leftMenuId = newMenuId;
+        mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
+      } else {
+        rightMenuId = newMenuId;
+        mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
+      }
+      renderDesktopSidebar();
+      updateHeaderAndToggleUI();
+    }
+
+    function swapSplitPanes() {
+      const temp = leftMenuId;
+      leftMenuId = rightMenuId;
+      rightMenuId = temp;
+      populateSplitSelects();
+      mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
+      mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
+      updateHeaderAndToggleUI();
+    }
+
+    function expandPaneToSingle(side) {
+      singleMenuId = (side === 'left') ? leftMenuId : rightMenuId;
+      splitMode = 1;
+      openViewer();
+    }
+
+    function renderQuickSwitcherBar() {
+      const orderedItems = sortMenusByPin(MENU_ITEMS);
+      const container = document.getElementById('quickSwitcherBar');
+      if (!container) return;
+
+      container.innerHTML = orderedItems.map(item => {
+        const isActive = item.id === singleMenuId;
+        const pinned = isMenuPinned(item.id);
+        return `
+          <button
+            data-tab-id="${item.id}"
+            onclick="openMenu('${item.id}')"
+            class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition active:scale-95 ${
+              isActive
+                ? 'bg-[#18181B] text-white font-bold shadow-xs'
+                : 'bg-white text-zinc-600 hover:text-[#18181B] border border-[#E6E4DD] font-semibold'
+            }"
+          >
+            <i class="${item.icon} text-[10.5px] ${isActive ? 'text-amber-400' : ''}"></i>
+            <span>${item.title}</span>
+            ${pinned && !isActive ? '<i class="fa-solid fa-star text-[8px] text-amber-500"></i>' : ''}
+          </button>
+        `;
+      }).join('');
+
+      requestAnimationFrame(() => {
+        const activeTab = container.querySelector(`[data-tab-id="${singleMenuId}"]`);
+        if (activeTab) {
+          activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      });
+    }
+
+    // =========================================================================
+    // [뷰어 본문 마운트 (실제 환경: iframe + postMessage / 미리보기 환경: 리얼 데모 UI)]
+    // =========================================================================
+    function mountViewerContent(containerEl, menuId) {
+      if (!containerEl) return;
+      const menuObj = MENU_ITEMS.find(m => m.id === menuId) || MENU_ITEMS[0];
+
+      if (!isPreviewEnv) {
+        containerEl.innerHTML = `
+          <div class="pane-loader absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center z-10 transition-opacity duration-200">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-700 mb-2"></i>
+            <span class="text-xs font-semibold text-zinc-600">${menuObj.title} 불러오는 중...</span>
+          </div>
+        `;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = menuObj.url;
+        if (currentUser) {
+          iframe.setAttribute('data-user-email', currentUser.email);
+        }
+        iframe.onload = () => {
+          const loader = containerEl.querySelector('.pane-loader');
+          if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => { loader.style.display = 'none'; }, 180);
+          }
+          if (iframe.contentWindow && currentUser) {
+            iframe.contentWindow.postMessage({
+              type: 'WM_PORTAL_AUTH',
+              user: currentUser
+            }, '*');
+          }
+        };
+        containerEl.appendChild(iframe);
+        return;
+      }
+
+      // 미리보기 샌드박스 환경에서는 실제 6개 페이지의 레이아웃과 지표를 재현한 데모 UI 렌더링
+      containerEl.innerHTML = `
+        <div class="h-full overflow-y-auto thin-scrollbar bg-slate-100/80 p-3.5 lg:p-4">
+          <div class="max-w-lg mx-auto space-y-3 animate-view">
+            ${getPreviewDemoMarkup(menuObj.id)}
+          </div>
+        </div>
+      `;
+    }
+
+    function getPreviewDemoMarkup(menuId) {
+      if (menuId === 'daily') {
+        return `
+          <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between shadow-2xs">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs">WM</div>
+              <div>
+                <div class="text-sm font-extrabold text-slate-900">WM중부 매출장</div>
+                <div class="text-[11px] text-emerald-600 font-bold">● 실시간 구글 시트 연동</div>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold bg-slate-100 px-2.5 py-1 rounded-lg text-slate-700">총 100개 매장</span>
+          </div>
+
+          <div class="rounded-2xl bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-4 shadow-md">
+            <div class="flex items-center justify-between text-xs">
+              <span class="px-2 py-0.5 rounded bg-white/15 text-blue-100 font-bold">중부영업팀 당일</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-amber-400 text-blue-950 font-black">104.2% 달성</span>
+            </div>
+            <div class="text-2xl font-black mt-2 tabular-nums">118.4 <span class="text-xs font-semibold text-blue-200">백만원</span></div>
+            <div class="mt-2.5 pt-2 border-t border-white/15 flex justify-between text-[11px] text-blue-200">
+              <span>일목표 <strong class="text-white">113.6백만</strong></span>
+              <span class="text-amber-300 font-bold">+4.8백만 초과</span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden text-xs tabular-nums">
+            <div class="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 font-bold text-slate-700 flex justify-between">
+              <span>주요 매장 실시간 실적</span><span class="text-slate-400 font-normal">단위: 백만원</span>
+            </div>
+            <div class="divide-y divide-slate-100">
+              <div class="px-3.5 py-2.5 flex justify-between items-center">
+                <div><div class="font-bold text-slate-900">방학직영점</div><div class="text-[10.5px] text-slate-400">서울 · 신현호</div></div>
+                <div class="text-right"><div class="font-black text-blue-600">4.8백만</div><div class="text-[10.5px] font-bold text-emerald-600">112.4% 달성</div></div>
+              </div>
+              <div class="px-3.5 py-2.5 flex justify-between items-center">
+                <div><div class="font-bold text-slate-900">분당서현점</div><div class="text-[10.5px] text-slate-400">경기 · 신순호</div></div>
+                <div class="text-right"><div class="font-black text-blue-600">4.3백만</div><div class="text-[10.5px] font-bold text-emerald-600">106.8% 달성</div></div>
+              </div>
+              <div class="px-3.5 py-2.5 flex justify-between items-center">
+                <div><div class="font-bold text-slate-900">강릉죽헌직영점</div><div class="text-[10.5px] text-slate-400">강원 · 김동하</div></div>
+                <div class="text-right"><div class="font-black text-blue-600">3.9백만</div><div class="text-[10.5px] font-bold text-blue-600">98.5% 달성</div></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (menuId === 'weekly') {
+        return `
+          <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center shadow-sm">
+            <div>
+              <span class="bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM중부</span>
+              <h4 class="text-sm font-extrabold mt-1">주간 실적 리포트 (CFM)</h4>
+            </div>
+            <span class="text-xs font-extrabold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-1 rounded-full">당월 서울 4위</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 tabular-nums">
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <div class="text-[10.5px] text-slate-500 font-bold">주간 전체매출</div>
+              <div class="text-base font-black text-slate-900 mt-1">16,320천원</div>
+              <div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 9% 전년비</div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <div class="text-[10.5px] text-slate-500 font-bold">주간 구매고객</div>
+              <div class="text-base font-black text-slate-900 mt-1">86명</div>
+              <div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 10% 전년비</div>
+            </div>
+            <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200/80">
+              <div class="text-[10.5px] text-amber-900 font-bold">첫구매 (월누계)</div>
+              <div class="text-base font-black text-slate-900 mt-1">24명 <span class="text-[10px] text-amber-800 font-bold">/ 목표 35</span></div>
+            </div>
+            <div class="bg-white p-3 rounded-xl border border-slate-200">
+              <div class="text-[10.5px] text-slate-500 font-bold">당월 누계매출</div>
+              <div class="text-base font-black text-slate-900 mt-1">29,450천원</div>
+              <div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 12% 전년비</div>
+            </div>
+          </div>
+
+          <div class="bg-slate-900 text-white p-3.5 rounded-2xl space-y-2 text-xs tabular-nums">
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>5대 브랜드 매출 비중</span>
+              <span class="text-amber-400 font-bold">합계 29,450천원</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden flex gap-0.5">
+              <div class="bg-slate-300 h-full" style="width:50%"></div>
+              <div class="bg-blue-500 h-full" style="width:18%"></div>
+              <div class="bg-emerald-500 h-full" style="width:22%"></div>
+              <div class="bg-amber-400 h-full" style="width:6%"></div>
+              <div class="bg-rose-500 h-full" style="width:4%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] pt-1 text-slate-300">
+              <span>인디안 50% · 데일리 22%</span>
+              <span>브루노 18% · 기타 10%</span>
+            </div>
+          </div>
+        `;
+      }
+
+      if (menuId === 'competitor') {
+        return `
+          <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white text-xs flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></span>
+              <div>
+                <div class="text-sm font-extrabold text-slate-900">타브랜드 매출 현황</div>
+                <div class="text-[11px] text-slate-500">서울·경기·강원 상권 통합</div>
+              </div>
+            </div>
+            <span class="text-[11px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">단위: 천원</span>
+          </div>
+
+          <div class="rounded-2xl bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white p-4 shadow-md">
+            <div class="flex justify-between items-center">
+              <span class="text-[10px] bg-white/15 px-2 py-0.5 rounded font-bold">서울지점 · 강동구</span>
+              <span class="text-[11px] text-emerald-300 font-bold">25년 마감 14.2억</span>
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+              <h4 class="text-lg font-extrabold">길동점 (웰메이드)</h4>
+              <span class="text-[11px] bg-indigo-700 px-2 py-0.5 rounded font-bold">상권 1위</span>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-white/15 space-y-1.5">
+              <div class="flex justify-between text-[11px]">
+                <span>상권 내 비중 <strong class="text-emerald-300">28.4%</strong></span>
+                <span>상권 합계 3,465,400</span>
+              </div>
+              <div class="w-full h-2 bg-white/15 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-400 rounded-full" style="width:28.4%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-xs tabular-nums">
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex justify-between items-center">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-amber-500 text-white font-black flex items-center justify-center text-[11px]">1위</span>
+                <div><div class="font-extrabold text-slate-900">웰메이드</div><div class="text-[10.5px] text-slate-400">점유 28.4%</div></div>
+              </div>
+              <div class="text-right"><div class="font-extrabold text-slate-900">984,200</div><div class="text-[10.5px] font-bold text-emerald-600">▲ +8.2%</div></div>
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 flex justify-between items-center">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-800 text-white font-black flex items-center justify-center text-[11px]">2위</span>
+                <div><div class="font-extrabold text-slate-900">트레몰로 / 타운젠트</div><div class="text-[10.5px] text-slate-400">점유 21.6%</div></div>
+              </div>
+              <div class="text-right"><div class="font-extrabold text-slate-900">748,500</div><div class="text-[10.5px] font-bold text-emerald-600">▲ +3.1%</div></div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (menuId === 'sellthru') {
+        return `
+          <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
+            <div>
+              <span class="bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM본부</span>
+              <h4 class="text-sm font-extrabold mt-1">FW 매장별 판매율 리포트</h4>
+            </div>
+            <span class="text-[11px] font-black bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-lg">종합 우수 (A)</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2.5 text-xs tabular-nums">
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+              <div class="flex justify-between"><span class="font-bold text-slate-700">인디안</span><span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-1.5 rounded">A등급</span></div>
+              <div class="text-lg font-black text-slate-900 mt-1">24.8%</div>
+              <div class="text-[10.5px] text-emerald-600 font-bold mt-1">전국평균 대비 +2.4%p</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+              <div class="flex justify-between"><span class="font-bold text-slate-700">브루노바피</span><span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-1.5 rounded">A등급</span></div>
+              <div class="text-lg font-black text-slate-900 mt-1">21.5%</div>
+              <div class="text-[10.5px] text-emerald-600 font-bold mt-1">전국평균 대비 +1.8%p</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 text-xs space-y-2 tabular-nums">
+            <div class="font-extrabold text-slate-800">복종별 수량 판매율 TOP 3</div>
+            <div class="flex justify-between items-center py-1.5 border-b border-slate-100"><span>1. 핸드메이드 하프코트 (EH)</span><span class="font-black text-emerald-600">34.2%</span></div>
+            <div class="flex justify-between items-center py-1.5 border-b border-slate-100"><span>2. 셋업 자켓 (FA)</span><span class="font-black text-emerald-600">29.8%</span></div>
+            <div class="flex justify-between items-center py-1.5"><span>3. 니트 가디건 (BC)</span><span class="font-black text-amber-600">25.1%</span></div>
+          </div>
+        `;
+      }
+
+      if (menuId === 'investment') {
+        return `
+          <div class="rounded-2xl bg-gradient-to-br from-indigo-950 via-teal-950 to-slate-900 text-white p-4 shadow-md">
+            <div class="flex justify-between text-[10px]">
+              <span class="bg-white/15 px-2 py-0.5 rounded font-bold">서울지점 · 대리점</span>
+              <span class="text-teal-200">단위: 백만원</span>
+            </div>
+            <h4 class="text-lg font-extrabold mt-2">명일점 투자비 · 마진 구조</h4>
+            <div class="grid grid-cols-2 gap-2.5 mt-3 tabular-nums">
+              <div class="bg-white/10 p-3 rounded-xl"><div class="text-[10.5px] text-teal-200">총 투자비 (보증+권리)</div><div class="text-xl font-black mt-0.5">332백만</div></div>
+              <div class="bg-white/10 p-3 rounded-xl"><div class="text-[10.5px] text-teal-200">인테리어 총액</div><div class="text-xl font-black mt-0.5">78백만</div></div>
+            </div>
+          </div>
+
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-3 text-xs tabular-nums">
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-slate-50 p-2.5 rounded-xl"><div class="text-[10px] text-slate-400">전세보증금</div><div class="font-extrabold text-indigo-600 mt-0.5">252백만</div></div>
+              <div class="bg-slate-50 p-2.5 rounded-xl"><div class="text-[10px] text-slate-400">권리금</div><div class="font-extrabold text-slate-800 mt-0.5">80백만</div></div>
+              <div class="bg-slate-50 p-2.5 rounded-xl"><div class="text-[10px] text-slate-400">월세 / 평균마진</div><div class="font-extrabold text-amber-600 mt-0.5">7.1 / 36.3%</div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[11px] font-bold text-slate-600 mb-1.5"><span>인테리어 분담 비율</span><span class="text-indigo-600">매장 100% : 본사 0%</span></div>
+              <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-indigo-600 h-full rounded-full" style="width:100%"></div></div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
+          <div>
+            <span class="text-[10px] text-indigo-300 font-bold">중부영업팀 통합 앱</span>
+            <h4 class="text-sm font-extrabold">현장의 소리 (VOC)</h4>
+          </div>
+          <span class="text-[10.5px] bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-bold">● 클라우드연동</span>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-1.5">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900">분당서현점</span>
+              <span class="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded font-bold">VM/디스플레이</span>
+            </div>
+            <p class="text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">주말 윈도우 마네킹 캐시미어 코트 착장 변경 후 입점 고객 문의 및 세트 구매율 상승 확인.</p>
+          </div>
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-1.5">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-slate-900">원주단계점</span>
+              <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-bold">상품/재고결품</span>
+            </div>
+            <p class="text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">인디안 경량 다운 베스트 100·105 사이즈 추가 리오더 출고 요청.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // [모바일용 전체 메뉴 드로어 (#allMenusDrawer)]
+    // =========================================================================
+    function openAllMenusDrawer() {
+      document.getElementById('drawerMenuCountBadge').innerText = `${MENU_ITEMS.length}개`;
+      renderDrawerMenuList();
+      document.getElementById('allMenusDrawer').classList.remove('hidden');
+    }
+
+    function closeAllMenusDrawer() {
+      document.getElementById('allMenusDrawer').classList.add('hidden');
+    }
+
+    function renderDrawerMenuList() {
+      const container = document.getElementById('drawerMenuList');
+      const grouped = {};
+      MENU_ITEMS.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      container.innerHTML = Object.entries(grouped).map(([categoryName, items]) => {
+        const sortedItems = sortMenusByPin(items);
+        return `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between px-1">
+              <span class="text-[11px] font-extrabold text-zinc-500">${categoryName}</span>
+              <span class="text-[11px] font-semibold text-zinc-400">${sortedItems.length}개</span>
+            </div>
+            <div class="bg-white border border-[#E6E4DD] rounded-2xl divide-y divide-[#F0EEE9] overflow-hidden">
+              ${sortedItems.map(item => {
+                const style = getAccentStyle(item.accent);
+                const pinned = isMenuPinned(item.id);
+                return `
+                  <div
+                    onclick="openMenu('${item.id}')"
+                    class="px-3.5 py-3 flex items-center justify-between gap-2.5 cursor-pointer hover:bg-[#FAF9F6] active:bg-[#F3F1EB] transition"
+                  >
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-9 h-9 rounded-xl ${style.iconBg} ${style.iconText} flex items-center justify-center text-[14px] shrink-0">
+                        <i class="${item.icon}"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                          <span class="text-[14px] font-bold text-[#18181B] truncate">${item.title}</span>
+                          <span class="text-[9.5px] font-extrabold border px-1.5 py-0.2 rounded shrink-0 ${style.badge}">${item.badge}</span>
+                        </div>
+                        <p class="text-[11.5px] text-zinc-500 truncate mt-0.5">${item.subtitle}</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onclick="toggleMenuPin('${item.id}', event)"
+                      class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F7F6F2] transition ${pinned ? 'text-amber-500' : 'text-zinc-300'}"
+                      title="즐겨찾기 고정"
+                    >
+                      <i class="fa-solid fa-star text-[11px]"></i>
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // [Google OAuth 2.0 보안 인증 및 미리보기 환경 자동 해제 제어]
+    // =========================================================================
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function handleCredentialResponse(response) {
+      const data = parseJwt(response.credential);
+      const errorMsgEl = document.getElementById('authErrorMsg');
+
+      if (!data || !data.email) {
+        errorMsgEl.innerText = "계정 정보를 확인할 수 없습니다.";
+        errorMsgEl.classList.remove('hidden');
+        return;
+      }
+
+      if (ALLOWED_EMAILS.includes(data.email)) {
+        const userObj = { email: data.email, name: data.name || 'WM중부 관리자' };
+        localStorage.setItem('wm_portal_user', JSON.stringify(userObj));
+        unlockPortal(userObj, false);
+      } else {
+        errorMsgEl.innerHTML = `접근 권한이 없는 계정입니다.<br><span class="text-slate-300">(${data.email})</span>`;
+        errorMsgEl.classList.remove('hidden');
+        localStorage.removeItem('wm_portal_user');
+      }
+    }
+
+    function unlockPortal(userObj, isDemo = false) {
+      if (!isDemo && (!userObj || !ALLOWED_EMAILS.includes(userObj.email))) {
+        localStorage.removeItem('wm_portal_user');
+        return;
+      }
+
+      currentUser = userObj;
+      document.getElementById('authOverlay').classList.add('hidden');
+
+      const drawerEmail = document.getElementById('drawerUserEmail');
+      const sidebarEmail = document.getElementById('sidebarUserEmail');
+      const sidebarName = document.getElementById('sidebarUserName');
+      if (drawerEmail) drawerEmail.innerText = userObj.email;
+      if (sidebarEmail) sidebarEmail.innerText = userObj.email;
+      if (sidebarName) sidebarName.innerText = userObj.name || 'WM중부 관리자';
+
+      const hashMenuId = window.location.hash.replace('#', '');
+      if (hashMenuId && MENU_ITEMS.some(m => m.id === hashMenuId)) {
+        openMenu(hashMenuId, false);
+      } else {
+        goHome(false);
+      }
+    }
+
+    function handleLogout() {
+      document.getElementById('logoutModal').classList.remove('hidden');
+    }
+
+    function closeLogoutModal() {
+      document.getElementById('logoutModal').classList.add('hidden');
+    }
+
+    function confirmLogout() {
+      localStorage.removeItem('wm_portal_user');
+      currentUser = null;
+      closeLogoutModal();
+      location.reload();
+    }
+
+    function initGoogleAuth() {
+      isPreviewEnv = detectPreviewEnvironment();
+
+      // 미리보기 샌드박스 환경에서는 잠금 화면을 자동으로 건너뛰어 즉시 PC 대시보드 표시
+      if (isPreviewEnv) {
+        unlockPortal({ email: ALLOWED_EMAILS[0], name: 'WM중부 미리보기' }, true);
+        return;
+      }
+
+      const savedUser = localStorage.getItem('wm_portal_user');
+      if (savedUser) {
+        try {
+          const userObj = JSON.parse(savedUser);
+          if (userObj && ALLOWED_EMAILS.includes(userObj.email)) {
+            unlockPortal(userObj, false);
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem('wm_portal_user');
+        }
+      }
+
+      document.getElementById('authOverlay').classList.remove('hidden');
+
+      let attempts = 0;
+      const checkGsi = setInterval(() => {
+        attempts++;
+        if (window.google && google.accounts && google.accounts.id) {
+          clearInterval(checkGsi);
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse
+          });
+          google.accounts.id.renderButton(
+            document.getElementById("googleBtnWrapper"),
+            { theme: "filled_blue", size: "large", shape: "pill", width: 240, text: "signin_with" }
+          );
+        } else if (attempts > 50) {
+          clearInterval(checkGsi);
+        }
+      }, 100);
+    }
+
+    window.addEventListener('hashchange', () => {
+      if (!currentUser || (!isPreviewEnv && !ALLOWED_EMAILS.includes(currentUser.email))) return;
+      const hashMenuId = window.location.hash.replace('#', '');
+      if (hashMenuId && MENU_ITEMS.some(m => m.id === hashMenuId)) {
+        if (currentView !== 'viewer' || splitMode !== 1 || singleMenuId !== hashMenuId) {
+          splitMode = 1;
+          openMenu(hashMenuId, false);
+        }
+      } else if (currentView !== 'home') {
+        goHome(false);
+      }
+    });
+
+    // =========================================================================
+    // [초기화 실행]
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPins();
+      syncPortalUI();
+      initGoogleAuth();
+    });
+  </script>
+</body>
+</html>
