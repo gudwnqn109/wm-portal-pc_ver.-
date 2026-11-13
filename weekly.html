@@ -117,16 +117,10 @@
   <!-- ================= 1. 상단 PC 통합 커맨드 헤더 ================= -->
   <header class="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800 shadow-2xs">
     <div class="max-w-[1720px] mx-auto px-4 lg:px-5 py-2.5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2.5">
-
-      <!-- 좌측: 브랜드 + 기준일 + 실시간 동기화 -->
       <div class="flex items-center gap-2.5 shrink-0">
-        <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs tracking-tighter shrink-0 shadow-xs">
-          WM
-        </div>
+        <div class="w-8 h-8 rounded-lg bg-slate-900 dark:bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs tracking-tighter shrink-0 shadow-xs">WM</div>
         <div class="flex items-center gap-2 whitespace-nowrap">
-          <h1 class="text-[15px] font-extrabold tracking-tight text-slate-900 dark:text-white">
-            WM중부 주간 실적 리포트
-          </h1>
+          <h1 class="text-[15px] font-extrabold tracking-tight text-slate-900 dark:text-white">WM중부 주간 실적 리포트</h1>
           <span class="text-slate-300 dark:text-slate-700">|</span>
           <span id="headerDateLabel" class="text-xs font-bold text-slate-600 dark:text-slate-300">기준일: 계산중...</span>
           <button type="button" onclick="loadGoogleSheetData(true)" id="currentSheetLabel"
@@ -138,35 +132,19 @@
         </div>
       </div>
 
-      <!-- 중앙: 4개 권역/지점 세그먼트 탭 -->
       <div class="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700/70 shrink-0" id="branchTabs">
-        <button type="button" data-branch="ALL" onclick="setBranchFilter('ALL')"
-                class="branch-tab px-3 py-1 text-xs font-extrabold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs transition whitespace-nowrap">
-          중부전체
-        </button>
-        <button type="button" data-branch="서울" onclick="setBranchFilter('서울')"
-                class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
-          서울지점
-        </button>
-        <button type="button" data-branch="경기" onclick="setBranchFilter('경기')"
-                class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
-          경기지점
-        </button>
-        <button type="button" data-branch="강원" onclick="setBranchFilter('강원')"
-                class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">
-          강원지점
-        </button>
+        <button type="button" data-branch="ALL" onclick="setBranchFilter('ALL')" class="branch-tab px-3 py-1 text-xs font-extrabold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs transition whitespace-nowrap">중부전체</button>
+        <button type="button" data-branch="서울" onclick="setBranchFilter('서울')" class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">서울지점</button>
+        <button type="button" data-branch="경기" onclick="setBranchFilter('경기')" class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">경기지점</button>
+        <button type="button" data-branch="강원" onclick="setBranchFilter('강원')" class="branch-tab px-3 py-1 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition whitespace-nowrap">강원지점</button>
       </div>
 
-      <!-- 우측: 매장 빠른 탐색 + 요약복사 + 다크모드 -->
       <div class="flex items-center gap-2 shrink-0">
         <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl px-1 py-0.5 border border-slate-200/80 dark:border-slate-700/80">
           <button type="button" onclick="stepStore(-1)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition" title="이전 매장">
             <i class="ph-bold ph-caret-left text-xs"></i>
           </button>
-          <select id="storeSelect" onchange="selectStore(this.value)"
-                  class="bg-transparent font-extrabold text-slate-900 dark:text-amber-300 text-xs focus:outline-none cursor-pointer px-2 text-center whitespace-nowrap max-w-[165px] truncate">
-          </select>
+          <select id="storeSelect" onchange="selectStore(this.value)" class="bg-transparent font-extrabold text-slate-900 dark:text-amber-300 text-xs focus:outline-none cursor-pointer px-2 text-center whitespace-nowrap max-w-[165px] truncate"></select>
           <button type="button" onclick="stepStore(1)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg transition" title="다음 매장">
             <i class="ph-bold ph-caret-right text-xs"></i>
           </button>
@@ -176,13 +154,9 @@
           <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
           조회 <strong id="header-store-count" class="text-slate-900 dark:text-white font-black">-개점</strong>
         </span>
-
-        <button type="button" onclick="copyBriefingText()"
-                class="bg-slate-900 dark:bg-amber-400 hover:bg-slate-800 dark:hover:bg-amber-300 active:scale-95 text-amber-400 dark:text-slate-950 px-3 h-8 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 shadow-2xs transition whitespace-nowrap">
-          <i class="ph-bold ph-copy text-xs"></i>
-          <span>요약복사</span>
+        <button type="button" onclick="copyBriefingText()" class="bg-slate-900 dark:bg-amber-400 hover:bg-slate-800 dark:hover:bg-amber-300 active:scale-95 text-amber-400 dark:text-slate-950 px-3 h-8 rounded-xl text-xs font-extrabold inline-flex items-center gap-1.5 shadow-2xs transition whitespace-nowrap">
+          <i class="ph-bold ph-copy text-xs"></i><span>요약복사</span>
         </button>
-
         <button id="theme-toggle-btn" type="button" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition shrink-0" title="다크 모드 전환">
           <i id="theme-icon" class="ph-bold ph-moon text-sm"></i>
         </button>
@@ -192,25 +166,19 @@
 
   <!-- ================= 2. 메인 PC 대시보드 컨테이너 ================= -->
   <main class="max-w-[1720px] mx-auto px-4 lg:px-5 py-3.5 space-y-3.5">
-
+    
     <!-- [SECTION 1] 1분할 PC 1줄(4열) / 2분할 비교 2줄(2열) 선택 매장 핵심 KPI 스트립 -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-
       <!-- KPI 1: 선택 매장 히어로 + 주간 전체매출 -->
       <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 shadow-sm border border-slate-800 flex flex-col justify-between relative overflow-hidden">
-        <div class="absolute -right-3 -bottom-3 text-white/[0.05] pointer-events-none">
-          <i class="ph-fill ph-chart-bar text-7xl"></i>
-        </div>
+        <div class="absolute -right-3 -bottom-3 text-white/[0.05] pointer-events-none"><i class="ph-fill ph-chart-bar text-7xl"></i></div>
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-1.5 min-w-0">
             <span id="cardStoreBranch" class="text-[11px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-slate-950 whitespace-nowrap shrink-0">서울지점</span>
             <h2 id="cardStoreName" class="text-sm font-black text-white whitespace-nowrap truncate">-</h2>
           </div>
-          <span id="cardStoreRank" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-white/15 text-amber-300 whitespace-nowrap shrink-0">
-            당월 -위
-          </span>
+          <span id="cardStoreRank" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-white/15 text-amber-300 whitespace-nowrap shrink-0">당월 -위</span>
         </div>
-
         <div class="my-2 flex items-baseline justify-between gap-2 whitespace-nowrap">
           <div class="flex items-baseline gap-1.5">
             <span id="kpiWeeklySales" class="text-2xl xl:text-3xl font-black tracking-tight text-white">-</span>
@@ -218,7 +186,6 @@
           </div>
           <div id="kpiWeeklySalesGr">-</div>
         </div>
-
         <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
           <span class="text-slate-300">25년 전년 <strong id="heroSales25" class="text-white font-extrabold">-천원</strong></span>
           <span class="text-amber-300 font-bold">회원비중 <strong id="heroCustShare">-</strong></span>
@@ -231,7 +198,6 @@
           <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">주간 구매고객수</span>
           <div id="kpiWeeklyCustGr">-</div>
         </div>
-
         <div class="my-2 flex items-baseline justify-between gap-2 whitespace-nowrap">
           <div class="flex items-baseline gap-1">
             <span id="kpiWeeklyCust" class="text-2xl xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white">-</span>
@@ -239,7 +205,6 @@
           </div>
           <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">전년 <strong id="kpiCust25" class="text-slate-700 dark:text-slate-200">-명</strong></span>
         </div>
-
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
           <span class="text-slate-500 dark:text-slate-400">객단가 <strong id="kpiUnitPrice" class="text-slate-800 dark:text-slate-200 font-extrabold">-천원</strong></span>
           <span class="text-slate-500 dark:text-slate-400">건단가 <strong id="kpiBillPrice" class="text-blue-600 dark:text-blue-400 font-extrabold">-천원</strong></span>
@@ -251,13 +216,10 @@
         <div class="flex items-center justify-between gap-1.5">
           <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">첫구매 신규고객 (월누계)</span>
           <div class="flex items-center gap-1 shrink-0">
-            <span id="kpiFirstRateBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-amber-50 text-amber-800 border-amber-200/80 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60 whitespace-nowrap">
-              달성 0%
-            </span>
+            <span id="kpiFirstRateBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded-md border bg-amber-50 text-amber-800 border-amber-200/80 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60 whitespace-nowrap">달성 0%</span>
             <div id="kpiFirstMonthGrBadge">-</div>
           </div>
         </div>
-
         <div class="my-2 flex items-baseline justify-between gap-2 whitespace-nowrap">
           <div class="flex items-baseline gap-1">
             <span id="kpiFirstMonthVal" class="text-2xl xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white">-</span>
@@ -265,7 +227,6 @@
           </div>
           <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400 bg-amber-50/90 dark:bg-amber-950/50 px-2 py-0.5 rounded whitespace-nowrap" id="kpiFirstWeekBadge">금주 -명</span>
         </div>
-
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
           <span class="text-slate-500 dark:text-slate-400">연간 누계 첫구매</span>
           <span id="kpiFirstYearVal" class="font-extrabold text-slate-800 dark:text-slate-200">-명</span>
@@ -278,7 +239,6 @@
           <span class="text-xs font-extrabold text-slate-700 dark:text-slate-200 whitespace-nowrap shrink-0">당월 브랜드 누계매출</span>
           <div id="kpiBrandMonthGr">-</div>
         </div>
-
         <div class="my-2 flex items-baseline justify-between gap-2 whitespace-nowrap">
           <div class="flex items-baseline gap-1">
             <span id="kpiBrandMonthSales" class="text-2xl xl:text-3xl font-black tracking-tight text-slate-900 dark:text-white">-</span>
@@ -286,36 +246,29 @@
           </div>
           <span id="kpiBrandRankBadge" class="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded whitespace-nowrap">- 내 -위</span>
         </div>
-
         <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs whitespace-nowrap">
           <span class="text-slate-500 dark:text-slate-400">년 누계매출 <strong id="kpiBrandYearSales" class="text-slate-800 dark:text-slate-200 font-extrabold">-천원</strong></span>
           <div id="kpiBrandYearGr">-</div>
         </div>
       </div>
-
     </section>
 
     <!-- [SECTION 2-A] 1번 & 2번 카드 좌·우 1:1 병렬 배치 -->
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
-
       <!-- 1. 주간 매출 및 회원 고객 비중 (좌측 50%) -->
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-[13px] font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i class="ph-fill ph-chart-bar text-amber-500 text-base"></i>
-            <span>1. 주간 매출 및 회원 고객 비중</span>
+            <i class="ph-fill ph-chart-bar text-amber-500 text-base"></i><span>1. 주간 매출 및 회원 고객 비중</span>
           </h3>
           <span class="text-[11px] text-slate-400 font-semibold">단위: 천원 · 전년 동기 대비</span>
         </div>
-
         <div class="bg-slate-50/90 dark:bg-slate-800/70 rounded-xl p-3.5 border border-slate-200/70 dark:border-slate-700/70 space-y-3 flex-1 flex flex-col justify-between">
           <div class="space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-600 dark:text-slate-300">전년 동기 대비 실적 비교</span>
               <div id="s1SalesBadge">-</div>
             </div>
-
-            <!-- 26년 주간 막대 -->
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="font-extrabold text-slate-800 dark:text-slate-100">26년 주간 실적</span>
@@ -325,8 +278,6 @@
                 <div id="s1Bar26" class="bg-slate-900 dark:bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
-
-            <!-- 25년 전년 막대 -->
             <div>
               <div class="flex justify-between text-xs mb-1">
                 <span class="font-semibold text-slate-500 dark:text-slate-400">25년 전년 동기</span>
@@ -337,14 +288,10 @@
               </div>
             </div>
           </div>
-
-          <!-- 회원 고객매출 비중 바 -->
           <div class="pt-3 border-t border-slate-200/70 dark:border-slate-700/70">
             <div class="flex items-center justify-between text-xs mb-1.5">
               <span class="font-bold text-slate-600 dark:text-slate-300">회원 고객매출 <strong class="text-slate-900 dark:text-white font-black ml-1" id="s1CustSales">-</strong></span>
-              <span class="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/70 dark:border-emerald-800/60 px-2 py-0.5 rounded-md">
-                비중 <span id="s1CustShare">-</span>
-              </span>
+              <span class="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/70 dark:border-emerald-800/60 px-2 py-0.5 rounded-md">비중 <span id="s1CustShare">-</span></span>
             </div>
             <div class="w-full bg-slate-200/80 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
               <div id="s1CustShareBar" class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -357,14 +304,11 @@
       <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs flex flex-col justify-between space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-[13px] font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i class="ph-fill ph-users-three text-blue-600 dark:text-blue-400 text-base"></i>
-            <span>2. 고객 지표 및 첫구매 신규고객</span>
+            <i class="ph-fill ph-users-three text-blue-600 dark:text-blue-400 text-base"></i><span>2. 고객 지표 및 첫구매 신규고객</span>
           </h3>
           <span class="text-[11px] text-slate-400 font-semibold">단위: 명, 천원</span>
         </div>
-
         <div class="space-y-3 flex-1 flex flex-col justify-between">
-          <!-- 3대 고객 핵심 지표 -->
           <div class="grid grid-cols-3 gap-2.5">
             <div class="bg-slate-50 dark:bg-slate-800/70 p-3 rounded-xl border border-slate-200/70 dark:border-slate-700/70 text-center">
               <div class="text-[11px] text-slate-500 dark:text-slate-400 font-bold">구매고객수</div>
@@ -382,8 +326,6 @@
               <div class="text-[10px] text-slate-400">영수증 단가</div>
             </div>
           </div>
-
-          <!-- 첫구매 신규고객 (당월) 트래커 -->
           <div class="bg-gradient-to-br from-amber-50/90 to-orange-50/40 dark:from-amber-950/30 dark:to-slate-800/70 p-3.5 rounded-xl border border-amber-200/80 dark:border-amber-800/50 space-y-2.5">
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-baseline flex-wrap gap-x-1.5">
@@ -394,11 +336,9 @@
               </div>
               <span class="text-xs font-black text-amber-800 dark:text-amber-300 bg-amber-100/90 dark:bg-amber-900/60 border border-amber-200 dark:border-amber-700/60 px-2 py-0.5 rounded-md shrink-0" id="s2FirstMonthRate">달성률 0%</span>
             </div>
-
             <div class="w-full bg-amber-200/60 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
               <div id="s2FirstMonthBar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
-
             <div class="grid grid-cols-2 gap-2 pt-1.5 border-t border-amber-200/60 dark:border-amber-800/40 text-xs">
               <div class="bg-white/80 dark:bg-slate-900/70 px-2.5 py-1.5 rounded-lg flex items-center justify-between">
                 <span class="text-slate-500 dark:text-slate-400 font-semibold">금주 실적</span>
@@ -412,42 +352,29 @@
           </div>
         </div>
       </div>
-
     </section>
 
-    <!-- [SECTION 2-B] 3번 카드 하단 와이드 배치:
-         - 1분할(PC 일반 화면): 좌측 [당월 누계] 50% + 우측 [년 누계] 50% 동시 비교
-         - 2분할(1160px 이하 좁은 패널): [당월 누계 / 년 누계] 토글 선택 모드 자동 전환 -->
+    <!-- [SECTION 2-B] 3번 카드 하단 와이드 배치 -->
     <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-2xs space-y-3.5">
-
-      <!-- 섹션 헤더 -->
       <div class="flex items-center justify-between gap-2">
         <div>
           <h3 class="text-[13px] font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <i class="ph-fill ph-tag text-indigo-600 dark:text-indigo-400 text-base"></i>
-            <span>3. 5대 브랜드별 매출 구성 및 전년 대비 신장</span>
+            <i class="ph-fill ph-tag text-indigo-600 dark:text-indigo-400 text-base"></i><span>3. 5대 브랜드별 매출 구성 및 전년 대비 신장</span>
           </h3>
-          <p class="text-[11px] text-slate-400 font-medium mt-0.5">매장 내 브랜드별 매출 비중(%) · 매출액(천원) · 전년 동기 대비 증감률</p>
+          <p class="text-[11px] text-slate-400 font-medium mt-0.5">매장 내 브랜드별 매출 비중(%) · 매출액(천원) · 지점 및 영업팀 평균 비교</p>
         </div>
-
-        <!-- 2분할 좁은 패널에서만 표시되는 당월 누계 / 년 누계 선택 토글 -->
         <div class="brand-split-toggle hidden bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs shrink-0 border border-slate-200/70 dark:border-slate-700/70">
           <button type="button" onclick="switchBrandMode('MONTH')" id="btnBrandMonth" class="px-3 py-1 font-extrabold rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs transition">당월 누계</button>
           <button type="button" onclick="switchBrandMode('YEAR')" id="btnBrandYear" class="px-3 py-1 font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">년 누계</button>
         </div>
       </div>
 
-      <!-- [A. 1분할 PC 전용: 당월 누계 (좌 50%) + 년 누계 (우 50%) 동시 비교 레이아웃] -->
       <div class="brand-wide-only grid-cols-2 gap-4">
-
         <!-- 좌측 50%: 당월 누계 패널 -->
         <div class="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-3.5 space-y-3">
           <div class="bg-slate-900 dark:bg-slate-950 text-white p-3.5 rounded-xl border border-slate-800 space-y-2.5">
             <div class="flex items-center justify-between text-xs">
-              <span class="text-amber-300 font-extrabold flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                당월 누계 브랜드 매출
-              </span>
+              <span class="text-amber-300 font-extrabold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400"></span>당월 누계 브랜드 매출</span>
               <span class="text-amber-400 font-extrabold bg-slate-800 px-2.5 py-0.5 rounded-md" id="wideMonthRank">- 내 -위</span>
             </div>
             <div class="flex items-baseline justify-between">
@@ -465,20 +392,14 @@
               </div>
             </div>
           </div>
-
-          <div class="space-y-2" id="wideMonthBrandList">
-            <!-- 당월 5대 브랜드 동적 렌더링 -->
-          </div>
+          <div class="space-y-2" id="wideMonthBrandList"></div>
         </div>
 
         <!-- 우측 50%: 년 누계 패널 -->
         <div class="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 p-3.5 space-y-3">
           <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-3.5 rounded-xl border border-slate-800 space-y-2.5">
             <div class="flex items-center justify-between text-xs">
-              <span class="text-indigo-300 font-extrabold flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                년 누계 브랜드 매출
-              </span>
+              <span class="text-indigo-300 font-extrabold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-400"></span>년 누계 브랜드 매출</span>
               <span class="text-indigo-200 font-extrabold bg-white/10 px-2.5 py-0.5 rounded-md" id="wideYearRank">- 내 -위</span>
             </div>
             <div class="flex items-baseline justify-between">
@@ -496,15 +417,11 @@
               </div>
             </div>
           </div>
-
-          <div class="space-y-2" id="wideYearBrandList">
-            <!-- 연간 5대 브랜드 동적 렌더링 -->
-          </div>
+          <div class="space-y-2" id="wideYearBrandList"></div>
         </div>
-
       </div>
 
-      <!-- [B. 2분할 비교 모드 전용: 당월 누계 / 년 누계 토글 단일 뷰] -->
+      <!-- [B. 2분할 비교 모드 전용] -->
       <div class="brand-split-only space-y-3">
         <div class="bg-slate-900 dark:bg-slate-950 text-white p-3.5 rounded-xl border border-slate-800 space-y-2.5">
           <div class="flex items-center justify-between text-xs">
@@ -526,21 +443,14 @@
             </div>
           </div>
         </div>
-
-        <div class="space-y-2" id="brandCardsList">
-          <!-- 토글 모드 5대 브랜드 동적 렌더링 -->
-        </div>
+        <div class="space-y-2" id="brandCardsList"></div>
       </div>
-
     </section>
 
     <!-- [SECTION 3] 전 매장 주간 실적 비교 통합 테이블 -->
     <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs overflow-hidden">
-
       <!-- 테이블 상단 컨트롤 툴바 -->
       <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-900/70">
-
-        <!-- 좌측: 검색창 + 주간 실적 필터 칩 -->
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto flex-1 min-w-0">
           <div class="relative w-full sm:w-52 shrink-0">
             <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -550,25 +460,16 @@
               <i class="ph-fill ph-x-circle text-sm"></i>
             </button>
           </div>
-
           <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar" id="statusChips">
-            <button type="button" onclick="setTableStatusFilter('ALL')" data-filter="ALL"
-                    class="status-chip px-2.5 py-1.5 text-xs font-extrabold rounded-xl bg-slate-900 dark:bg-blue-700 text-white whitespace-nowrap transition">
-              전체 (<span id="chipAllCount">0</span>)
-            </button>
-            <button type="button" onclick="setTableStatusFilter('GROWTH_UP')" data-filter="GROWTH_UP"
-                    class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition">
-              주간 신장 (+)
-            </button>
+            <button type="button" onclick="setTableStatusFilter('ALL')" data-filter="ALL" class="status-chip px-2.5 py-1.5 text-xs font-extrabold rounded-xl bg-slate-900 dark:bg-blue-700 text-white whitespace-nowrap transition">전체 (<span id="chipAllCount">0</span>)</button>
+            <button type="button" onclick="setTableStatusFilter('GROWTH_UP')" data-filter="GROWTH_UP" class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition">주간 신장 (+)</button>
           </div>
         </div>
 
-        <!-- 우측: 조회 건수 + 정렬 선택 + 안내 -->
         <div class="flex items-center justify-between sm:justify-end gap-2.5 w-full lg:w-auto shrink-0 text-xs">
           <span class="text-slate-500 dark:text-slate-400 whitespace-nowrap">
             조회 <strong id="matchCount" class="text-slate-900 dark:text-white font-black">0</strong>개점 · <span class="text-blue-600 dark:text-amber-400 font-bold">행 클릭 시 상세 분석 전환</span>
           </span>
-
           <div class="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <i class="ph-bold ph-arrows-down-up text-slate-400"></i>
             <select id="sortSelect" onchange="handleSortChange(this.value)" class="bg-transparent font-bold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer whitespace-nowrap">
@@ -580,7 +481,6 @@
               <option value="brandYear_desc">년 누계순</option>
             </select>
           </div>
-
           <span class="text-[11px] font-semibold text-slate-400 whitespace-nowrap hidden sm:inline">단위: 천원·명</span>
         </div>
       </div>
@@ -589,22 +489,13 @@
       <div class="overflow-x-auto max-h-[540px] overflow-y-auto">
         <table class="w-full text-left border-collapse">
           <thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
+            <!-- 2분할 숨김(.hide-in-split) 반영하여 colspans 최적화 (3 / 4 / 4 / 4 / 2) -->
             <tr class="text-[10.5px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
-              <th colspan="3" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700">
-                매장 정보
-              </th>
-              <th colspan="4" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">
-                주간 매출 실적 (천원)
-              </th>
-              <th colspan="3" class="py-1.5 px-2 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700">
-                주간 고객 · 단가
-              </th>
-              <th colspan="3" class="py-1.5 px-2 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700">
-                첫구매 신규고객 (명)
-              </th>
-              <th colspan="2" class="py-1.5 px-2 text-center bg-slate-100/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-300">
-                브랜드 누계 (천원)
-              </th>
+              <th colspan="3" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700">매장 정보</th>
+              <th colspan="4" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">주간 매출 실적 (천원)</th>
+              <th colspan="4" class="py-1.5 px-2 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700">주간 고객 · 단가</th>
+              <th colspan="4" class="py-1.5 px-2 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700">첫구매 신규고객 (명)</th>
+              <th colspan="2" class="hide-in-split py-1.5 px-2 text-center bg-slate-100/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-300">브랜드 누계 (천원)</th>
             </tr>
 
             <tr class="text-[11px] font-extrabold border-b border-slate-200 dark:border-slate-700 bg-slate-50/95 dark:bg-slate-900/95 text-slate-600 dark:text-slate-300">
@@ -615,40 +506,36 @@
               <th onclick="toggleColumnSort('sales26')" class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 cursor-pointer hover:text-indigo-600 transition select-none">
                 26년 주간 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200">
-                25년 전년
-              </th>
+              <th class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200">25년 전년</th>
               <th onclick="toggleColumnSort('salesGr')" class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 cursor-pointer hover:text-indigo-600 transition select-none">
                 전년비 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 border-r border-slate-200 dark:border-slate-700">
-                회원비중
-              </th>
+              <th class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 border-r border-slate-200 dark:border-slate-700">회원비중</th>
 
               <th onclick="toggleColumnSort('custCnt26')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 cursor-pointer hover:text-blue-600 transition select-none">
                 구매고객 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200">
-                객단가
+              <th onclick="toggleColumnSort('custGr')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 cursor-pointer hover:text-blue-600 transition select-none">
+                신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="hide-in-split py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 border-r border-slate-200 dark:border-slate-700">
-                건단가
-              </th>
+              <th class="hide-in-split py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200">객단가</th>
+              <th class="hide-in-split py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 border-r border-slate-200 dark:border-slate-700">건단가</th>
 
-              <th class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200">
-                금주
+              <th onclick="toggleColumnSort('firstWeek')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
+                첫구매 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+              </th>
+              <th onclick="toggleColumnSort('firstWeekGr')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
+                신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
               <th onclick="toggleColumnSort('firstProg')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
                 당월/목표 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 border-r border-slate-200 dark:border-slate-700">
-                연간누계
-              </th>
+              <th class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 border-r border-slate-200 dark:border-slate-700">연간누계</th>
 
-              <th onclick="toggleColumnSort('brandMonth')" class="compact-head py-2 px-2 text-right cursor-pointer hover:text-blue-600 transition select-none">
+              <th onclick="toggleColumnSort('brandMonth')" class="hide-in-split compact-head py-2 px-2 text-right cursor-pointer hover:text-blue-600 transition select-none">
                 당월 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th onclick="toggleColumnSort('brandYear')" class="compact-head py-2 pl-2 pr-3 text-right cursor-pointer hover:text-blue-600 transition select-none">
+              <th onclick="toggleColumnSort('brandYear')" class="hide-in-split compact-head py-2 pl-2 pr-3 text-right cursor-pointer hover:text-blue-600 transition select-none">
                 년 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
             </tr>
@@ -687,12 +574,9 @@
     }
 
     function createStoreRecord(
-      name, branch,
-      sales26, sales25, custSales26,
-      custCnt26, custCnt25,
+      name, branch, sales26, sales25, custSales26, custCnt26, custCnt25,
       firstGoal, firstWeek, firstWeek25, firstMonth, firstMonth25, firstYear, firstYear25,
-      brandRank, brandYearRank,
-      bm, by
+      brandRank, brandYearRank, bm, by
     ) {
       const salesGr = sales25 > 0 ? (sales26 - sales25) / sales25 : 0;
       const custShare = sales26 > 0 ? custSales26 / sales26 : 0;
@@ -705,217 +589,49 @@
       const firstYearGr = firstYear25 > 0 ? (firstYear - firstYear25) / firstYear25 : 0;
 
       return {
-        name, branch,
-        sales26, sales25, salesGr,
-        custSales26, custShare,
-        custCnt26, custCnt25, custGr,
-        unitPrice, billPrice,
+        name, branch, sales26, sales25, salesGr, custSales26, custShare,
+        custCnt26, custCnt25, custGr, unitPrice, billPrice,
         firstGoal, firstWeek, firstWeekGr, firstMonth, firstMonthGr, firstProg, firstYear, firstYearGr,
-        brandRank, brandYearRank,
-        brandMonth: { rank: brandRank, ...bm },
-        brandYear: { rank: brandYearRank, ...by }
+        brandRank, brandYearRank, brandMonth: { rank: brandRank, ...bm }, brandYear: { rank: brandYearRank, ...by }
       };
     }
 
+    // DB에 벤치마크(중부영업팀, 각 지점 평균) 저장용 객체 추가
     let DB = {
+      benchmarks: {
+        'ALL': {
+          brandMonth: { indian: 0.50, bruno: 0.15, daily: 0.25, label: 0.05, duani: 0.05 },
+          brandYear: { indian: 0.48, bruno: 0.16, daily: 0.26, label: 0.06, duani: 0.04 }
+        },
+        '서울': {
+          brandMonth: { indian: 0.52, bruno: 0.14, daily: 0.24, label: 0.06, duani: 0.04 },
+          brandYear: { indian: 0.49, bruno: 0.15, daily: 0.25, label: 0.06, duani: 0.05 }
+        },
+        '경기': {
+          brandMonth: { indian: 0.55, bruno: 0.15, daily: 0.20, label: 0.05, duani: 0.05 },
+          brandYear: { indian: 0.50, bruno: 0.14, daily: 0.24, label: 0.06, duani: 0.06 }
+        },
+        '강원': {
+          brandMonth: { indian: 0.48, bruno: 0.19, daily: 0.23, label: 0.05, duani: 0.05 },
+          brandYear: { indian: 0.46, bruno: 0.18, daily: 0.25, label: 0.05, duani: 0.06 }
+        }
+      },
       stores: [
         createStoreRecord('금호직영점', '서울', 14250, 12180, 13680, 74, 62, 30, 12, 8, 19, 15, 540, 460, 6, 5,
-          { total: 24800, gr: 0.16, indian: 0.52, bruno: 0.16, daily: 0.21, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 12896, gr: 0.21 }, bruno: { sales: 3968, gr: 0.12 }, daily: { sales: 5208, gr: 0.14 }, label: { sales: 1488, gr: 0.08 }, duani: { sales: 1240, gr: 0.05 } } },
-          { total: 445000, gr: 0.14, indian: 0.48, bruno: 0.15, daily: 0.25, label: 0.06, duani: 0.06,
-            details: { indian: { sales: 213600, gr: 0.16 }, bruno: { sales: 66750, gr: 0.10 }, daily: { sales: 111250, gr: 0.15 }, label: { sales: 26700, gr: 0.12 }, duani: { sales: 26700, gr: 0.09 } } }
+          { total: 24800, gr: 0.16, indian: 0.52, bruno: 0.16, daily: 0.21, label: 0.06, duani: 0.05, details: { indian: { sales: 12896, gr: 0.21 }, bruno: { sales: 3968, gr: 0.12 }, daily: { sales: 5208, gr: 0.14 }, label: { sales: 1488, gr: 0.08 }, duani: { sales: 1240, gr: 0.05 } } },
+          { total: 445000, gr: 0.14, indian: 0.48, bruno: 0.15, daily: 0.25, label: 0.06, duani: 0.06, details: { indian: { sales: 213600, gr: 0.16 }, bruno: { sales: 66750, gr: 0.10 }, daily: { sales: 111250, gr: 0.15 }, label: { sales: 26700, gr: 0.12 }, duani: { sales: 26700, gr: 0.09 } } }
         ),
         createStoreRecord('길동점', '서울', 11122.9, 9747.3, 11122.9, 60, 47, 30, 10, 6, 11, 10, 494, 262, 9, 8,
-          { total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057,
-            details: { indian: { sales: 8181.0, gr: -0.145 }, bruno: { sales: -111.0, gr: -1.07 }, daily: { sales: 3329.0, gr: -0.029 }, label: { sales: 720.0, gr: 0.00 }, duani: { sales: 737.4, gr: 1.56 } } },
-          { total: 382278.0, gr: 0.22, indian: 0.46, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077,
-            details: { indian: { sales: 175844.4, gr: 0.15 }, bruno: { sales: 36764.4, gr: -0.054 }, daily: { sales: 117336.2, gr: 0.193 }, label: { sales: 20785.0, gr: 1.705 }, duani: { sales: 29548.0, gr: 0.886 } } }
-        ),
-        createStoreRecord('명일점', '서울', 9840, 9120, 9348, 52, 49, 25, 8, 7, 15, 13, 380, 340, 11, 10,
-          { total: 17420, gr: 0.08, indian: 0.55, bruno: 0.14, daily: 0.22, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 9581, gr: 0.10 }, bruno: { sales: 2439, gr: 0.05 }, daily: { sales: 3832, gr: 0.07 }, label: { sales: 871, gr: 0.02 }, duani: { sales: 697, gr: 0.04 } } },
-          { total: 328500, gr: 0.09, indian: 0.50, bruno: 0.14, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 164250, gr: 0.11 }, bruno: { sales: 45990, gr: 0.04 }, daily: { sales: 85410, gr: 0.08 }, label: { sales: 16425, gr: 0.06 }, duani: { sales: 16425, gr: 0.07 } } }
-        ),
-        createStoreRecord('미아직영점', '서울', 16320, 14950, 15504, 86, 78, 35, 14, 11, 24, 20, 620, 550, 4, 4,
-          { total: 29450, gr: 0.12, indian: 0.50, bruno: 0.18, daily: 0.22, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 14725, gr: 0.14 }, bruno: { sales: 5301, gr: 0.11 }, daily: { sales: 6479, gr: 0.09 }, label: { sales: 1767, gr: 0.15 }, duani: { sales: 1178, gr: 0.03 } } },
-          { total: 512000, gr: 0.15, indian: 0.47, bruno: 0.17, daily: 0.25, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 240640, gr: 0.16 }, bruno: { sales: 87040, gr: 0.14 }, daily: { sales: 128000, gr: 0.13 }, label: { sales: 30720, gr: 0.18 }, duani: { sales: 25600, gr: 0.11 } } }
-        ),
-        createStoreRecord('방학직영점', '서울', 12450, 11890, 11703, 66, 63, 30, 9, 8, 17, 16, 445, 410, 8, 7,
-          { total: 21300, gr: 0.05, indian: 0.54, bruno: 0.13, daily: 0.24, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 11502, gr: 0.06 }, bruno: { sales: 2769, gr: 0.02 }, daily: { sales: 5112, gr: 0.05 }, label: { sales: 1065, gr: 0.04 }, duani: { sales: 852, gr: 0.01 } } },
-          { total: 396000, gr: 0.07, indian: 0.49, bruno: 0.14, daily: 0.27, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 194040, gr: 0.08 }, bruno: { sales: 55440, gr: 0.03 }, daily: { sales: 106920, gr: 0.07 }, label: { sales: 19800, gr: 0.05 }, duani: { sales: 19800, gr: 0.04 } } }
-        ),
-        createStoreRecord('삼선교직영점', '서울', 10580, 11240, 9839, 54, 59, 25, 6, 8, 12, 15, 310, 355, 13, 12,
-          { total: 16890, gr: -0.06, indian: 0.51, bruno: 0.15, daily: 0.25, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 8614, gr: -0.05 }, bruno: { sales: 2534, gr: -0.08 }, daily: { sales: 4223, gr: -0.04 }, label: { sales: 845, gr: -0.10 }, duani: { sales: 676, gr: -0.07 } } },
-          { total: 312400, gr: -0.03, indian: 0.46, bruno: 0.15, daily: 0.28, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 143704, gr: -0.02 }, bruno: { sales: 46860, gr: -0.05 }, daily: { sales: 87472, gr: -0.02 }, label: { sales: 18744, gr: -0.04 }, duani: { sales: 15620, gr: -0.03 } } }
-        ),
-        createStoreRecord('수유점', '서울', 13190, 11980, 12530, 71, 64, 30, 11, 9, 20, 17, 480, 425, 7, 6,
-          { total: 22900, gr: 0.11, indian: 0.53, bruno: 0.15, daily: 0.23, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 12137, gr: 0.13 }, bruno: { sales: 3435, gr: 0.09 }, daily: { sales: 5267, gr: 0.10 }, label: { sales: 1145, gr: 0.08 }, duani: { sales: 916, gr: 0.06 } } },
-          { total: 418000, gr: 0.11, indian: 0.48, bruno: 0.15, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 200640, gr: 0.12 }, bruno: { sales: 62700, gr: 0.09 }, daily: { sales: 108680, gr: 0.11 }, label: { sales: 25080, gr: 0.10 }, duani: { sales: 20900, gr: 0.08 } } }
-        ),
-        createStoreRecord('장안점', '서울', 8920, 8450, 8385, 48, 45, 25, 7, 6, 13, 12, 335, 310, 14, 14,
-          { total: 15400, gr: 0.06, indian: 0.56, bruno: 0.12, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 8624, gr: 0.08 }, bruno: { sales: 1848, gr: 0.02 }, daily: { sales: 3542, gr: 0.05 }, label: { sales: 616, gr: 0.00 }, duani: { sales: 770, gr: 0.07 } } },
-          { total: 289000, gr: 0.05, indian: 0.51, bruno: 0.13, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 147390, gr: 0.06 }, bruno: { sales: 37570, gr: 0.01 }, daily: { sales: 75140, gr: 0.05 }, label: { sales: 14450, gr: 0.03 }, duani: { sales: 14450, gr: 0.06 } } }
-        ),
-        createStoreRecord('청량리점', '서울', 15480, 13620, 14706, 82, 72, 35, 13, 10, 22, 18, 575, 490, 5, 5,
-          { total: 27100, gr: 0.14, indian: 0.52, bruno: 0.17, daily: 0.21, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 14092, gr: 0.16 }, bruno: { sales: 4607, gr: 0.13 }, daily: { sales: 5691, gr: 0.11 }, label: { sales: 1626, gr: 0.15 }, duani: { sales: 1084, gr: 0.08 } } },
-          { total: 478000, gr: 0.13, indian: 0.47, bruno: 0.16, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 224660, gr: 0.15 }, bruno: { sales: 76480, gr: 0.11 }, daily: { sales: 124280, gr: 0.12 }, label: { sales: 28680, gr: 0.14 }, duani: { sales: 23900, gr: 0.09 } } }
-        ),
-        createStoreRecord('중곡점', '서울', 7640, 8120, 7105, 41, 44, 20, 5, 6, 9, 11, 265, 290, 19, 18,
-          { total: 13200, gr: -0.05, indian: 0.54, bruno: 0.13, daily: 0.24, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 7128, gr: -0.04 }, bruno: { sales: 1716, gr: -0.08 }, daily: { sales: 3168, gr: -0.05 }, label: { sales: 528, gr: -0.09 }, duani: { sales: 660, gr: -0.02 } } },
-          { total: 254000, gr: -0.02, indian: 0.49, bruno: 0.14, daily: 0.27, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 124460, gr: -0.01 }, bruno: { sales: 35560, gr: -0.04 }, daily: { sales: 68580, gr: -0.02 }, label: { sales: 12700, gr: -0.05 }, duani: { sales: 12700, gr: 0.01 } } }
-        ),
-        createStoreRecord('서울시흥점', '서울', 11420, 10290, 10735, 61, 55, 25, 9, 7, 16, 13, 415, 370, 10, 10,
-          { total: 19650, gr: 0.10, indian: 0.53, bruno: 0.14, daily: 0.24, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 10415, gr: 0.12 }, bruno: { sales: 2751, gr: 0.07 }, daily: { sales: 4716, gr: 0.09 }, label: { sales: 983, gr: 0.06 }, duani: { sales: 786, gr: 0.05 } } },
-          { total: 358000, gr: 0.10, indian: 0.48, bruno: 0.15, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 171840, gr: 0.11 }, bruno: { sales: 53700, gr: 0.08 }, daily: { sales: 93080, gr: 0.09 }, label: { sales: 21480, gr: 0.08 }, duani: { sales: 17900, gr: 0.07 } } }
-        ),
-        createStoreRecord('구로고대점', '서울', 10290, 9640, 9673, 55, 51, 25, 8, 7, 14, 12, 370, 340, 12, 11,
-          { total: 17850, gr: 0.07, indian: 0.51, bruno: 0.16, daily: 0.23, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 9104, gr: 0.08 }, bruno: { sales: 2856, gr: 0.06 }, daily: { sales: 4106, gr: 0.05 }, label: { sales: 1071, gr: 0.09 }, duani: { sales: 714, gr: 0.03 } } },
-          { total: 334000, gr: 0.08, indian: 0.47, bruno: 0.16, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 156980, gr: 0.09 }, bruno: { sales: 53440, gr: 0.07 }, daily: { sales: 86840, gr: 0.07 }, label: { sales: 20040, gr: 0.10 }, duani: { sales: 16700, gr: 0.05 } } }
-        ),
-        createStoreRecord('공항직영점', '서울', 18420, 15890, 17499, 94, 81, 40, 16, 12, 28, 22, 680, 585, 2, 3,
-          { total: 33200, gr: 0.17, indian: 0.49, bruno: 0.19, daily: 0.21, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 16268, gr: 0.19 }, bruno: { sales: 6308, gr: 0.16 }, daily: { sales: 6972, gr: 0.14 }, label: { sales: 1992, gr: 0.20 }, duani: { sales: 1660, gr: 0.12 } } },
-          { total: 564000, gr: 0.18, indian: 0.46, bruno: 0.18, daily: 0.24, label: 0.07, duani: 0.05,
-            details: { indian: { sales: 259440, gr: 0.20 }, bruno: { sales: 101520, gr: 0.17 }, daily: { sales: 135360, gr: 0.15 }, label: { sales: 39480, gr: 0.22 }, duani: { sales: 28200, gr: 0.14 } } }
-        ),
-        createStoreRecord('난곡점', '서울', 8450, 8120, 7943, 46, 44, 20, 6, 5, 11, 10, 295, 280, 17, 16,
-          { total: 14600, gr: 0.04, indian: 0.56, bruno: 0.12, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 8176, gr: 0.06 }, bruno: { sales: 1752, gr: 0.01 }, daily: { sales: 3358, gr: 0.03 }, label: { sales: 584, gr: 0.00 }, duani: { sales: 730, gr: 0.04 } } },
-          { total: 279000, gr: 0.04, indian: 0.51, bruno: 0.13, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 142290, gr: 0.05 }, bruno: { sales: 36270, gr: 0.02 }, daily: { sales: 72540, gr: 0.04 }, label: { sales: 13950, gr: 0.02 }, duani: { sales: 13950, gr: 0.05 } } }
-        ),
-        createStoreRecord('대림점', '서울', 9180, 8640, 8629, 49, 46, 25, 7, 6, 13, 11, 325, 300, 15, 14,
-          { total: 15800, gr: 0.06, indian: 0.54, bruno: 0.14, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 8532, gr: 0.08 }, bruno: { sales: 2212, gr: 0.04 }, daily: { sales: 3634, gr: 0.05 }, label: { sales: 632, gr: 0.02 }, duani: { sales: 790, gr: 0.06 } } },
-          { total: 298000, gr: 0.06, indian: 0.49, bruno: 0.14, daily: 0.27, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 146020, gr: 0.07 }, bruno: { sales: 41720, gr: 0.04 }, daily: { sales: 80460, gr: 0.06 }, label: { sales: 14900, gr: 0.04 }, duani: { sales: 14900, gr: 0.06 } } }
-        ),
-        createStoreRecord('먹골역점', '서울', 8740, 9150, 8128, 47, 50, 20, 5, 7, 10, 13, 285, 315, 18, 17,
-          { total: 14950, gr: -0.04, indian: 0.55, bruno: 0.13, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 8223, gr: -0.03 }, bruno: { sales: 1944, gr: -0.07 }, daily: { sales: 3439, gr: -0.04 }, label: { sales: 598, gr: -0.08 }, duani: { sales: 748, gr: -0.01 } } },
-          { total: 282000, gr: -0.02, indian: 0.50, bruno: 0.14, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 141000, gr: -0.01 }, bruno: { sales: 39480, gr: -0.04 }, daily: { sales: 73320, gr: -0.02 }, label: { sales: 14100, gr: -0.05 }, duani: { sales: 14100, gr: 0.01 } } }
-        ),
-        createStoreRecord('사가정직영점', '서울', 11850, 10920, 11258, 63, 58, 30, 10, 8, 18, 15, 430, 395, 9, 9,
-          { total: 20450, gr: 0.09, indian: 0.53, bruno: 0.15, daily: 0.23, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 10839, gr: 0.11 }, bruno: { sales: 3068, gr: 0.07 }, daily: { sales: 4704, gr: 0.08 }, label: { sales: 1023, gr: 0.05 }, duani: { sales: 818, gr: 0.04 } } },
-          { total: 374000, gr: 0.09, indian: 0.48, bruno: 0.15, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 179520, gr: 0.10 }, bruno: { sales: 56100, gr: 0.08 }, daily: { sales: 97240, gr: 0.08 }, label: { sales: 22440, gr: 0.09 }, duani: { sales: 18700, gr: 0.07 } } }
-        ),
-        createStoreRecord('상도점', '서울', 9430, 8980, 8864, 50, 47, 25, 8, 7, 14, 13, 355, 330, 14, 13,
-          { total: 16200, gr: 0.05, indian: 0.55, bruno: 0.13, daily: 0.23, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 8910, gr: 0.07 }, bruno: { sales: 2106, gr: 0.03 }, daily: { sales: 3726, gr: 0.04 }, label: { sales: 810, gr: 0.02 }, duani: { sales: 648, gr: 0.01 } } },
-          { total: 304000, gr: 0.06, indian: 0.50, bruno: 0.14, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 152000, gr: 0.07 }, bruno: { sales: 42560, gr: 0.04 }, daily: { sales: 79040, gr: 0.06 }, label: { sales: 15200, gr: 0.05 }, duani: { sales: 15200, gr: 0.04 } } }
-        ),
-        createStoreRecord('신당점', '서울', 10120, 9480, 9513, 54, 50, 25, 8, 7, 15, 13, 365, 335, 12, 12,
-          { total: 17300, gr: 0.07, indian: 0.52, bruno: 0.16, daily: 0.22, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 8996, gr: 0.09 }, bruno: { sales: 2768, gr: 0.06 }, daily: { sales: 3806, gr: 0.05 }, label: { sales: 865, gr: 0.04 }, duani: { sales: 865, gr: 0.05 } } },
-          { total: 321000, gr: 0.07, indian: 0.48, bruno: 0.15, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 154080, gr: 0.08 }, bruno: { sales: 48150, gr: 0.06 }, daily: { sales: 83460, gr: 0.06 }, label: { sales: 19260, gr: 0.07 }, duani: { sales: 16050, gr: 0.06 } } }
-        ),
-        createStoreRecord('응암점', '서울', 12840, 11720, 12198, 68, 62, 30, 10, 8, 19, 16, 460, 415, 7, 7,
-          { total: 22100, gr: 0.10, indian: 0.54, bruno: 0.14, daily: 0.23, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 11934, gr: 0.12 }, bruno: { sales: 3094, gr: 0.08 }, daily: { sales: 5083, gr: 0.09 }, label: { sales: 1105, gr: 0.07 }, duani: { sales: 884, gr: 0.05 } } },
-          { total: 405000, gr: 0.10, indian: 0.49, bruno: 0.15, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 198450, gr: 0.11 }, bruno: { sales: 60750, gr: 0.08 }, daily: { sales: 105300, gr: 0.09 }, label: { sales: 20250, gr: 0.08 }, duani: { sales: 20250, gr: 0.07 } } }
-        ),
-        createStoreRecord('자양점', '서울', 11560, 10680, 10982, 62, 57, 30, 9, 8, 17, 15, 420, 385, 9, 9,
-          { total: 19950, gr: 0.08, indian: 0.52, bruno: 0.16, daily: 0.22, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 10374, gr: 0.10 }, bruno: { sales: 3192, gr: 0.07 }, daily: { sales: 4389, gr: 0.07 }, label: { sales: 1197, gr: 0.09 }, duani: { sales: 798, gr: 0.04 } } },
-          { total: 369000, gr: 0.09, indian: 0.48, bruno: 0.16, daily: 0.25, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 177120, gr: 0.10 }, bruno: { sales: 59040, gr: 0.08 }, daily: { sales: 92250, gr: 0.08 }, label: { sales: 22140, gr: 0.10 }, duani: { sales: 18450, gr: 0.06 } } }
-        ),
-        createStoreRecord('홍제점', '서울', 9650, 9180, 9071, 51, 48, 25, 7, 6, 14, 12, 345, 320, 13, 13,
-          { total: 16550, gr: 0.05, indian: 0.55, bruno: 0.13, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 9103, gr: 0.07 }, bruno: { sales: 2152, gr: 0.03 }, daily: { sales: 3807, gr: 0.04 }, label: { sales: 662, gr: 0.02 }, duani: { sales: 828, gr: 0.05 } } },
-          { total: 311000, gr: 0.06, indian: 0.50, bruno: 0.14, daily: 0.26, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 155500, gr: 0.07 }, bruno: { sales: 43540, gr: 0.04 }, daily: { sales: 80860, gr: 0.06 }, label: { sales: 15550, gr: 0.04 }, duani: { sales: 15550, gr: 0.05 } } }
-        ),
-        createStoreRecord('화곡점', '서울', 13890, 12450, 13196, 73, 65, 30, 11, 9, 21, 17, 510, 455, 6, 6,
-          { total: 24100, gr: 0.12, indian: 0.53, bruno: 0.15, daily: 0.22, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 12773, gr: 0.14 }, bruno: { sales: 3615, gr: 0.10 }, daily: { sales: 5302, gr: 0.10 }, label: { sales: 1446, gr: 0.12 }, duani: { sales: 964, gr: 0.07 } } },
-          { total: 432000, gr: 0.12, indian: 0.48, bruno: 0.15, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 207360, gr: 0.13 }, bruno: { sales: 64800, gr: 0.10 }, daily: { sales: 112320, gr: 0.11 }, label: { sales: 25920, gr: 0.12 }, duani: { sales: 21600, gr: 0.09 } } }
-        ),
-        createStoreRecord('연신내점', '서울', 14720, 13180, 13984, 78, 70, 35, 12, 10, 22, 18, 545, 480, 5, 5,
-          { total: 25600, gr: 0.12, indian: 0.51, bruno: 0.17, daily: 0.22, label: 0.06, duani: 0.04,
-            details: { indian: { sales: 13056, gr: 0.14 }, bruno: { sales: 4352, gr: 0.11 }, daily: { sales: 5632, gr: 0.09 }, label: { sales: 1536, gr: 0.13 }, duani: { sales: 1024, gr: 0.06 } } },
-          { total: 458000, gr: 0.13, indian: 0.47, bruno: 0.16, daily: 0.26, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 215260, gr: 0.14 }, bruno: { sales: 73280, gr: 0.11 }, daily: { sales: 119080, gr: 0.12 }, label: { sales: 27480, gr: 0.14 }, duani: { sales: 22900, gr: 0.09 } } }
-        ),
-        createStoreRecord('암사점', '서울', 8210, 7650, 7717, 45, 42, 20, 7, 5, 13, 10, 310, 275, 16, 15,
-          { total: 14350, gr: 0.08, indian: 0.56, bruno: 0.12, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 8036, gr: 0.10 }, bruno: { sales: 1722, gr: 0.04 }, daily: { sales: 3301, gr: 0.07 }, label: { sales: 574, gr: 0.03 }, duani: { sales: 718, gr: 0.06 } } },
-          { total: 276000, gr: 0.08, indian: 0.50, bruno: 0.13, daily: 0.27, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 138000, gr: 0.09 }, bruno: { sales: 35880, gr: 0.05 }, daily: { sales: 74520, gr: 0.08 }, label: { sales: 13800, gr: 0.06 }, duani: { sales: 13800, gr: 0.07 } } }
-        ),
-        createStoreRecord('대치342점', '서울', 369.1, 461.6, -97.0, 3, 4, 30, 1, 1, 1, 1, 44, 80, 26, 25,
-          { total: 921.1, gr: 0.343, indian: -0.154, bruno: 0.521, daily: 0.375, label: 0.00, duani: 0.182,
-            details: { indian: { sales: -142.0, gr: -1.381 }, bruno: { sales: 480.0, gr: 7.122 }, daily: { sales: 345.0, gr: 0.00 }, label: { sales: 0.0, gr: -1.00 }, duani: { sales: 167.3, gr: 0.00 } } },
-          { total: 70473.8, gr: 0.374, indian: 0.207, bruno: 0.204, daily: 0.306, label: 0.178, duani: 0.009,
-            details: { indian: { sales: 14605.8, gr: 0.111 }, bruno: { sales: 14381.5, gr: 2.052 }, daily: { sales: 21568.2, gr: 0.627 }, label: { sales: 12565.0, gr: -0.062 }, duani: { sales: 603.3, gr: 9.929 } } }
-        ),
-        createStoreRecord('강화점', '경기', 10840, 9620, 10190, 58, 51, 25, 9, 7, 17, 14, 410, 360, 7, 6,
-          { total: 19200, gr: 0.13, indian: 0.57, bruno: 0.14, daily: 0.21, label: 0.05, duani: 0.03,
-            details: { indian: { sales: 10944, gr: 0.15 }, bruno: { sales: 2688, gr: 0.09 }, daily: { sales: 4032, gr: 0.11 }, label: { sales: 960, gr: 0.14 }, duani: { sales: 576, gr: 0.06 } } },
-          { total: 356000, gr: 0.12, indian: 0.51, bruno: 0.15, daily: 0.24, label: 0.05, duani: 0.05,
-            details: { indian: { sales: 181560, gr: 0.14 }, bruno: { sales: 53400, gr: 0.09 }, daily: { sales: 85440, gr: 0.11 }, label: { sales: 17800, gr: 0.12 }, duani: { sales: 17800, gr: 0.10 } } }
+          { total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057, details: { indian: { sales: 8181.0, gr: -0.145 }, bruno: { sales: -111.0, gr: -1.07 }, daily: { sales: 3329.0, gr: -0.029 }, label: { sales: 720.0, gr: 0.00 }, duani: { sales: 737.4, gr: 1.56 } } },
+          { total: 382278.0, gr: 0.22, indian: 0.46, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077, details: { indian: { sales: 175844.4, gr: 0.15 }, bruno: { sales: 36764.4, gr: -0.054 }, daily: { sales: 117336.2, gr: 0.193 }, label: { sales: 20785.0, gr: 1.705 }, duani: { sales: 29548.0, gr: 0.886 } } }
         ),
         createStoreRecord('분당서현점', '경기', 17650, 15240, 16768, 91, 79, 35, 15, 11, 26, 21, 645, 550, 2, 2,
-          { total: 31400, gr: 0.16, indian: 0.54, bruno: 0.17, daily: 0.20, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 16956, gr: 0.18 }, bruno: { sales: 5338, gr: 0.14 }, daily: { sales: 6280, gr: 0.13 }, label: { sales: 1570, gr: 0.19 }, duani: { sales: 1256, gr: 0.10 } } },
-          { total: 538000, gr: 0.16, indian: 0.49, bruno: 0.16, daily: 0.24, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 263620, gr: 0.18 }, bruno: { sales: 86080, gr: 0.14 }, daily: { sales: 129120, gr: 0.14 }, label: { sales: 32280, gr: 0.17 }, duani: { sales: 26900, gr: 0.12 } } }
-        ),
-        createStoreRecord('수원인계점', '경기', 15120, 13680, 14364, 79, 71, 30, 12, 10, 22, 18, 530, 475, 4, 4,
-          { total: 26800, gr: 0.11, indian: 0.56, bruno: 0.14, daily: 0.21, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 15008, gr: 0.13 }, bruno: { sales: 3752, gr: 0.08 }, daily: { sales: 5628, gr: 0.10 }, label: { sales: 1340, gr: 0.11 }, duani: { sales: 1072, gr: 0.06 } } },
-          { total: 468000, gr: 0.11, indian: 0.50, bruno: 0.15, daily: 0.24, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 234000, gr: 0.12 }, bruno: { sales: 70200, gr: 0.09 }, daily: { sales: 112320, gr: 0.10 }, label: { sales: 28080, gr: 0.12 }, duani: { sales: 23400, gr: 0.08 } } }
-        ),
-        createStoreRecord('일산덕이직영점', '경기', 14380, 12950, 13661, 75, 68, 30, 11, 9, 20, 17, 495, 440, 5, 5,
-          { total: 24900, gr: 0.11, indian: 0.55, bruno: 0.15, daily: 0.21, label: 0.05, duani: 0.04,
-            details: { indian: { sales: 13695, gr: 0.13 }, bruno: { sales: 3735, gr: 0.09 }, daily: { sales: 5229, gr: 0.09 }, label: { sales: 1245, gr: 0.12 }, duani: { sales: 996, gr: 0.07 } } },
-          { total: 441000, gr: 0.11, indian: 0.49, bruno: 0.15, daily: 0.25, label: 0.06, duani: 0.05,
-            details: { indian: { sales: 216090, gr: 0.12 }, bruno: { sales: 66150, gr: 0.09 }, daily: { sales: 110250, gr: 0.10 }, label: { sales: 26460, gr: 0.11 }, duani: { sales: 22050, gr: 0.08 } } }
-        ),
-        createStoreRecord('춘천점', '강원', 11640, 10850, 10942, 61, 57, 25, 9, 8, 16, 15, 395, 370, 3, 3,
-          { total: 20150, gr: 0.08, indian: 0.49, bruno: 0.19, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 9874, gr: 0.09 }, bruno: { sales: 3829, gr: 0.08 }, daily: { sales: 4635, gr: 0.06 }, label: { sales: 806, gr: 0.05 }, duani: { sales: 1008, gr: 0.07 } } },
-          { total: 368000, gr: 0.07, indian: 0.46, bruno: 0.18, daily: 0.25, label: 0.05, duani: 0.06,
-            details: { indian: { sales: 169280, gr: 0.08 }, bruno: { sales: 66240, gr: 0.06 }, daily: { sales: 92000, gr: 0.07 }, label: { sales: 18400, gr: 0.05 }, duani: { sales: 22080, gr: 0.08 } } }
-        ),
-        createStoreRecord('강릉죽헌직영점', '강원', 13420, 12150, 12749, 70, 63, 30, 11, 9, 19, 16, 465, 415, 1, 1,
-          { total: 23400, gr: 0.11, indian: 0.48, bruno: 0.20, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 11232, gr: 0.12 }, bruno: { sales: 4680, gr: 0.10 }, daily: { sales: 5382, gr: 0.09 }, label: { sales: 936, gr: 0.08 }, duani: { sales: 1170, gr: 0.09 } } },
-          { total: 412000, gr: 0.10, indian: 0.45, bruno: 0.19, daily: 0.25, label: 0.05, duani: 0.06,
-            details: { indian: { sales: 185400, gr: 0.11 }, bruno: { sales: 78280, gr: 0.09 }, daily: { sales: 103000, gr: 0.09 }, label: { sales: 20600, gr: 0.08 }, duani: { sales: 24720, gr: 0.10 } } }
+          { total: 31400, gr: 0.16, indian: 0.54, bruno: 0.17, daily: 0.20, label: 0.05, duani: 0.04, details: { indian: { sales: 16956, gr: 0.18 }, bruno: { sales: 5338, gr: 0.14 }, daily: { sales: 6280, gr: 0.13 }, label: { sales: 1570, gr: 0.19 }, duani: { sales: 1256, gr: 0.10 } } },
+          { total: 538000, gr: 0.16, indian: 0.49, bruno: 0.16, daily: 0.24, label: 0.06, duani: 0.05, details: { indian: { sales: 263620, gr: 0.18 }, bruno: { sales: 86080, gr: 0.14 }, daily: { sales: 129120, gr: 0.14 }, label: { sales: 32280, gr: 0.17 }, duani: { sales: 26900, gr: 0.12 } } }
         ),
         createStoreRecord('원주단계점', '강원', 12180, 11340, 11449, 64, 59, 25, 10, 8, 18, 15, 430, 390, 2, 2,
-          { total: 21200, gr: 0.08, indian: 0.49, bruno: 0.19, daily: 0.23, label: 0.04, duani: 0.05,
-            details: { indian: { sales: 10388, gr: 0.09 }, bruno: { sales: 4028, gr: 0.07 }, daily: { sales: 4876, gr: 0.07 }, label: { sales: 848, gr: 0.06 }, duani: { sales: 1060, gr: 0.08 } } },
-          { total: 385000, gr: 0.08, indian: 0.46, bruno: 0.18, daily: 0.25, label: 0.05, duani: 0.06,
-            details: { indian: { sales: 177100, gr: 0.09 }, bruno: { sales: 69300, gr: 0.07 }, daily: { sales: 96250, gr: 0.08 }, label: { sales: 19250, gr: 0.06 }, duani: { sales: 23100, gr: 0.08 } } }
+          { total: 21200, gr: 0.08, indian: 0.49, bruno: 0.19, daily: 0.23, label: 0.04, duani: 0.05, details: { indian: { sales: 10388, gr: 0.09 }, bruno: { sales: 4028, gr: 0.07 }, daily: { sales: 4876, gr: 0.07 }, label: { sales: 848, gr: 0.06 }, duani: { sales: 1060, gr: 0.08 } } },
+          { total: 385000, gr: 0.08, indian: 0.46, bruno: 0.18, daily: 0.25, label: 0.05, duani: 0.06, details: { indian: { sales: 177100, gr: 0.09 }, bruno: { sales: 69300, gr: 0.07 }, daily: { sales: 96250, gr: 0.08 }, label: { sales: 19250, gr: 0.06 }, duani: { sales: 23100, gr: 0.08 } } }
         )
       ]
     };
@@ -943,13 +659,9 @@
     const fmtGrowthParen = gr => {
       if (gr === null || gr === undefined || isNaN(gr)) return '';
       const pct = Math.abs(Math.round(Number(gr) * 100));
-      if (gr > 0.005) {
-        return `<span class="text-xs font-extrabold text-red-600 dark:text-red-400">(▲${pct}%)</span>`;
-      } else if (gr < -0.005) {
-        return `<span class="text-xs font-extrabold text-blue-600 dark:text-blue-400">(▼${pct}%)</span>`;
-      } else {
-        return `<span class="text-xs font-bold text-slate-400">(0%)</span>`;
-      }
+      if (gr > 0.005) return `<span class="text-xs font-extrabold text-red-600 dark:text-red-400">(▲${pct}%)</span>`;
+      else if (gr < -0.005) return `<span class="text-xs font-extrabold text-blue-600 dark:text-blue-400">(▼${pct}%)</span>`;
+      else return `<span class="text-xs font-bold text-slate-400">(0%)</span>`;
     };
 
     let toastTimer = null;
@@ -959,7 +671,6 @@
       document.getElementById('toastMessage').innerText = msg;
       toast.classList.remove('opacity-0', '-translate-y-2', 'pointer-events-none');
       toast.classList.add('opacity-100', 'translate-y-0');
-
       if (toastTimer) clearTimeout(toastTimer);
       toastTimer = setTimeout(() => {
         toast.classList.remove('opacity-100', 'translate-y-0');
@@ -1005,25 +716,19 @@
         setSyncSpinning(false);
         if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
         if (syncText) syncText.innerText = '실시간 연동';
-        if (isManualSync) {
-          showToast(`실적 데이터 새로고침 완료 (${DB.stores.length}개 매장)`);
-        }
+        if (isManualSync) showToast(`실적 데이터 새로고침 완료 (${DB.stores.length}개 매장)`);
       }, 3000);
 
       const script = document.createElement('script');
       script.id = 'gviz_jsonp_script';
       script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGoogleSheetJSONP&sheet=${encodeURIComponent(SHEET_NAME)}&t=${Date.now()}`;
-
       script.onerror = function() {
         if (jsonpFallbackTimer) clearTimeout(jsonpFallbackTimer);
         setSyncSpinning(false);
         if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
         if (syncText) syncText.innerText = '데이터 연동됨';
-        if (isManualSync) {
-          showToast(`내장 실적 데이터 기준으로 표시 중입니다 (${DB.stores.length}개 매장).`);
-        }
+        if (isManualSync) showToast(`내장 실적 데이터 기준으로 표시 중입니다 (${DB.stores.length}개 매장).`);
       };
-
       document.body.appendChild(script);
     }
 
@@ -1060,8 +765,27 @@
           const rawBranch = String(getVal(0)).trim();
           const sName = String(getVal(2)).trim();
 
+          // 기본 스킵 조건
           if (!sName || sName === '매장명' || sName === '매장' || rawBranch === '지점') continue;
-          if (rawBranch.includes('벤치마크') || rawBranch.includes('평균') || sName.includes('벤치마크') || sName.includes('평균')) continue;
+
+          // 벤치마크, 평균 데이터 추출 및 저장 (지점 전체나 중부영업팀 데이터)
+          let isBench = rawBranch.includes('평균') || sName.includes('평균') || sName.includes('합계') || rawBranch.includes('합계') || sName.includes('벤치마크') || sName.includes('중부') || rawBranch.includes('중부');
+          if (isBench) {
+            let bKey = 'ALL';
+            if (sName.includes('서울') || rawBranch.includes('서울')) bKey = '서울';
+            else if (sName.includes('경기') || rawBranch.includes('경기')) bKey = '경기';
+            else if (sName.includes('강원') || rawBranch.includes('강원')) bKey = '강원';
+            
+            DB.benchmarks[bKey] = {
+              brandMonth: {
+                indian: toNum(getVal(23)), bruno: toNum(getVal(24)), daily: toNum(getVal(25)), label: toNum(getVal(26)), duani: toNum(getVal(27))
+              },
+              brandYear: {
+                indian: toNum(getVal(45)), bruno: toNum(getVal(46)), daily: toNum(getVal(47)), label: toNum(getVal(48)), duani: toNum(getVal(49))
+              }
+            };
+            continue;
+          }
 
           const branch = rawBranch || '지점';
           const sales26 = toNum(getVal(3));
@@ -1109,37 +833,15 @@
           const brandYearRank = parseInt(toNum(getVal(44))) || brandRank;
 
           parsedList.push({
-            name: sName,
-            branch: branch,
-            sales26: sales26,
-            sales25: sales25,
-            salesGr: salesGr,
-            custSales26: custSales26,
-            custShare: custShare,
-            custCnt26: custCnt26,
-            custCnt25: custCnt25,
-            custGr: custGr,
-            unitPrice: unitPrice,
-            billPrice: billPrice,
-            firstGoal: firstGoal,
-            firstWeek: firstWeek,
-            firstWeekGr: firstWeekGr,
-            firstMonth: firstMonth,
-            firstMonthGr: firstMonthGr,
-            firstProg: firstProg,
-            firstYear: firstYear26,
-            firstYearGr: firstYearGr,
-            brandRank: brandRank,
-            brandYearRank: brandYearRank,
+            name: sName, branch: branch, sales26: sales26, sales25: sales25, salesGr: salesGr,
+            custSales26: custSales26, custShare: custShare, custCnt26: custCnt26, custCnt25: custCnt25, custGr: custGr,
+            unitPrice: unitPrice, billPrice: billPrice,
+            firstGoal: firstGoal, firstWeek: firstWeek, firstWeekGr: firstWeekGr, firstMonth: firstMonth, firstMonthGr: firstMonthGr,
+            firstProg: firstProg, firstYear: firstYear26, firstYearGr: firstYearGr,
+            brandRank: brandRank, brandYearRank: brandYearRank,
             brandMonth: {
-              rank: brandRank,
-              total: bmTotal,
-              gr: bmGr,
-              indian: toNum(getVal(23)),
-              bruno: toNum(getVal(24)),
-              daily: toNum(getVal(25)),
-              label: toNum(getVal(26)),
-              duani: toNum(getVal(27)),
+              rank: brandRank, total: bmTotal, gr: bmGr,
+              indian: toNum(getVal(23)), bruno: toNum(getVal(24)), daily: toNum(getVal(25)), label: toNum(getVal(26)), duani: toNum(getVal(27)),
               details: {
                 indian: { sales: toNum(getVal(34)), gr: toNum(getVal(39)) },
                 bruno:  { sales: toNum(getVal(35)), gr: toNum(getVal(40)) },
@@ -1149,14 +851,8 @@
               }
             },
             brandYear: {
-              rank: brandYearRank,
-              total: byTotal,
-              gr: byGr,
-              indian: toNum(getVal(45)),
-              bruno: toNum(getVal(46)),
-              daily: toNum(getVal(47)),
-              label: toNum(getVal(48)),
-              duani: toNum(getVal(49)),
+              rank: brandYearRank, total: byTotal, gr: byGr,
+              indian: toNum(getVal(45)), bruno: toNum(getVal(46)), daily: toNum(getVal(47)), label: toNum(getVal(48)), duani: toNum(getVal(49)),
               details: {
                 indian: { sales: toNum(getVal(50)), gr: toNum(getVal(55)) },
                 bruno:  { sales: toNum(getVal(51)), gr: toNum(getVal(56)) },
@@ -1294,7 +990,6 @@
       } else {
         selectStore(list[0].name);
       }
-
       renderComparisonTable();
     }
 
@@ -1338,7 +1033,7 @@
       if (!currentStore) return;
       const s = currentStore;
 
-      // KPI 1: 히어로 + 주간 전체매출
+      // KPI 업데이트
       document.getElementById('cardStoreBranch').innerText = `${s.branch}지점`;
       document.getElementById('cardStoreName').innerText = s.name;
       document.getElementById('cardStoreRank').innerText = `당월 ${s.branch} ${s.brandRank}위`;
@@ -1347,14 +1042,12 @@
       document.getElementById('heroSales25').innerText = `${fmt(s.sales25)}천원`;
       document.getElementById('heroCustShare').innerText = fmtPct(s.custShare);
 
-      // KPI 2: 주간 구매고객
       document.getElementById('kpiWeeklyCust').innerText = fmt(s.custCnt26);
       document.getElementById('kpiWeeklyCustGr').innerHTML = getBadge(s.custGr);
       document.getElementById('kpiCust25').innerText = `${fmt(s.custCnt25)}명`;
       document.getElementById('kpiUnitPrice').innerText = `${fmt(s.unitPrice)}천원`;
       document.getElementById('kpiBillPrice').innerText = `${fmt(s.billPrice)}천원`;
 
-      // KPI 3: 첫구매 (월누계)
       document.getElementById('kpiFirstMonthVal').innerText = fmt(s.firstMonth);
       document.getElementById('kpiFirstGoalLabel').innerText = `/ ${fmt(s.firstGoal)}명`;
       document.getElementById('kpiFirstRateBadge').innerText = `달성 ${fmtPct(s.firstProg)}`;
@@ -1362,7 +1055,6 @@
       document.getElementById('kpiFirstWeekBadge').innerText = `금주 ${fmt(s.firstWeek)}명`;
       document.getElementById('kpiFirstYearVal').innerHTML = `${fmt(s.firstYear)}명 ${fmtGrowthParen(s.firstYearGr)}`;
 
-      // KPI 4: 당월·연간 브랜드 누계
       document.getElementById('kpiBrandMonthSales').innerText = fmt(s.brandMonth.total);
       document.getElementById('kpiBrandMonthGr').innerHTML = getBadge(s.brandMonth.gr);
       document.getElementById('kpiBrandRankBadge').innerText = `${s.branch} 내 ${s.brandRank}위`;
@@ -1376,21 +1068,15 @@
 
     function renderSalesSection() {
       const s = currentStore;
-
       document.getElementById('s1Sales26').innerText = `${fmt(s.sales26)} 천원`;
       document.getElementById('s1Sales25').innerText = `${fmt(s.sales25)} 천원`;
       document.getElementById('s1SalesBadge').innerHTML = getBadge(s.salesGr);
-
       const maxSales = Math.max(s.sales26, s.sales25, 1);
-      const w26 = Math.max((s.sales26 / maxSales) * 100, 0);
-      const w25 = Math.max((s.sales25 / maxSales) * 100, 0);
-      document.getElementById('s1Bar26').style.width = `${Math.min(w26, 100)}%`;
-      document.getElementById('s1Bar25').style.width = `${Math.min(w25, 100)}%`;
-
+      document.getElementById('s1Bar26').style.width = `${Math.min(Math.max((s.sales26 / maxSales) * 100, 0), 100)}%`;
+      document.getElementById('s1Bar25').style.width = `${Math.min(Math.max((s.sales25 / maxSales) * 100, 0), 100)}%`;
       document.getElementById('s1CustSales').innerText = `${fmt(s.custSales26)}천원`;
       document.getElementById('s1CustShare').innerText = fmtPct(s.custShare);
-      const sharePct = Math.min(Math.max(s.custShare * 100, 0), 100);
-      document.getElementById('s1CustShareBar').style.width = `${sharePct}%`;
+      document.getElementById('s1CustShareBar').style.width = `${Math.min(Math.max(s.custShare * 100, 0), 100)}%`;
     }
 
     function renderCustSection() {
@@ -1405,17 +1091,20 @@
       document.getElementById('s2FirstMonthGrParen').innerHTML = fmtGrowthParen(s.firstMonthGr);
       document.getElementById('s2FirstMonthRate').innerText = `달성률 ${fmtPct(s.firstProg)}`;
       document.getElementById('s2FirstMonthBar').style.width = `${Math.min(Math.max(s.firstProg * 100, 0), 100)}%`;
-
       document.getElementById('s2FirstWeekVal').innerHTML = `${fmt(s.firstWeek)}명 ${fmtGrowthParen(s.firstWeekGr)}`;
       document.getElementById('s2FirstYearVal').innerHTML = `${fmt(s.firstYear)}명 ${fmtGrowthParen(s.firstYearGr)}`;
     }
 
-    function buildBrandCardsHTML(bObj, brandDefs) {
+    // 벤치마크 데이터를 포함하여 렌더링하도록 인자 추가
+    function buildBrandCardsHTML(bObj, brandDefs, branchBenchObj, teamBenchObj) {
       return brandDefs.map(b => {
         const detail = (bObj.details && bObj.details[b.key]) ? bObj.details[b.key] : null;
         const bSales = detail ? detail.sales : Math.round(bObj.total * b.sh);
         const bGr = detail ? detail.gr : bObj.gr;
         const barWidth = Math.min(Math.max(b.sh * 100, 0), 100);
+
+        const branchSh = branchBenchObj ? branchBenchObj[b.key] : null;
+        const teamSh = teamBenchObj ? teamBenchObj[b.key] : null;
 
         return `
           <div class="bg-white dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
@@ -1430,9 +1119,14 @@
                 ${getBadge(bGr)}
               </div>
             </div>
-
             <div class="w-full bg-slate-200/80 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
               <div class="${b.barColor} h-full rounded-full transition-all duration-500" style="width: ${barWidth}%"></div>
+            </div>
+            
+            <!-- 지점 평균 및 중부 평균 벤치마크 데이터 비교 바 -->
+            <div class="flex justify-between items-center text-[10px] text-slate-500 dark:text-slate-400 font-medium px-0.5 pt-1.5 mt-1 border-t border-slate-100 dark:border-slate-700/50">
+              <span>지점 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtPct(branchSh)}</strong></span>
+              <span>중부 평균 <strong class="text-slate-700 dark:text-slate-300 ml-0.5">${fmtPct(teamSh)}</strong></span>
             </div>
           </div>
         `;
@@ -1464,30 +1158,38 @@
       const bmDefs = getBrandDefs(bm);
       const byDefs = getBrandDefs(by);
 
-      // 1. 1분할 와이드 화면: 당월 누계(좌 50%) + 년 누계(우 50%) 동시 렌더링
+      // 평균 벤치마크 추출 (해당 지점 평균 & 전체 중부 평균)
+      const bmBranchBench = DB.benchmarks ? (DB.benchmarks[s.branch]?.brandMonth || DB.benchmarks['ALL']?.brandMonth) : null;
+      const bmTeamBench = DB.benchmarks ? DB.benchmarks['ALL']?.brandMonth : null;
+      const byBranchBench = DB.benchmarks ? (DB.benchmarks[s.branch]?.brandYear || DB.benchmarks['ALL']?.brandYear) : null;
+      const byTeamBench = DB.benchmarks ? DB.benchmarks['ALL']?.brandYear : null;
+
+      // 1. 1분할 와이드 화면 렌더링
       document.getElementById('wideMonthRank').innerText = `${s.branch} 내 ${bm.rank || s.brandRank}위`;
       document.getElementById('wideMonthTotal').innerText = `${fmt(bm.total)} 천원`;
       document.getElementById('wideMonthBadge').innerHTML = getBadge(bm.gr);
       document.getElementById('wideMonthStackedBar').innerHTML = buildStackedBarHTML(bmDefs);
-      document.getElementById('wideMonthBrandList').innerHTML = buildBrandCardsHTML(bm, bmDefs);
+      document.getElementById('wideMonthBrandList').innerHTML = buildBrandCardsHTML(bm, bmDefs, bmBranchBench, bmTeamBench);
 
       document.getElementById('wideYearRank').innerText = `${s.branch} 내 ${by.rank || s.brandYearRank || s.brandRank}위`;
       document.getElementById('wideYearTotal').innerText = `${fmt(by.total)} 천원`;
       document.getElementById('wideYearBadge').innerHTML = getBadge(by.gr);
       document.getElementById('wideYearStackedBar').innerHTML = buildStackedBarHTML(byDefs);
-      document.getElementById('wideYearBrandList').innerHTML = buildBrandCardsHTML(by, byDefs);
+      document.getElementById('wideYearBrandList').innerHTML = buildBrandCardsHTML(by, byDefs, byBranchBench, byTeamBench);
 
-      // 2. 2분할 비교 모드(1160px 이하): 선택된 모드(당월 누계 or 년 누계) 단일 렌더링
+      // 2. 2분할 좁은 화면 (토글 모드) 렌더링
       const isM = brandMode === 'MONTH';
       const bObj = isM ? bm : by;
       const bDefs = isM ? bmDefs : byDefs;
+      const branchBench = isM ? bmBranchBench : byBranchBench;
+      const teamBench = isM ? bmTeamBench : byTeamBench;
 
       document.getElementById('s3BrandTotalTitle').innerText = isM ? '브랜드 총매출 (당월 누계)' : '브랜드 총매출 (년 누계)';
       document.getElementById('s3BrandRankText').innerText = `${s.branch} 내 ${bObj.rank || s.brandRank}위`;
       document.getElementById('s3BrandTotalSales').innerText = `${fmt(bObj.total)} 천원`;
       document.getElementById('s3BrandTotalBadge').innerHTML = getBadge(bObj.gr);
       document.getElementById('brandStackedBar').innerHTML = buildStackedBarHTML(bDefs);
-      document.getElementById('brandCardsList').innerHTML = buildBrandCardsHTML(bObj, bDefs);
+      document.getElementById('brandCardsList').innerHTML = buildBrandCardsHTML(bObj, bDefs, branchBench, teamBench);
     }
 
     // =========================================================================
@@ -1495,10 +1197,8 @@
     // =========================================================================
     function renderComparisonTable() {
       let data = [...filteredStores];
-
-      if (currentTableStatus === 'GROWTH_UP') {
-  data = data.filter(s => s.salesGr > 0.005);
-} 
+      if (currentTableStatus === 'GROWTH_UP') data = data.filter(s => s.salesGr > 0.005);
+      
       data.sort((a, b) => {
         if (currentSort === 'sales26_desc') return b.sales26 - a.sales26;
         if (currentSort === 'sales26_asc') return a.sales26 - b.sales26;
@@ -1506,6 +1206,12 @@
         if (currentSort === 'salesGr_asc') return a.salesGr - b.salesGr;
         if (currentSort === 'custCnt26_desc') return b.custCnt26 - a.custCnt26;
         if (currentSort === 'custCnt26_asc') return a.custCnt26 - b.custCnt26;
+        if (currentSort === 'custGr_desc') return b.custGr - a.custGr;
+        if (currentSort === 'custGr_asc') return a.custGr - b.custGr;
+        if (currentSort === 'firstWeek_desc') return b.firstWeek - a.firstWeek;
+        if (currentSort === 'firstWeek_asc') return a.firstWeek - b.firstWeek;
+        if (currentSort === 'firstWeekGr_desc') return b.firstWeekGr - a.firstWeekGr;
+        if (currentSort === 'firstWeekGr_asc') return a.firstWeekGr - b.firstWeekGr;
         if (currentSort === 'firstProg_desc') return b.firstProg - a.firstProg;
         if (currentSort === 'firstProg_asc') return a.firstProg - b.firstProg;
         if (currentSort === 'brandMonth_desc') return b.brandMonth.total - a.brandMonth.total;
@@ -1519,23 +1225,20 @@
       const tbody = document.getElementById('weeklyTableBody');
 
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="15" class="py-12 text-center text-slate-400 text-xs">일치하는 매장 데이터가 없습니다.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="17" class="py-12 text-center text-slate-400 text-xs">일치하는 매장 데이터가 없습니다.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = data.map((s, idx) => {
         const isSelected = currentStore && currentStore.name === s.name;
         const isDirect = s.name.includes('직영');
-        const firstRateColor = s.firstProg >= 1
-          ? 'text-emerald-600 dark:text-emerald-400'
-          : (s.firstProg >= 0.7 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400');
+        const firstRateColor = s.firstProg >= 1 ? 'text-emerald-600 dark:text-emerald-400'
+                             : (s.firstProg >= 0.7 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400');
 
         return `
           <tr onclick="selectStore('${s.name.replace(/'/g, "\\'")}')"
               class="cursor-pointer whitespace-nowrap transition group ${
-                isSelected
-                  ? 'bg-blue-50/90 dark:bg-blue-950/50 font-bold'
-                  : 'hover:bg-slate-100/70 dark:hover:bg-slate-800/80'
+                isSelected ? 'bg-blue-50/90 dark:bg-blue-950/50 font-bold' : 'hover:bg-slate-100/70 dark:hover:bg-slate-800/80'
               }">
             <td class="compact-cell py-2 pl-3 pr-1.5 text-center font-mono text-[11px] font-bold ${isSelected ? 'text-blue-600 dark:text-amber-400' : 'text-slate-400'}">
               ${idx + 1}
@@ -1566,7 +1269,10 @@
             <td class="compact-cell py-2 px-2 text-right font-extrabold bg-blue-50/20 dark:bg-blue-950/10 text-slate-900 dark:text-white">
               ${fmt(s.custCnt26)}명
             </td>
-            <td class="compact-cell py-2 px-2 text-right font-semibold bg-blue-50/20 dark:bg-blue-950/10 text-slate-700 dark:text-slate-200">
+            <td class="compact-cell py-2 px-2 text-right bg-blue-50/20 dark:bg-blue-950/10">
+              ${getBadge(s.custGr)}
+            </td>
+            <td class="hide-in-split py-2 px-2 text-right font-semibold bg-blue-50/20 dark:bg-blue-950/10 text-slate-700 dark:text-slate-200">
               ${fmt(s.unitPrice)}
             </td>
             <td class="hide-in-split py-2 px-2 text-right font-medium bg-blue-50/20 dark:bg-blue-950/10 text-slate-500 dark:text-slate-400 border-r border-slate-200/80 dark:border-slate-800">
@@ -1577,6 +1283,9 @@
               ${fmt(s.firstWeek)}명
             </td>
             <td class="compact-cell py-2 px-2 text-right bg-amber-50/20 dark:bg-amber-950/10">
+              ${getBadge(s.firstWeekGr)}
+            </td>
+            <td class="compact-cell py-2 px-2 text-right bg-amber-50/20 dark:bg-amber-950/10">
               <span class="font-extrabold ${firstRateColor}">${fmt(s.firstMonth)}</span>
               <span class="text-[10px] text-slate-400">/${fmt(s.firstGoal)} (${fmtPct(s.firstProg)})</span>
             </td>
@@ -1584,10 +1293,10 @@
               ${fmt(s.firstYear)}명
             </td>
 
-            <td class="compact-cell py-2 px-2 text-right font-extrabold text-slate-900 dark:text-white">
+            <td class="hide-in-split py-2 px-2 text-right font-extrabold text-slate-900 dark:text-white">
               ${fmt(s.brandMonth.total)}
             </td>
-            <td class="compact-cell py-2 pl-2 pr-3 text-right font-bold text-slate-600 dark:text-slate-300">
+            <td class="hide-in-split py-2 pl-2 pr-3 text-right font-bold text-slate-600 dark:text-slate-300">
               ${fmt(s.brandYear.total)}
             </td>
           </tr>
@@ -1602,8 +1311,7 @@
       if (!currentStore) return;
       const s = currentStore;
       const grSign = s.firstMonthGr > 0.005 ? `▲${Math.abs(Math.round(s.firstMonthGr * 100))}%`
-                   : s.firstMonthGr < -0.005 ? `▼${Math.abs(Math.round(s.firstMonthGr * 100))}%`
-                   : `0%`;
+                   : s.firstMonthGr < -0.005 ? `▼${Math.abs(Math.round(s.firstMonthGr * 100))}%` : `0%`;
 
       const text = `[WM중부영업팀 주간 실적 요약]\n` +
         `■ 매장명: [${s.branch}] ${s.name}\n` +
