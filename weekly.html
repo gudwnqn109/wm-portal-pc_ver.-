@@ -84,8 +84,8 @@
 
     @media (max-width: 1160px) {
       .hide-in-split { display: none !important; }
-      .compact-cell { padding-left: 0.375rem !important; padding-right: 0.375rem !important; font-size: 11px !important; }
-      .compact-head { padding-left: 0.375rem !important; padding-right: 0.375rem !important; font-size: 10.5px !important; }
+      .compact-cell { padding-left: 0.25rem !important; padding-right: 0.25rem !important; font-size: 11px !important; letter-spacing: -0.01em; }
+      .compact-head { padding-left: 0.25rem !important; padding-right: 0.25rem !important; font-size: 10.5px !important; letter-spacing: -0.03em; }
       .brand-wide-only { display: none !important; }
       .brand-split-only { display: block !important; }
       .brand-split-toggle { display: flex !important; }
@@ -430,8 +430,8 @@
     <!-- [SECTION 3] 전 매장 주간 실적 비교 통합 테이블 -->
     <section class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-2xs overflow-hidden">
       <!-- 테이블 상단 컨트롤 툴바 -->
-      <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 flex flex-wrap lg:flex-nowrap items-center justify-between gap-2 bg-slate-50/70 dark:bg-slate-900/70">
-        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full lg:w-auto flex-1 min-w-0">
+      <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-3 bg-slate-50/70 dark:bg-slate-900/70">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto flex-1 min-w-0">
           <div class="relative w-full sm:w-52 shrink-0">
             <i class="ph-bold ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input type="text" id="storeSearchInput" oninput="handleSearchInput()" placeholder="매장명, 지점 검색"
@@ -441,16 +441,16 @@
             </button>
           </div>
           <div class="flex items-center gap-1 overflow-x-auto hide-scrollbar" id="statusChips">
-            <button type="button" onclick="setTableStatusFilter('ALL')" data-filter="ALL" class="status-chip px-2.5 py-1.5 text-xs font-extrabold rounded-xl bg-slate-900 dark:bg-blue-700 text-white whitespace-nowrap transition">전체 (<span id="chipAllCount">0</span>)</button>
-            <button type="button" onclick="setTableStatusFilter('GROWTH_UP')" data-filter="GROWTH_UP" class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition">주간 신장 (+)</button>
+            <button type="button" onclick="setTableStatusFilter('ALL')" data-filter="ALL" class="status-chip px-2.5 py-1.5 text-xs font-extrabold rounded-xl bg-slate-900 dark:bg-blue-700 text-white whitespace-nowrap transition shrink-0">전체 (<span id="chipAllCount">0</span>)</button>
+            <button type="button" onclick="setTableStatusFilter('GROWTH_UP')" data-filter="GROWTH_UP" class="status-chip px-2.5 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-slate-400 whitespace-nowrap transition shrink-0">주간 신장 (+)</button>
           </div>
         </div>
 
-        <div class="flex items-center justify-between sm:justify-end gap-2.5 w-full lg:w-auto shrink-0 text-xs">
+        <div class="flex flex-wrap items-center justify-between md:justify-end gap-2.5 w-full md:w-auto shrink-0 text-xs">
           <span class="text-slate-500 dark:text-slate-400 whitespace-nowrap">
             조회 <strong id="matchCount" class="text-slate-900 dark:text-white font-black">0</strong>개점 · <span class="text-blue-600 dark:text-amber-400 font-bold">행 클릭 시 상세 분석 전환</span>
           </span>
-          <div class="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+          <div class="inline-flex items-center gap-1 bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 shrink-0">
             <i class="ph-bold ph-arrows-down-up text-slate-400"></i>
             <select id="sortSelect" onchange="handleSortChange(this.value)" class="bg-transparent font-bold text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer whitespace-nowrap">
               <option value="sales26_desc" selected>주간 매출순</option>
@@ -461,7 +461,7 @@
               <option value="brandYear_desc">년 누계순</option>
             </select>
           </div>
-          <span class="text-[11px] font-semibold text-slate-400 whitespace-nowrap hidden sm:inline">단위: 천원·명</span>
+          <span class="text-[11px] font-semibold text-slate-400 whitespace-nowrap hidden lg:inline">단위: 천원·명</span>
         </div>
       </div>
 
@@ -471,9 +471,9 @@
           <thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
             <tr class="text-[10.5px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
               <th colspan="3" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700">매장 정보</th>
-              <th colspan="4" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">주간 매출 실적 (천원)</th>
-              <th colspan="4" class="py-1.5 px-2 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700">주간 고객 · 단가</th>
-              <th colspan="4" class="py-1.5 px-2 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700">첫구매 신규고객 (명)</th>
+              <th id="th-sales" colspan="4" class="py-1.5 px-2 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700 transition-all">주간 매출 실적 (천원)</th>
+              <th id="th-cust" colspan="4" class="py-1.5 px-2 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700 transition-all">주간 고객 · 단가</th>
+              <th id="th-first" colspan="4" class="py-1.5 px-2 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700 transition-all">첫구매 신규고객 (명)</th>
               <th colspan="2" class="hide-in-split py-1.5 px-2 text-center bg-slate-100/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-300">브랜드 누계 (천원)</th>
             </tr>
 
@@ -757,13 +757,8 @@
     // =========================================================================
     // [수정 1] 소수점 첫째 자리 정밀 포맷 & 미세 신장률(±0.05% 이상) 표시
     // =========================================================================
-    // 금액·단가(천원): 정수로 딱 떨어지면 정수로(13,025), 소수점이 있으면 첫째 자리까지(11,122.9, 289.4)
-    const fmt = n => {
-      if (n === null || n === undefined || isNaN(n)) return '-';
-      const num = Number(n);
-      const rounded1 = Math.round(num * 10) / 10;
-      return rounded1.toLocaleString('ko-KR', { minimumFractionDigits: 0, maximumFractionDigits: 1 });
-    };
+    // 금액·단가(천원): 깔끔하게 정수로 가되 소수점이 있으면 반올림
+    const fmt = n => (n === null || n === undefined || isNaN(n)) ? '-' : Math.round(Number(n)).toLocaleString('ko-KR');
 
     // 고객수·목표·순위 등 정수 전용 포맷
     const fmtInt = n => {
@@ -771,18 +766,14 @@
       return Math.round(Number(n)).toLocaleString('ko-KR');
     };
 
-    // 비중·신장률·달성률(%): 소수점 첫째 자리까지 표시 (예: 31.7%, 100%, -0.2%)
-    const fmtPct = n => {
-      if (n === null || n === undefined || isNaN(n)) return '-';
-      const pct = Number((Number(n) * 100).toFixed(1));
-      return `${pct}%`;
-    };
+    // 비중·신장률·달성률(%): 소수점 첫째 자리까지 표시 (예: 31.7%, 100.0%, -0.2%)
+    const fmtPct = n => (n === null || n === undefined || isNaN(n)) ? '-' : (Number(n) * 100).toFixed(1) + '%';
 
-    // 등락 배지: 판정 기준을 0.005(0.5%)에서 0.0005(0.05%)로 낮추고 소수점 첫째 자리까지 표시
+    // 등락 배지: 판정 기준을 0.0005(0.05%)로 낮추고 소수점 첫째 자리까지 표시
     const getBadge = v => {
       if (v === null || v === undefined || isNaN(v)) return '<span class="badge-flat">-</span>';
       const num = Number(v);
-      const pct = Number((Math.abs(num) * 100).toFixed(1));
+      const pct = (Math.abs(num) * 100).toFixed(1);
       if (num >= 0.0005) return `<span class="badge-up">▲ ${pct}%</span>`;
       if (num <= -0.0005) return `<span class="badge-down">▼ ${pct}%</span>`;
       return `<span class="badge-flat">0%</span>`;
@@ -792,7 +783,7 @@
     const fmtGrowthParen = gr => {
       if (gr === null || gr === undefined || isNaN(gr)) return '';
       const num = Number(gr);
-      const pct = Number((Math.abs(num) * 100).toFixed(1));
+      const pct = (Math.abs(num) * 100).toFixed(1);
       if (num >= 0.0005) return `<span class="text-xs font-extrabold text-red-600 dark:text-red-400">(▲${pct}%)</span>`;
       if (num <= -0.0005) return `<span class="text-xs font-extrabold text-blue-600 dark:text-blue-400">(▼${pct}%)</span>`;
       return `<span class="text-xs font-bold text-slate-400">(0%)</span>`;
@@ -1122,6 +1113,17 @@
     // =========================================================================
     // 이벤트 & 필터·정렬 컨트롤러
     // =========================================================================
+    function adjustColSpan() {
+      const isSplit = window.innerWidth <= 1160;
+      const thSales = document.getElementById('th-sales');
+      const thCust = document.getElementById('th-cust');
+      const thFirst = document.getElementById('th-first');
+      
+      if (thSales) thSales.colSpan = isSplit ? 2 : 4;
+      if (thCust) thCust.colSpan = isSplit ? 2 : 4;
+      if (thFirst) thFirst.colSpan = isSplit ? 3 : 4;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('headerDateLabel').innerText = `기준일: ${getReportBaseDate()} 마감`;
 
@@ -1131,6 +1133,9 @@
         themeIcon.className = isDark ? 'ph-bold ph-sun text-sm text-amber-400' : 'ph-bold ph-moon text-sm';
         showToast(isDark ? '다크 모드가 적용되었습니다.' : '라이트 모드가 적용되었습니다.');
       });
+
+      window.addEventListener('resize', adjustColSpan);
+      adjustColSpan();
 
       assignWeeklyBranchRanks(DB.stores);
       populateStoreList();
@@ -1336,7 +1341,7 @@
         if (!bench || bench.sh == null) return '-';
         const sh = fmtPct(bench.sh);
         const grVal = Number(bench.gr || 0);
-        const pct = Number((Math.abs(grVal) * 100).toFixed(1));
+        const pct = (Math.abs(grVal) * 100).toFixed(1);
         let grStr = '<span class="text-slate-400">0%</span>';
         if (grVal >= 0.0005) grStr = `<span class="text-red-500 dark:text-red-400">▲${pct}%</span>`;
         else if (grVal <= -0.0005) grStr = `<span class="text-blue-500 dark:text-blue-400">▼${pct}%</span>`;
