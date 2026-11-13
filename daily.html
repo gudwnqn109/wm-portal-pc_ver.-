@@ -49,7 +49,7 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* index.html 2분할(좌·우 비교) 좁은 패널(1160px 이하) 자동 컴팩트 최적화 */
+    /* index.html 2분할(좌·우 비교) 좁은 패널(1160px 이하) 자동 컴팩트 최적화 */
     @media (max-width: 1160px) {
       .hide-in-split { display: none !important; }
       .pc-group-header { display: none !important; }
@@ -73,7 +73,6 @@
     @media (min-width: 1161px) {
       .pc-group-header { display: table-row !important; }
       .split-group-header { display: none !important; }
-    }
     }
   </style>
 </head>
@@ -337,7 +336,8 @@
       <!-- 일 · 월 · 연 2단 그룹 헤더 통합 데이터 그리드 -->
       <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
         <table class="w-full text-left border-collapse">
-<thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
+          <thead class="sticky top-0 z-10 backdrop-blur-xs whitespace-nowrap">
+            
             <!-- 1-1단 그룹 헤더 (PC 버전 - 1160px 초과 시 표시) -->
             <tr class="pc-group-header text-[10.5px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
               <th colspan="4" class="py-1.5 px-3 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 text-center">
@@ -359,21 +359,14 @@
 
             <!-- 1-2단 그룹 헤더 (2분할 Split 버전 - 1160px 이하 시 표시) -->
             <tr class="split-group-header text-[10px] font-black tracking-wide border-b border-slate-200 dark:border-slate-700">
-              <!-- 점코드 숨김에 맞춰 colspan 3으로 축소 -->
               <th colspan="3" class="py-1.5 px-1 bg-slate-100/95 dark:bg-slate-800/95 text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-700 text-center">
                 매장 정보
               </th>
-              <th colspan="2" class="py-1.5 px-1 text-center bg-indigo-50/95 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border-r border-slate-200 dark:border-slate-700">
-                당일 실적
-              </th>
-              <!-- 스크롤 방지를 위해 '월 목표' 숨김 -> colspan 3 -->
+              <th class="hide-in-split">당일 실적</th> <!-- 숨김 -->
               <th colspan="3" class="py-1.5 px-1 text-center bg-blue-50/95 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 border-r border-slate-200 dark:border-slate-700">
-                당월 누계 (월)
+                당월 누계 실적 (월)
               </th>
-              <!-- '연 목표'와 '연 신장률' 숨김 -> colspan 2 -->
-              <th colspan="2" class="py-1.5 px-1 text-center bg-amber-50/95 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-r border-slate-200 dark:border-slate-700">
-                연간 누계 (연)
-              </th>
+              <th class="hide-in-split">연간 누계</th> <!-- 숨김 -->
               <th class="py-1.5 px-1 text-center bg-slate-100/95 dark:bg-slate-800/95 text-slate-600 dark:text-slate-300">
                 고객
               </th>
@@ -381,22 +374,24 @@
 
             <!-- 2단 세부 컬럼 헤더 -->
             <tr class="text-[11px] font-extrabold border-b border-slate-200 dark:border-slate-700 bg-slate-50/95 dark:bg-slate-900/95 text-slate-600 dark:text-slate-300">
+              <!-- 매장 정보 -->
               <th class="compact-head py-2 pl-3 pr-1.5 w-10 text-center">순위</th>
               <th class="hide-in-split py-2 px-1.5 w-16">점코드</th>
               <th class="compact-head py-2 px-2 min-w-[118px]">매장명</th>
               <th class="compact-head py-2 px-2 border-r border-slate-200 dark:border-slate-700">지점·담당</th>
 
-              <th onclick="toggleColumnSort('daily')" class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 cursor-pointer hover:text-indigo-600 transition select-none">
+              <!-- 일 데이터 -->
+              <th onclick="toggleColumnSort('daily')" class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 cursor-pointer hover:text-indigo-600 transition select-none">
                 당일 실적 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <th class="compact-head py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 border-r border-slate-200 dark:border-slate-700">
+              <th class="hide-in-split py-2 px-2 text-right bg-indigo-50/40 dark:bg-indigo-950/30 text-indigo-900 dark:text-indigo-200 border-r border-slate-200 dark:border-slate-700">
                 일 달성
               </th>
 
+              <!-- 월 데이터 -->
               <th onclick="toggleColumnSort('month')" class="compact-head py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200 cursor-pointer hover:text-blue-600 transition select-none">
                 월 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <!-- 2분할 가로축 스크롤 방지를 위해 hide-in-split 추가 -->
               <th class="hide-in-split py-2 px-2 text-right bg-blue-50/40 dark:bg-blue-950/30 text-blue-900 dark:text-blue-200">
                 월 목표
               </th>
@@ -407,23 +402,23 @@
                 신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
 
-              <th onclick="toggleColumnSort('year')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
+              <!-- 연 데이터 -->
+              <th onclick="toggleColumnSort('year')" class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none">
                 연 누계 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
               <th class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200">
                 연 목표
               </th>
-              <!-- 연 신장률이 숨겨질 때 그룹 우측 테두리가 끊기지 않도록 max-[1160px]:border-r 유틸리티 추가 -->
-              <th onclick="toggleColumnSort('year_achieve')" class="compact-head py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none border-slate-200 dark:border-slate-700 max-[1160px]:border-r">
+              <th onclick="toggleColumnSort('year_achieve')" class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 cursor-pointer hover:text-amber-600 transition select-none border-slate-200 dark:border-slate-700 max-[1160px]:border-r">
                 연 달성 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
-              <!-- 2분할 가로축 스크롤 방지를 위해 hide-in-split 추가 -->
               <th onclick="toggleColumnSort('year_growth')" class="hide-in-split py-2 px-2 text-right bg-amber-50/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 border-r border-slate-200 dark:border-slate-700 cursor-pointer hover:text-amber-600 transition select-none">
                 신장률 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
 
+              <!-- 고객 데이터 -->
               <th onclick="toggleColumnSort('cust')" class="compact-head py-2 pl-2 pr-3 text-right cursor-pointer hover:text-blue-600 transition select-none">
-                첫구매 <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
+                첫구매(목표) <i class="ph-bold ph-caret-up-down text-[9px] opacity-60"></i>
               </th>
             </tr>
           </thead>
@@ -1988,13 +1983,13 @@
               <span class="font-bold text-slate-700 dark:text-slate-200">${s.sv}</span>
             </td>
 
-            <!-- 5. 당일 실적 (일) -->
-            <td class="compact-cell py-2 px-2 text-right font-black bg-indigo-50/20 dark:bg-indigo-950/10 text-indigo-700 dark:text-indigo-300">
+            <!-- 5. 당일 실적 (일) - hide-in-split 적용 -->
+            <td class="hide-in-split py-2 px-2 text-right font-black bg-indigo-50/20 dark:bg-indigo-950/10 text-indigo-700 dark:text-indigo-300">
               ${toMillion(curDaySales)}
             </td>
 
-            <!-- 6. 일 달성 (일) -->
-            <td class="compact-cell py-2 px-2 text-right font-bold bg-indigo-50/20 dark:bg-indigo-950/10 ${dayRateColor} border-r border-slate-200/80 dark:border-slate-800">
+            <!-- 6. 일 달성 (일) - hide-in-split 적용 -->
+            <td class="hide-in-split py-2 px-2 text-right font-bold bg-indigo-50/20 dark:bg-indigo-950/10 ${dayRateColor} border-r border-slate-200/80 dark:border-slate-800">
               ${curDayRate.toFixed(1)}%
             </td>
 
@@ -2003,41 +1998,41 @@
               ${toMillion(s.monthActual)}
             </td>
 
-            <!-- 8. 월 목표 (월) - hide-in-split 적용 -->
+            <!-- 8. 월 목표 (월) -->
             <td class="hide-in-split py-2 px-2 text-right font-medium bg-blue-50/20 dark:bg-blue-950/10 text-slate-500 dark:text-slate-400">
               ${toMillion(s.monthCumTarget)}
             </td>
 
-            <!-- 9. 월 달성 (월) - 기존과 동일 -->
+            <!-- 9. 월 달성 (월) -->
             <td class="compact-cell py-2 px-2 text-right bg-blue-50/20 dark:bg-blue-950/10">
               <span class="inline-block text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border ${monthRateBadge}">
                 ${s.monthCumRate.toFixed(1)}%
               </span>
             </td>
 
-            <!-- 10. 월 신장률 (월) - 기존과 동일 -->
+            <!-- 10. 월 신장률 (월) -->
             <td class="compact-cell py-2 px-2 text-right font-extrabold bg-blue-50/20 dark:bg-blue-950/10 ${monthGrowthColor} border-r border-slate-200/80 dark:border-slate-800">
               ${formatSignedPct(s.growthRate)}
             </td>
 
-            <!-- 11. 연 누계 (연) - 기존과 동일 -->
-            <td class="compact-cell py-2 px-2 text-right font-extrabold bg-amber-50/20 dark:bg-amber-950/10 text-slate-900 dark:text-slate-100">
+            <!-- 11. 연 누계 (연) - hide-in-split 적용 -->
+            <td class="hide-in-split py-2 px-2 text-right font-extrabold bg-amber-50/20 dark:bg-amber-950/10 text-slate-900 dark:text-slate-100">
               ${toMillionInt(s.actual26Cum)}
             </td>
 
-            <!-- 12. 연 목표 (연) - 기존과 동일 -->
+            <!-- 12. 연 목표 (연) -->
             <td class="hide-in-split py-2 px-2 text-right font-medium bg-amber-50/20 dark:bg-amber-950/10 text-slate-500 dark:text-slate-400">
               ${toMillionInt(s.target26)}
             </td>
 
-            <!-- 13. 연 달성 (연) - 14번 컬럼이 숨겨질 때를 대비하여 max-[1160px]:border-r 유틸리티 추가 -->
-            <td class="compact-cell py-2 px-2 text-right bg-amber-50/20 dark:bg-amber-950/10 max-[1160px]:border-r border-slate-200/80 dark:border-slate-800">
+            <!-- 13. 연 달성 (연) - hide-in-split 적용 -->
+            <td class="hide-in-split py-2 px-2 text-right bg-amber-50/20 dark:bg-amber-950/10 max-[1160px]:border-r border-slate-200/80 dark:border-slate-800">
               <span class="inline-block text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border ${yearRateBadge}">
                 ${s.rate26Cum.toFixed(1)}%
               </span>
             </td>
 
-            <!-- 14. 연 신장률 (연) - hide-in-split 적용 -->
+            <!-- 14. 연 신장률 (연) -->
             <td class="hide-in-split py-2 px-2 text-right font-extrabold bg-amber-50/20 dark:bg-amber-950/10 ${yearGrowthColor} border-r border-slate-200/80 dark:border-slate-800">
               ${formatSignedPct(yGrowth)}
             </td>
