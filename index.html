@@ -959,7 +959,8 @@
           
           // [추가됨] Vercel 404 에러 감지 시 데모 UI로 자동 폴백
           try {
-            const pageText = iframe.contentDocument.body.innerText || '';
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            const pageText = doc.body.innerText || '';
             if (pageText.includes('404') && pageText.includes('NOT_FOUND')) {
               containerEl.innerHTML = \`
                 <div class="h-full overflow-y-auto thin-scrollbar bg-[#F7F6F2] p-3.5 lg:p-4">
