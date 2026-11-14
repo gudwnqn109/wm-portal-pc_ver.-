@@ -427,20 +427,18 @@
 
     const ALLOWED_EMAILS = [
       "gudwnqn109@gmail.com",
-      "doowon0623@gmail.com",
-      "ablejuno@gmail.com"
     ];
 
     // =========================================================================
     // [메뉴 설정 배열 (MENU_ITEMS)]
     // =========================================================================
     const MENU_ITEMS = [
-      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
-      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
-      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
-      { id: 'sellthru', title: 'FW 판매율', subtitle: '시즌·브랜드·복종별 수량/금액 판매율', url: './sellthru.html', category: '시장·상품', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'emerald' },
-      { id: 'investment', title: '매장 투자비 현황', subtitle: '보증금·권리금·인테리어·마진 구조', url: './investment.html', category: '매장·운영', badge: 'STORE', icon: 'fa-solid fa-building-columns', accent: 'teal' },
-      { id: 'voc', title: '현장의 소리', subtitle: '매장 VOC·건의사항 실시간 접수 현황', url: './voc.html', category: '매장·운영', badge: 'VOC', icon: 'fa-solid fa-bullhorn', accent: 'rose' }
+      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: '/daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
+      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: '/weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: '/competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
+      { id: 'sellthru', title: 'FW 판매율', subtitle: '시즌·브랜드·복종별 수량/금액 판매율', url: '/sellthru.html', category: '시장·상품', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'emerald' },
+      { id: 'investment', title: '매장 투자비 현황', subtitle: '보증금·권리금·인테리어·마진 구조', url: '/investment.html', category: '매장·운영', badge: 'STORE', icon: 'fa-solid fa-building-columns', accent: 'teal' },
+      { id: 'voc', title: '현장의 소리', subtitle: '매장 VOC·건의사항 실시간 접수 현황', url: '/voc.html', category: '매장·운영', badge: 'VOC', icon: 'fa-solid fa-bullhorn', accent: 'rose' }
     ];
 
     const ACCENT_STYLES = {
@@ -958,6 +956,23 @@
               user: currentUser
             }, '*');
           }
+          
+          // [추가됨] Vercel 404 에러 감지 시 데모 UI로 자동 폴백
+          try {
+            const pageText = iframe.contentDocument.body.innerText || '';
+            if (pageText.includes('404') && pageText.includes('NOT_FOUND')) {
+              containerEl.innerHTML = `
+                <div class="h-full overflow-y-auto thin-scrollbar bg-[#F7F6F2] p-3.5 lg:p-4">
+                  <div class="max-w-lg mx-auto space-y-3 animate-view">
+                    <div class="bg-rose-50 text-rose-600 p-3 rounded-xl text-xs font-bold text-center border border-rose-200 shadow-sm mb-3">
+                      <i class="fa-solid fa-triangle-exclamation mr-1"></i> 서버 연결 문제로 실제 \${menuObj.title} 페이지를 찾을 수 없어 임시 화면을 표시합니다.
+                    </div>
+                    \${getPreviewDemoMarkup(menuId)}
+                  </div>
+                </div>
+              `;
+            }
+          } catch(e) {}
         };
         containerEl.appendChild(iframe);
         return;
