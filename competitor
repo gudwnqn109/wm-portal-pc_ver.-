@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- [직접 접속 차단 보안 코드] (미리보기를 위해 임시 비활성화) -->
+  <script>
+    // if (window.self === window.top) {
+    //   window.location.replace('./index.html');
+    // }
+  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WM중부영업팀 타브랜드 매출 현황 (서울·경기·강원 통합)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Pretendard Font -->
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex justify-center items-start min-h-screen p-0 md:p-4 lg:p-6">
+
+    <!-- Main App Container (PC 버전 확장) -->
+    <div class="w-full max-w-[1400px] bg-white min-h-screen md:min-h-[90vh] md:rounded-3xl md:shadow-2xl flex flex-col relative overflow-hidden border border-slate-200">
+        
+        <!-- Top Header Bar -->
+        <header class="bg-white/95 backdrop-blur-sm px-5 lg:px-8 pt-4 lg:pt-5 pb-3.5 sticky top-0 z-30 border-b border-slate-100 flex items-center justify-between gap-2">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div id="headerIconBox" class="w-10 h-10 rounded-xl bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-100 transition-colors duration-300">
+                    <i class="fa-solid fa-chart-line text-base"></i>
+                </div>
+                <div class="min-w-0">
+                    <h1 class="text-base lg:text-lg font-extrabold text-slate-900 leading-tight truncate">WM중부영업팀 타브랜드 매출 현황</h1>
+                    <p id="headerSubtitle" class="text-xs lg:text-sm text-slate-500 font-medium truncate mt-0.5">데이터 불러오는 중...</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 flex-shrink-0">
+                <span id="unitBadge" class="text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/70 px-3 py-1.5 rounded-lg transition-colors duration-300">
+                    단위 : 천원
+                </span>
+                <button onclick="openHelpModal()" title="화면 보는 법" aria-label="화면 보는 법" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition">
+                    <i class="fa-solid fa-question text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto px-5 lg:px-8 pt-5 lg:pt-6 pb-10 space-y-6 lg:space-y-8">
+
+            <!-- 1. 상단 컨트롤 패널 (PC 최적화: 필터부 통합 가로 배치) -->
+            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 lg:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8">
+                
+                <!-- 좌측: 지점 & 검색 필터 -->
+                <div class="lg:col-span-4 xl:col-span-3 space-y-3">
+                    <!-- 4-Way Branch Selector Tabs -->
+                    <div class="bg-slate-200/60 p-1 rounded-xl grid grid-cols-4 gap-1 text-center">
+                        <button onclick="selectBranch('all')" id="tab_all" class="py-2 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-sm">전체</button>
+                        <button onclick="selectBranch('seoul')" id="tab_seoul" class="py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">서울</button>
+                        <button onclick="selectBranch('gyeonggi')" id="tab_gyeonggi" class="py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">경기</button>
+                        <button onclick="selectBranch('gangwon')" id="tab_gangwon" class="py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition">강원</button>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                        <input type="text" id="storeSearchInput" oninput="handleSearchInput()" placeholder="전 지점 매장명 또는 지역 검색 (예: 길동점, 원주)" class="w-full pl-9 pr-9 py-2.5 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/50 focus:border-indigo-400 transition shadow-sm">
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-circle-xmark text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 우측: 지역 & 매장 칩 (가로 확장 영역) -->
+                <div class="lg:col-span-8 xl:col-span-9 flex flex-col justify-center space-y-4">
+                    <!-- Region Pills -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-700">지역(시·군·구) 선택</span>
+                            <div class="flex items-center space-x-2">
+                                <span id="regionCountLabel" class="text-[11px] text-slate-400">불러오는 중...</span>
+                                <button id="toggleRegionExpandBtn" onclick="toggleRegionExpand()" class="text-[11px] font-semibold text-indigo-600 hover:underline">전체 보기</button>
+                            </div>
+                        </div>
+                        <div id="regionPillsContainer" class="flex space-x-1.5 overflow-x-auto no-scrollbar pb-1">
+                            <button class="px-3.5 py-1.5 rounded-full text-xs bg-indigo-600 text-white shadow-sm font-semibold">전체 지역</button>
+                        </div>
+                    </div>
+
+                    <!-- Store Selector Chips -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-slate-700">매장 선택</span>
+                            <div class="flex items-center space-x-2">
+                                <span id="storeCountLabel" class="text-[11px] text-slate-400">-</span>
+                                <button id="toggleStoreExpandBtn" onclick="toggleStoreExpand()" class="text-[11px] font-semibold text-indigo-600 hover:underline">전체 보기</button>
+                            </div>
+                        </div>
+                        <div id="storeChipsContainer" class="flex space-x-1.5 overflow-x-auto no-scrollbar pb-1">
+                            <span class="text-xs text-slate-400 py-1">데이터 로딩 중...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. 대시보드 본문 영역 (PC 최적화: 좌우 2단 분할) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                
+                <!-- 좌측 (PC): 상권 요약 하이라이트 카드 (스크롤 시 상단 고정) -->
+                <div class="lg:col-span-5 xl:col-span-4 space-y-3 lg:sticky lg:top-6 h-fit">
+                    <h3 class="text-sm font-extrabold text-slate-900 ml-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-pie text-indigo-500"></i> 기준 브랜드 상권 요약
+                    </h3>
+                    <!-- Highlight Summary Card -->
+                    <div id="highlightCard" class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-5 lg:p-6 text-white shadow-xl relative overflow-hidden border border-indigo-800/40 transition-all duration-300">
+                        <div id="highlightGlow" class="absolute -right-8 -bottom-8 w-40 h-40 bg-indigo-500 opacity-20 rounded-full blur-2xl pointer-events-none"></div>
+                        
+                        <!-- Card Top Row 1 -->
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <span id="cardBranchBadge" class="flex-shrink-0 text-xs font-bold px-2 py-0.5 rounded bg-white/15 text-white">서울지점</span>
+                                <p id="cardRegionInfo" class="text-[13px] text-indigo-200 font-medium truncate">지역 · 기준 브랜드</p>
+                            </div>
+                            <span id="cardShareBadge" class="flex-shrink-0 text-emerald-300 text-xs font-bold bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 whitespace-nowrap tabular-nums">
+                                25년 마감 -
+                            </span>
+                        </div>
+
+                        <!-- Card Top Row 2 -->
+                        <div class="mt-3 flex items-end justify-between gap-1.5">
+                            <div class="flex items-center gap-2 min-w-0 flex-1 flex-wrap">
+                                <h2 id="cardStoreName" class="text-xl lg:text-2xl font-extrabold tracking-tight text-white truncate">-</h2>
+                                <span id="cardStoreRank" class="flex-shrink-0 whitespace-nowrap text-xs font-bold text-indigo-100 bg-indigo-700/80 px-2 py-1 rounded-md">상권 -위</span>
+                                <span id="cardTopShareBadge" class="flex-shrink-0 whitespace-nowrap text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-1 rounded-md tabular-nums">점유율 -%</span>
+                            </div>
+                        </div>
+
+                        <!-- Market Share Progress Bar -->
+                        <div class="mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center justify-between text-[11px] lg:text-xs mb-2">
+                                <span class="flex items-center gap-1.5 font-semibold text-white/90">
+                                    <span id="shareBarDot" class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                                    <span>상권 내 비중 <strong id="shareBarPercent" class="text-emerald-300 font-extrabold tabular-nums">0.0%</strong></span>
+                                </span>
+                                <span class="text-white/65 tabular-nums">상권 합계 <strong id="shareBarTotal" class="text-white font-bold">0</strong></span>
+                            </div>
+                            <div class="w-full h-2.5 bg-white/15 rounded-full overflow-hidden">
+                                <div id="shareBarFill" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- 2 Key Metric Boxes -->
+                        <div id="metricsGrid" class="grid grid-cols-2 gap-3 mt-4">
+                            <div id="metricBox1" class="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10">
+                                <p id="cardMetric1Label" class="text-xs text-indigo-200 font-medium truncate">26년 누계</p>
+                                <p id="cardMetric1Value" class="text-xl font-extrabold text-white mt-1 tracking-tight tabular-nums">-</p>
+                                <div class="mt-1.5 flex items-center flex-wrap gap-1.5">
+                                    <span id="cardGrowth1Badge" class="text-[11px] font-bold text-emerald-400 tabular-nums">-</span>
+                                    <span id="cardPrev1Label" class="text-[11px] text-white/65 tabular-nums">-</span>
+                                </div>
+                            </div>
+                            <div id="metricBox2" class="bg-white/10 backdrop-blur-xs p-3.5 rounded-xl border border-white/10">
+                                <p id="cardMetric2Label" class="text-xs text-indigo-200 font-medium truncate">월평균 매출</p>
+                                <p id="cardMetric2Value" class="text-xl font-extrabold text-white mt-1 tracking-tight tabular-nums">-</p>
+                                <div class="mt-1.5 flex items-center flex-wrap gap-1.5">
+                                    <span id="cardGrowth2Badge" class="text-[11px] font-bold text-emerald-400 tabular-nums">-</span>
+                                    <span id="cardPrev2Label" class="text-[11px] text-white/65 tabular-nums">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Monthly Comparison Bar Chart -->
+                        <div class="mt-5 pt-4 border-t border-white/10">
+                            <div class="flex items-center justify-between text-xs mb-3">
+                                <span class="font-semibold text-white/85 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-chart-column text-emerald-400 text-[11px]"></i>
+                                    <span id="chartBrandLabel">월별 추이 (막대 클릭 시 월별 조회)</span>
+                                </span>
+                                <div class="flex items-center space-x-3 text-[11px] text-white/70">
+                                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-xs bg-white/35 inline-block"></span>25년</span>
+                                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-xs bg-emerald-400 inline-block"></span>26년</span>
+                                </div>
+                            </div>
+                            <div id="monthlyChartContainer" class="grid grid-cols-10 gap-1 items-end h-24 pt-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 우측 (PC): 동일 상권 브랜드별 실적 현황 및 리스트 -->
+                <div class="lg:col-span-7 xl:col-span-8 space-y-4">
+                    
+                    <!-- Section Header & Toggles -->
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col gap-4">
+                        
+                        <!-- Title & Dropdown -->
+                        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="text-base lg:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                                    동일 상권 브랜드별 실적 현황
+                                    <span id="brandCountBadge" class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full tabular-nums">0개</span>
+                                </h3>
+                                <p class="text-[11px] lg:text-xs text-slate-400 mt-1">25년 누계 대비 신장률 비교 (단위:천원)</p>
+                            </div>
+                            <div class="relative flex-shrink-0">
+                                <select id="periodFilterSelect" onchange="changePeriod(this.value)" class="appearance-none text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 pl-3.5 pr-8 py-2 rounded-xl focus:outline-none cursor-pointer transition w-full sm:w-auto">
+                                    <option value="accum">26년 누계</option>
+                                </select>
+                                <i id="periodSelectIcon" class="fa-solid fa-chevron-down text-[10px] text-indigo-600 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Tools: Period Chips & Sort/View Toggles -->
+                        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+                            
+                            <!-- Period Quick Chips -->
+                            <div id="periodChipsContainer" class="flex space-x-2 overflow-x-auto no-scrollbar pb-1 flex-1">
+                                <button onclick="changePeriod('accum')" data-period="accum" class="period-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition whitespace-nowrap">누계</button>
+                            </div>
+
+                            <!-- Sort & View Toggle Toolbar -->
+                            <div class="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-200/70 shrink-0">
+                                <!-- Sort Buttons -->
+                                <div class="flex items-center bg-slate-200/60 p-0.5 rounded-lg text-xs">
+                                    <button id="sort_sales" onclick="changeSort('sales')" class="px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition">매출순</button>
+                                    <button id="sort_growth" onclick="changeSort('growth')" class="px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition">신장률순</button>
+                                </div>
+                                <!-- View Mode Buttons -->
+                                <div class="flex items-center bg-slate-200/60 p-0.5 rounded-lg text-xs">
+                                    <button id="view_card" onclick="changeViewMode('card')" class="px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-layer-group text-[10px]"></i> 카드
+                                    </button>
+                                    <button id="view_table" onclick="changeViewMode('table')" class="px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-table-list text-[10px]"></i> 요약표
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand List / Summary Table Container -->
+                    <div id="brandListContainer" class="w-full">
+                        <div class="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-3">
+                            <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-400"></i>
+                            <p class="text-sm font-bold text-slate-600">구글 시트 데이터를 연동하는 중입니다...</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+
+        <!-- Help Guide Modal -->
+        <div id="helpModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-end sm:items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-2xl p-5 shadow-2xl border border-slate-200 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-circle-info"></i>
+                        </span>
+                        <h3 class="text-base font-extrabold text-slate-900">한눈에 보는 대시보드 안내</h3>
+                    </div>
+                    <button onclick="closeHelpModal()" class="text-slate-400 hover:text-slate-700 p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+                    <div class="bg-slate-50 p-3.5 rounded-xl space-y-1">
+                        <p class="font-bold text-slate-800">1. 상권 및 매장 탐색</p>
+                        <p>상단 <strong>전체 · 서울 · 경기 · 강원</strong> 탭과 <strong>지역 · 매장 버튼</strong>을 눌러 원하는 매장의 상권 현황을 바로 조회할 수 있습니다.</p>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl space-y-1">
+                        <p class="font-bold text-slate-800">2. 상단 요약 카드 & 월별 막대 차트</p>
+                        <p>기준 브랜드의 상권 내 순위, 점유율, 25년 마감 매출 및 누계·월평균 실적을 보여줍니다. <strong>하단 월별 막대를 클릭</strong>하면 해당 월 실적으로 즉시 전환됩니다.</p>
+                    </div>
+                    <div class="bg-slate-50 p-3.5 rounded-xl space-y-1">
+                        <p class="font-bold text-slate-800">3. 동일 상권 브랜드별 비교</p>
+                        <p><strong>매출순 / 신장률순</strong> 정렬과 <strong>카드 / 요약표</strong> 보기를 전환하여 동일 상권 내 경쟁 브랜드 실적을 한눈에 비교할 수 있습니다.</p>
+                    </div>
+                </div>
+                <button onclick="closeHelpModal()" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition mt-2">
+                    확인했습니다
+                </button>
+            </div>
+        </div>
+
+        <!-- Toast Notification Box -->
+        <div id="toastBox" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900/95 text-white text-xs lg:text-sm font-medium px-5 py-3 rounded-full shadow-xl transition-opacity duration-300 pointer-events-none z-50 flex items-center space-x-2.5 opacity-0">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toastMessage">데이터가 연동되었습니다.</span>
+        </div>
+
+    </div>
+
+    <script>
+        // =========================================================================
+        // [구글 시트 실시간 연동 설정]
+        // =========================================================================
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1ml4qhwd0axGXdozyd1m7thOiZEuzi1_cnFyvPaMfQAc/edit?gid=0#gid=0";
+
+        // 상단 요약 카드의 기준 브랜드 우선순위
+        const FOCUS_BRAND_PRIORITY = ['웰메이드', 'WM상설', 'WM백화점', 'OL', 'OL상설'];
+
+        let SEOUL_DATA = [];
+        let GYEONGGI_DATA = [];
+        let GANGWON_DATA = [];
+        let RAW_STORE_DATA = [];
+
+        let currentBranch = 'all';
+        let currentRegion = '전체 지역';
+        let currentStore = '';
+        let currentPeriod = 'accum';
+        let currentSort = 'sales';     // 'sales' | 'growth'
+        let currentViewMode = 'card';  // 'card' | 'table'
+        let isRegionExpanded = false;
+        let isStoreExpanded = false;
+
+        const PERIOD_NAMES = {
+            accum: '2026 누계 실적',
+            m1: '2026년 1월', m2: '2026년 2월', m3: '2026년 3월',
+            m4: '2026년 4월', m5: '2026년 5월', m6: '2026년 6월',
+            m7: '2026년 7월', m8: '2026년 8월', m9: '2026년 9월',
+            m10: '2026년 10월', m11: '2026년 11월', m12: '2026년 12월'
+        };
+
+        let maxMonthWithData = 10;
+
+        // 천원 단위 매출을 깔끔한 천 단위 콤마 숫자로 변환
+        function formatSales(val) {
+            if (val === undefined || val === null || isNaN(val)) return '-';
+            return Math.round(val).toLocaleString();
+        }
+
+        // 천원 단위 금액을 "25년 마감 0.0억" 형태로 포맷팅
+        function formatToEok(val) {
+            if (val === undefined || val === null || val === '' || isNaN(val) || Number(val) === 0) {
+                return '25년 마감 -';
+            }
+            const num = parseFloat(val);
+            if (num < 1000) {
+                return `25년 마감 ${num.toFixed(1)}억`;
+            }
+            const eok = (num / 100000).toFixed(1);
+            return `25년 마감 ${eok}억`;
+        }
+
+        // 데이터가 존재하는 마지막 월 자동 감지
+        function detectMaxMonth() {
+            let maxM = 1;
+            for (const store of RAW_STORE_DATA) {
+                if (store.sales_26) {
+                    for (let m = 1; m <= 12; m++) {
+                        const mData = store.sales_26[`m${m}`];
+                        if (mData && Object.keys(mData).length > 0) {
+                            if (m > maxM) maxM = m;
+                        }
+                    }
+                }
+            }
+            maxMonthWithData = maxM;
+            PERIOD_NAMES.accum = `2026 누계 (1~${maxMonthWithData}월)`;
+        }
+
+        // 기간 드롭다운 및 퀵 버튼 렌더링
+        function renderPeriodUI() {
+            detectMaxMonth();
+
+            const select = document.getElementById('periodFilterSelect');
+            if (select) {
+                let opts = `<option value="accum">26년 누계 (1~${maxMonthWithData}월)</option>`;
+                for (let m = 1; m <= maxMonthWithData; m++) {
+                    opts += `<option value="m${m}">${m}월 마감</option>`;
+                }
+                select.innerHTML = opts;
+                select.value = currentPeriod;
+            }
+
+            const container = document.getElementById('periodChipsContainer');
+            if (container) {
+                let chips = `<button onclick="changePeriod('accum')" data-period="accum" class="period-chip px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap">누계</button>`;
+                for (let m = 1; m <= maxMonthWithData; m++) {
+                    chips += `<button onclick="changePeriod('m${m}')" data-period="m${m}" class="period-chip px-3 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap">${m}월</button>`;
+                }
+                container.innerHTML = chips;
+            }
+        }
+
+        const BRANCH_META = {
+            seoul: { name: '서울지점', activePill: 'bg-indigo-600' },
+            gyeonggi: { name: '경기지점', activePill: 'bg-blue-600' },
+            gangwon: { name: '강원지점', activePill: 'bg-teal-600' }
+        };
+
+        function extractSheetId(input) {
+            if (!input) return null;
+            const match = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+            if (match && match[1]) return match[1];
+            if (input.length > 25 && !input.includes('/') && !input.includes('.')) return input.trim();
+            return null;
+        }
+
+        function loadGoogleSheetData() {
+            const sheetId = extractSheetId(GOOGLE_SHEET_URL);
+            if (!sheetId) {
+                showToast("구글 스프레드시트 주소를 확인해주세요.");
+                return;
+            }
+
+            const oldScript = document.getElementById('gviz_jsonp_script');
+            if (oldScript) oldScript.remove();
+
+            const script = document.createElement('script');
+            script.id = 'gviz_jsonp_script';
+            script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGoogleSheetJSONP&t=${Date.now()}`;
+            
+            script.onerror = function() {
+                const listEl = document.getElementById('brandListContainer');
+                listEl.className = 'w-full';
+                listEl.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl border border-rose-200 text-center space-y-3">
+                        <i class="fa-solid fa-triangle-exclamation text-3xl text-rose-400"></i>
+                        <p class="text-sm font-bold text-slate-800">구글 시트 데이터를 불러오지 못했습니다.</p>
+                        <p class="text-xs text-slate-500">네트워크 연결 또는 시트 공유 권한을 확인해주세요.</p>
+                        <button onclick="loadGoogleSheetData()" class="px-5 py-2 mt-2 rounded-lg bg-slate-900 text-white text-xs font-bold">다시 시도</button>
+                    </div>`;
+                showToast("구글 시트 로드 실패. 다시 시도해주세요.");
+            };
+
+            document.body.appendChild(script);
+        }
+
+        window.handleGoogleSheetJSONP = function(response) {
+            try {
+                if (!response || !response.table || !response.table.rows) {
+                    showToast("구글 시트 데이터 형식이 올바르지 않습니다.");
+                    return;
+                }
+
+                const rows = response.table.rows;
+                const storeMap = {};
+
+                for (let i = 0; i < rows.length; i++) {
+                    const cells = rows[i].c || [];
+                    const getVal = (idx) => (cells[idx] && cells[idx].v !== null && cells[idx].v !== undefined) ? cells[idx].v : '';
+
+                    const branchRaw = String(getVal(0)).trim();
+                    const region = String(getVal(1)).trim();
+                    const pop = String(getVal(2)).trim();
+                    const store = String(getVal(3)).trim();
+                    const brand = String(getVal(4)).trim();
+                    const yearRaw = String(getVal(5)).trim();
+
+                    if (!store || !brand || store === '매장명' || brand === '브랜드') continue;
+
+                    let branch = 'seoul';
+                    let branchName = '서울지점';
+                    if (branchRaw.includes('경기')) {
+                        branch = 'gyeonggi';
+                        branchName = '경기지점';
+                    } else if (branchRaw.includes('강원')) {
+                        branch = 'gangwon';
+                        branchName = '강원지점';
+                    }
+
+                    const key = `${branch}_${region}_${store}`;
+                    if (!storeMap[key]) {
+                        storeMap[key] = {
+                            region,
+                            pop,
+                            store,
+                            branch,
+                            branchName,
+                            sales_26: { accum: {} },
+                            sales_25: { accum: {} },
+                            sales_25_close: {}
+                        };
+                        for (let m = 1; m <= 12; m++) {
+                            storeMap[key].sales_26[`m${m}`] = {};
+                            storeMap[key].sales_25[`m${m}`] = {};
+                        }
+                    }
+
+                    const is26 = yearRaw.includes('26');
+                    const target = is26 ? storeMap[key].sales_26 : storeMap[key].sales_25;
+
+                    let sumM = 0;
+                    for (let m = 1; m <= 12; m++) {
+                        const val = getVal(5 + m);
+                        if (val !== '' && !isNaN(val)) {
+                            const num = parseFloat(val);
+                            if (num !== 0) {
+                                target[`m${m}`][brand] = Math.round(num * 10) / 10;
+                                sumM += num;
+                            }
+                        }
+                    }
+
+                    const accVal = getVal(18);
+                    if (accVal !== '' && !isNaN(accVal)) {
+                        target.accum[brand] = Math.round(parseFloat(accVal) * 10) / 10;
+                    } else if (sumM > 0) {
+                        target.accum[brand] = Math.round(sumM * 10) / 10;
+                    }
+
+                    const closeColVal = getVal(19);
+                    if (closeColVal !== '' && !isNaN(closeColVal) && parseFloat(closeColVal) > 0) {
+                        storeMap[key].sales_25_close[brand] = Math.round(parseFloat(closeColVal) * 10) / 10;
+                    } else if (!is26) {
+                        const closeBase = (accVal !== '' && !isNaN(accVal)) ? parseFloat(accVal) : sumM;
+                        if (closeBase > 0 && !storeMap[key].sales_25_close[brand]) {
+                            storeMap[key].sales_25_close[brand] = Math.round(closeBase * 10) / 10;
+                        }
+                    }
+                }
+
+                const parsedList = Object.values(storeMap);
+                SEOUL_DATA = parsedList.filter(d => d.branch === 'seoul');
+                GYEONGGI_DATA = parsedList.filter(d => d.branch === 'gyeonggi');
+                GANGWON_DATA = parsedList.filter(d => d.branch === 'gangwon');
+
+                RAW_STORE_DATA = [...SEOUL_DATA, ...GYEONGGI_DATA, ...GANGWON_DATA];
+                renderPeriodUI();
+
+                if (RAW_STORE_DATA.length > 0) {
+                    currentRegion = '전체 지역';
+                    currentStore = RAW_STORE_DATA[0].store;
+                    updateBranchTabUI();
+                    renderRegionPills();
+                    renderStoreChips();
+                    updateDashboard();
+                    showToast(`연동 완료! 총 ${RAW_STORE_DATA.length}개 매장 데이터가 로드되었습니다.`);
+                } else {
+                    showToast("구글 시트에 유효한 매장 데이터가 없습니다.");
+                }
+            } catch (err) {
+                console.error("데이터 처리 오류:", err);
+                showToast("데이터 분석 중 오류가 발생했습니다.");
+            }
+        };
+
+        function getBranchFilteredData() {
+            if (currentBranch === 'all') return RAW_STORE_DATA;
+            return RAW_STORE_DATA.filter(d => d.branch === currentBranch);
+        }
+
+        function selectBranch(branchKey) {
+            currentBranch = branchKey;
+            isRegionExpanded = false;
+            isStoreExpanded = false;
+            document.getElementById('storeSearchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+
+            const branchData = getBranchFilteredData();
+            if (branchData.length > 0) {
+                currentRegion = '전체 지역';
+                currentStore = branchData[0].store;
+            } else {
+                currentRegion = '전체 지역';
+                currentStore = '';
+            }
+
+            updateBranchTabUI();
+            renderRegionPills();
+            renderStoreChips();
+            updateDashboard();
+        }
+
+        function updateBranchTabUI() {
+            ['all', 'seoul', 'gyeonggi', 'gangwon'].forEach(t => {
+                const btn = document.getElementById('tab_' + t);
+                if (!btn) return;
+                if (t === currentBranch) {
+                    btn.className = 'py-2 rounded-lg text-xs font-bold transition bg-white text-slate-900 shadow-sm';
+                } else {
+                    btn.className = 'py-2 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition';
+                }
+            });
+        }
+
+        function toggleRegionExpand() {
+            isRegionExpanded = !isRegionExpanded;
+            renderRegionPills();
+        }
+
+        function toggleStoreExpand() {
+            isStoreExpanded = !isStoreExpanded;
+            renderStoreChips();
+        }
+
+        function applyThemeColor(branch, hasWellmade = true) {
+            const headerIconBox = document.getElementById('headerIconBox');
+            const unitBadge = document.getElementById('unitBadge');
+            const highlightCard = document.getElementById('highlightCard');
+            const highlightGlow = document.getElementById('highlightGlow');
+            const cardRegionInfo = document.getElementById('cardRegionInfo');
+            const cardStoreRank = document.getElementById('cardStoreRank');
+            const cardMetric1Label = document.getElementById('cardMetric1Label');
+            const cardMetric2Label = document.getElementById('cardMetric2Label');
+            const shareBarDot = document.getElementById('shareBarDot');
+            const shareBarPercent = document.getElementById('shareBarPercent');
+            const shareBarFill = document.getElementById('shareBarFill');
+            const periodSelect = document.getElementById('periodFilterSelect');
+            const periodSelectIcon = document.getElementById('periodSelectIcon');
+
+            let activeChipColor = 'bg-indigo-600';
+
+            // 1) 상단 헤더 및 기간 필터는 지점별 기본 컬러 유지
+            if (branch === 'gangwon') {
+                activeChipColor = 'bg-teal-600';
+                headerIconBox.className = 'w-10 h-10 rounded-xl bg-teal-600 flex-shrink-0 flex items-center justify-center text-white font-bold shadow-md shadow-teal-100 transition-colors duration-300';
+                unitBadge.className = 'text-xs font-bold text-teal-700 bg-teal-50 border border-teal-200/70 px-3 py-1.5 rounded-lg transition-colors duration-300';
+                periodSelect.className = 'appearance-none text-xs font-bold text-teal-700 bg-teal-50 border border-teal-100 pl-3.5 pr-8 py-2 rounded-xl focus:outline-none cursor-pointer transition w-full sm:w-auto';
+                periodSelectIcon.className = 'fa-solid fa-chevron-down text-[10px] text-teal-700 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none';
+            } else if (branch === 'gyeonggi') {
+                activeChipColor = 'bg-blue-600';
+                headerIconBox.className = 'w-10 h-10 rounded-xl bg-blue-600 flex-shrink-0 flex items-center justify-center text-white font-bold shadow-md shadow-blue-100 transition-colors duration-300';
+                unitBadge.className = 'text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200/70 px-3 py-1.5 rounded-lg transition-colors duration-300';
+                periodSelect.className = 'appearance-none text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 pl-3.5 pr-8 py-2 rounded-xl focus:outline-none cursor-pointer transition w-full sm:w-auto';
+                periodSelectIcon.className = 'fa-solid fa-chevron-down text-[10px] text-blue-700 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none';
+            } else {
+                headerIconBox.className = 'w-10 h-10 rounded-xl bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white font-bold shadow-md shadow-indigo-100 transition-colors duration-300';
+                unitBadge.className = 'text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-200/70 px-3 py-1.5 rounded-lg transition-colors duration-300';
+                periodSelect.className = 'appearance-none text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 pl-3.5 pr-8 py-2 rounded-xl focus:outline-none cursor-pointer transition w-full sm:w-auto';
+                periodSelectIcon.className = 'fa-solid fa-chevron-down text-[10px] text-indigo-600 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none';
+            }
+
+            // 2) 상단 요약 카드는 웰메이드 유무에 따라 색상 구분
+            if (!hasWellmade) {
+                highlightCard.className = 'bg-gradient-to-br from-slate-900 via-stone-900 to-amber-950 rounded-2xl p-5 lg:p-6 text-white shadow-xl relative overflow-hidden border border-amber-700/50 transition-all duration-300';
+                highlightGlow.className = 'absolute -right-8 -bottom-8 w-40 h-40 bg-amber-500 opacity-20 rounded-full blur-2xl pointer-events-none';
+                cardRegionInfo.className = 'text-[13px] text-amber-200 font-medium truncate';
+                cardStoreRank.className = 'flex-shrink-0 whitespace-nowrap text-xs font-bold text-amber-100 bg-amber-700/75 px-2 py-1 rounded-md';
+                cardMetric1Label.className = 'text-xs text-amber-200 font-medium truncate';
+                cardMetric2Label.className = 'text-xs text-amber-200 font-medium truncate';
+                if (shareBarDot) shareBarDot.className = 'w-2 h-2 rounded-full bg-amber-400 inline-block';
+                if (shareBarPercent) shareBarPercent.className = 'text-amber-300 font-extrabold tabular-nums';
+                if (shareBarFill) shareBarFill.className = 'h-full bg-amber-400 rounded-full transition-all duration-500';
+            } else if (branch === 'gangwon') {
+                highlightCard.className = 'bg-gradient-to-br from-slate-900 via-teal-950 to-emerald-950 rounded-2xl p-5 lg:p-6 text-white shadow-xl relative overflow-hidden border border-teal-800/40 transition-all duration-300';
+                highlightGlow.className = 'absolute -right-8 -bottom-8 w-40 h-40 bg-teal-500 opacity-20 rounded-full blur-2xl pointer-events-none';
+                cardRegionInfo.className = 'text-[13px] text-teal-200 font-medium truncate';
+                cardStoreRank.className = 'flex-shrink-0 whitespace-nowrap text-xs font-bold text-teal-100 bg-teal-700/80 px-2 py-1 rounded-md';
+                cardMetric1Label.className = 'text-xs text-teal-200 font-medium truncate';
+                cardMetric2Label.className = 'text-xs text-teal-200 font-medium truncate';
+                if (shareBarDot) shareBarDot.className = 'w-2 h-2 rounded-full bg-emerald-400 inline-block';
+                if (shareBarPercent) shareBarPercent.className = 'text-emerald-300 font-extrabold tabular-nums';
+                if (shareBarFill) shareBarFill.className = 'h-full bg-emerald-400 rounded-full transition-all duration-500';
+            } else if (branch === 'gyeonggi') {
+                highlightCard.className = 'bg-gradient-to-br from-slate-900 via-blue-950 to-sky-950 rounded-2xl p-5 lg:p-6 text-white shadow-xl relative overflow-hidden border border-blue-800/40 transition-all duration-300';
+                highlightGlow.className = 'absolute -right-8 -bottom-8 w-40 h-40 bg-blue-500 opacity-20 rounded-full blur-2xl pointer-events-none';
+                cardRegionInfo.className = 'text-[13px] text-blue-200 font-medium truncate';
+                cardStoreRank.className = 'flex-shrink-0 whitespace-nowrap text-xs font-bold text-blue-100 bg-blue-700/80 px-2 py-1 rounded-md';
+                cardMetric1Label.className = 'text-xs text-blue-200 font-medium truncate';
+                cardMetric2Label.className = 'text-xs text-blue-200 font-medium truncate';
+                if (shareBarDot) shareBarDot.className = 'w-2 h-2 rounded-full bg-emerald-400 inline-block';
+                if (shareBarPercent) shareBarPercent.className = 'text-emerald-300 font-extrabold tabular-nums';
+                if (shareBarFill) shareBarFill.className = 'h-full bg-emerald-400 rounded-full transition-all duration-500';
+            } else {
+                highlightCard.className = 'bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-5 lg:p-6 text-white shadow-xl relative overflow-hidden border border-indigo-800/40 transition-all duration-300';
+                highlightGlow.className = 'absolute -right-8 -bottom-8 w-40 h-40 bg-indigo-500 opacity-20 rounded-full blur-2xl pointer-events-none';
+                cardRegionInfo.className = 'text-[13px] text-indigo-200 font-medium truncate';
+                cardStoreRank.className = 'flex-shrink-0 whitespace-nowrap text-xs font-bold text-indigo-100 bg-indigo-700/80 px-2 py-1 rounded-md';
+                cardMetric1Label.className = 'text-xs text-indigo-200 font-medium truncate';
+                cardMetric2Label.className = 'text-xs text-indigo-200 font-medium truncate';
+                if (shareBarDot) shareBarDot.className = 'w-2 h-2 rounded-full bg-emerald-400 inline-block';
+                if (shareBarPercent) shareBarPercent.className = 'text-emerald-300 font-extrabold tabular-nums';
+                if (shareBarFill) shareBarFill.className = 'h-full bg-emerald-400 rounded-full transition-all duration-500';
+            }
+
+            document.querySelectorAll('.period-chip').forEach(btn => {
+                if (btn.getAttribute('data-period') === currentPeriod) {
+                    btn.className = `period-chip px-3 py-1.5 rounded-lg text-xs font-bold ${activeChipColor} text-white transition whitespace-nowrap`;
+                } else {
+                    btn.className = 'period-chip px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap';
+                }
+            });
+        }
+
+        function renderRegionPills() {
+            const branchData = getBranchFilteredData();
+            const uniqueRegions = [...new Set(branchData.map(d => d.region))];
+            const regions = ['전체 지역', ...uniqueRegions];
+
+            document.getElementById('regionCountLabel').innerText = `총 ${uniqueRegions.length}개 지역`;
+            const toggleBtn = document.getElementById('toggleRegionExpandBtn');
+            if (toggleBtn) {
+                toggleBtn.innerText = isRegionExpanded ? '접기' : '전체 보기';
+            }
+
+            const container = document.getElementById('regionPillsContainer');
+            container.className = isRegionExpanded
+                ? 'flex flex-wrap gap-1.5 pb-1'
+                : 'flex space-x-1.5 overflow-x-auto no-scrollbar pb-1';
+
+            const storeObj = RAW_STORE_DATA.find(d => d.store === currentStore);
+            const activeBranch = currentBranch !== 'all' ? currentBranch : (storeObj ? storeObj.branch : 'seoul');
+            const activeColor = (BRANCH_META[activeBranch] && BRANCH_META[activeBranch].activePill) || 'bg-indigo-600';
+
+            container.innerHTML = regions.map(reg => {
+                const isActive = reg === currentRegion;
+                const activeCls = isActive
+                    ? `${activeColor} text-white shadow-sm font-bold`
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 font-medium';
+                return `<button onclick="selectRegion('${reg}')" class="px-3.5 py-1.5 rounded-full text-xs transition whitespace-nowrap ${activeCls}">${reg}</button>`;
+            }).join('');
+        }
+
+        function renderStoreChips() {
+            const query = document.getElementById('storeSearchInput').value.trim().toLowerCase();
+            let filtered = getBranchFilteredData();
+
+            if (query) {
+                filtered = RAW_STORE_DATA.filter(d =>
+                    d.store.toLowerCase().includes(query) ||
+                    d.region.toLowerCase().includes(query)
+                );
+            } else if (currentRegion !== '전체 지역') {
+                filtered = filtered.filter(d => d.region === currentRegion);
+            }
+
+            document.getElementById('storeCountLabel').innerText = `${filtered.length}개 매장`;
+            const toggleBtn = document.getElementById('toggleStoreExpandBtn');
+            if (toggleBtn) {
+                toggleBtn.innerText = isStoreExpanded ? '접기' : '전체 보기';
+            }
+
+            const container = document.getElementById('storeChipsContainer');
+            container.className = isStoreExpanded
+                ? 'flex flex-wrap gap-1.5 pb-1'
+                : 'flex space-x-1.5 overflow-x-auto no-scrollbar pb-1';
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 py-1">해당 조건에 등록된 매장이 없습니다.</span>`;
+                return;
+            }
+
+            if (!filtered.some(d => d.store === currentStore)) {
+                currentStore = filtered[0].store;
+            }
+
+            container.innerHTML = filtered.map(d => {
+                const isSelected = d.store === currentStore;
+                const cls = isSelected
+                    ? 'bg-slate-900 text-white font-bold border-slate-900 shadow-sm'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium';
+                return `<button onclick="selectStore('${d.store}')" class="px-3.5 py-1.5 rounded-lg text-xs border transition whitespace-nowrap ${cls}">${d.store}</button>`;
+            }).join('');
+        }
+
+        function selectRegion(reg) {
+            currentRegion = reg;
+            document.getElementById('storeSearchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderRegionPills();
+            renderStoreChips();
+            updateDashboard();
+        }
+
+        function selectStore(storeName) {
+            currentStore = storeName;
+            renderStoreChips();
+            updateDashboard();
+        }
+
+        function handleSearchInput() {
+            const val = document.getElementById('storeSearchInput').value;
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (val.trim().length > 0) clearBtn.classList.remove('hidden');
+            else clearBtn.classList.add('hidden');
+            renderStoreChips();
+            updateDashboard();
+        }
+
+        function clearSearch() {
+            document.getElementById('storeSearchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderStoreChips();
+            updateDashboard();
+        }
+
+        function changePeriod(periodKey) {
+            currentPeriod = periodKey;
+            const select = document.getElementById('periodFilterSelect');
+            if (select) select.value = periodKey;
+            updateDashboard();
+        }
+
+        function changeSort(sortKey) {
+            currentSort = sortKey;
+            document.getElementById('sort_sales').className = sortKey === 'sales'
+                ? 'px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition'
+                : 'px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition';
+            document.getElementById('sort_growth').className = sortKey === 'growth'
+                ? 'px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition'
+                : 'px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition';
+            updateDashboard();
+        }
+
+        function changeViewMode(mode) {
+            currentViewMode = mode;
+            document.getElementById('view_card').className = mode === 'card'
+                ? 'px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition flex items-center gap-1.5'
+                : 'px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+            document.getElementById('view_table').className = mode === 'table'
+                ? 'px-3 py-1.5 rounded-md font-bold bg-white text-slate-900 shadow-xs transition flex items-center gap-1.5'
+                : 'px-3 py-1.5 rounded-md font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5';
+            updateDashboard();
+        }
+
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.remove('hidden');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.add('hidden');
+        }
+
+        function renderMonthlyChart(storeObj, brandName) {
+            const container = document.getElementById('monthlyChartContainer');
+            const labelEl = document.getElementById('chartBrandLabel');
+            if (!container) return;
+
+            if (labelEl) {
+                labelEl.innerText = `${brandName} 월별 추이 (막대 클릭 시 월별 조회)`;
+            }
+
+            const count = Math.max(1, maxMonthWithData);
+            container.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+
+            const months = [];
+            let maxVal = 1;
+            for (let m = 1; m <= count; m++) {
+                const v26 = (storeObj.sales_26 && storeObj.sales_26[`m${m}`] && storeObj.sales_26[`m${m}`][brandName]) || 0;
+                const v25 = (storeObj.sales_25 && storeObj.sales_25[`m${m}`] && storeObj.sales_25[`m${m}`][brandName]) || 0;
+                if (v26 > maxVal) maxVal = v26;
+                if (v25 > maxVal) maxVal = v25;
+                months.push({ m, v26, v25 });
+            }
+
+            container.innerHTML = months.map(({ m, v26, v25 }) => {
+                const pKey = `m${m}`;
+                const isSelected = currentPeriod === pKey;
+                // 차트 높이를 h-24에 맞춰 스케일 업 (최대 높이 약 64px)
+                const h25 = v25 > 0 ? Math.max(8, Math.round((v25 / maxVal) * 64)) : 2;
+                const h26 = v26 > 0 ? Math.max(8, Math.round((v26 / maxVal) * 64)) : 2;
+                const nextPeriod = isSelected ? 'accum' : pKey;
+                const colHighlight = isSelected
+                    ? 'bg-white/15 ring-1 ring-emerald-400/60'
+                    : 'hover:bg-white/10';
+                const labelCls = isSelected ? 'text-emerald-300 font-extrabold' : 'text-white/65 font-medium';
+
+                return `
+                    <button type="button" onclick="changePeriod('${nextPeriod}')" title="${m}월 · 26년 ${formatSales(v26)} / 25년 ${formatSales(v25)}" class="flex flex-col items-center justify-end h-full rounded-lg px-0.5 py-1 transition cursor-pointer ${colHighlight}">
+                        <div class="flex items-end justify-center gap-0.5 h-16 w-full">
+                            <span class="w-1.5 lg:w-2 rounded-t-xs bg-white/30 transition-all duration-300" style="height: ${h25}px;"></span>
+                            <span class="w-1.5 lg:w-2 rounded-t-xs ${isSelected ? 'bg-amber-300' : 'bg-emerald-400'} transition-all duration-300" style="height: ${h26}px;"></span>
+                        </div>
+                        <span class="text-[10px] mt-1.5 leading-none tabular-nums ${labelCls}">${m}월</span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function updateDashboard() {
+            const listEl = document.getElementById('brandListContainer');
+            const branchData = getBranchFilteredData();
+
+            if (branchData.length === 0 && !document.getElementById('storeSearchInput').value.trim()) {
+                listEl.className = 'w-full';
+                listEl.innerHTML = `
+                    <div class="bg-white p-10 rounded-2xl border border-slate-200 text-center space-y-3">
+                        <i class="fa-solid fa-spinner fa-spin text-3xl text-indigo-400"></i>
+                        <p class="text-sm font-bold text-slate-600">데이터를 불러오는 중이거나 매장이 없습니다.</p>
+                    </div>`;
+                return;
+            }
+
+            const storeObj = RAW_STORE_DATA.find(d => d.store === currentStore) || branchData[0] || RAW_STORE_DATA[0];
+            if (!storeObj) return;
+
+            const branch = storeObj.branch;
+            renderRegionPills();
+
+            const p26 = (storeObj.sales_26 && storeObj.sales_26[currentPeriod]) || {};
+            const p25 = (storeObj.sales_25 && storeObj.sales_25[currentPeriod]) || {};
+            const acc26 = (storeObj.sales_26 && storeObj.sales_26.accum) || {};
+            const acc25 = (storeObj.sales_25 && storeObj.sales_25.accum) || {};
+
+            document.getElementById('headerSubtitle').innerText = `${storeObj.branchName} · ${storeObj.region} · ${storeObj.store} · ${PERIOD_NAMES[currentPeriod]}`;
+            document.getElementById('cardBranchBadge').innerText = storeObj.branchName;
+
+            const selectedMonth = currentPeriod !== 'accum' ? parseInt(currentPeriod.replace('m', ''), 10) : maxMonthWithData;
+
+            const salesSortedList = Object.entries(p26)
+                .filter(([_, v]) => v > 0)
+                .map(([brand, val26]) => {
+                    const val25 = p25[brand] || 0;
+                    const growth = val25 > 0 ? ((val26 - val25) / val25) * 100 : null;
+                    const close25 = (storeObj.sales_25_close && storeObj.sales_25_close[brand])
+                        || (acc25 && acc25[brand])
+                        || 0;
+
+                    let ytd26 = 0;
+                    if (currentPeriod === 'accum' || selectedMonth === maxMonthWithData) {
+                        ytd26 = acc26[brand] || 0;
+                        if (ytd26 === 0) {
+                            for (let m = 1; m <= selectedMonth; m++) {
+                                ytd26 += (storeObj.sales_26 && storeObj.sales_26[`m${m}`] && storeObj.sales_26[`m${m}`][brand]) || 0;
+                            }
+                        }
+                    } else {
+                        for (let m = 1; m <= selectedMonth; m++) {
+                            ytd26 += (storeObj.sales_26 && storeObj.sales_26[`m${m}`] && storeObj.sales_26[`m${m}`][brand]) || 0;
+                        }
+                    }
+
+                    return { brand, val26, val25, close25, ytd26, growth };
+                })
+                .sort((a, b) => b.val26 - a.val26);
+
+            const totalDistrictSales = salesSortedList.reduce((sum, item) => sum + item.val26, 0);
+            const topBrandSales = salesSortedList.length > 0 ? salesSortedList[0].val26 : 1;
+
+            salesSortedList.forEach((item, idx) => {
+                item.salesRank = idx + 1;
+                item.share = totalDistrictSales > 0 ? (item.val26 / totalDistrictSales) * 100 : 0;
+            });
+
+            let focusBrand = null;
+            for (const pBrand of FOCUS_BRAND_PRIORITY) {
+                const found = salesSortedList.find(b => b.brand === pBrand);
+                if (found) {
+                    focusBrand = found;
+                    break;
+                }
+            }
+            if (!focusBrand) {
+                focusBrand = salesSortedList[0] || { brand: '웰메이드', val26: 0, val25: 0, close25: 0, growth: null, salesRank: 0, share: 0 };
+            }
+
+            const hasWellmade = focusBrand.brand === '웰메이드';
+            applyThemeColor(branch, hasWellmade);
+
+            const popText = storeObj.pop ? ` · 인구 ${storeObj.pop}` : '';
+            document.getElementById('cardRegionInfo').innerText = `${storeObj.region}${popText} · ${focusBrand.brand} 기준`;
+            document.getElementById('cardStoreName').innerText = storeObj.store;
+            document.getElementById('cardStoreRank').innerText = focusBrand.salesRank > 0
+                ? `상권 ${focusBrand.salesRank}위 / ${salesSortedList.length}개`
+                : '실적 없음';
+            document.getElementById('cardTopShareBadge').innerText = `점유율 ${focusBrand.share.toFixed(1)}%`;
+
+            const focusClose25 = (storeObj.sales_25_close && storeObj.sales_25_close[focusBrand.brand])
+                || (acc25 && acc25[focusBrand.brand])
+                || focusBrand.close25
+                || 0;
+            document.getElementById('cardShareBadge').innerText = formatToEok(focusClose25);
+
+            document.getElementById('shareBarPercent').innerText = `${focusBrand.share.toFixed(1)}%`;
+            document.getElementById('shareBarTotal').innerText = formatSales(totalDistrictSales);
+            document.getElementById('shareBarFill').style.width = `${Math.min(100, Math.max(0, focusBrand.share)).toFixed(1)}%`;
+
+            const accVal26 = acc26[focusBrand.brand] || 0;
+            const accVal25 = acc25[focusBrand.brand] || 0;
+            const accGrowth = accVal25 > 0 ? (((accVal26 - accVal25) / accVal25) * 100).toFixed(1) : null;
+
+            document.getElementById('cardMetric1Label').innerText = `26년 누계 (${focusBrand.brand})`;
+            document.getElementById('cardMetric1Value').innerText = formatSales(accVal26);
+            if (accGrowth !== null) {
+                const sign = parseFloat(accGrowth) > 0 ? '▲ +' : (parseFloat(accGrowth) < 0 ? '▼ ' : '');
+                document.getElementById('cardGrowth1Badge').innerText = `${sign}${accGrowth}%`;
+                document.getElementById('cardGrowth1Badge').className = parseFloat(accGrowth) >= 0 ? 'text-[11px] font-bold text-emerald-400 tabular-nums' : 'text-[11px] font-bold text-rose-400 tabular-nums';
+                document.getElementById('cardPrev1Label').innerText = `(전년 ${formatSales(accVal25)})`;
+            } else {
+                document.getElementById('cardGrowth1Badge').innerText = '-';
+                document.getElementById('cardPrev1Label').innerText = '(전년 없음)';
+            }
+
+            if (currentPeriod === 'accum') {
+                const avg26 = Math.round(accVal26 / Math.max(1, maxMonthWithData));
+                const avg25 = Math.round(accVal25 / Math.max(1, maxMonthWithData));
+                document.getElementById('cardMetric2Label').innerText = `월평균 매출 (1~${maxMonthWithData}월)`;
+                document.getElementById('cardMetric2Value').innerText = formatSales(avg26);
+                if (accGrowth !== null) {
+                    const sign = parseFloat(accGrowth) > 0 ? '▲ +' : (parseFloat(accGrowth) < 0 ? '▼ ' : '');
+                    document.getElementById('cardGrowth2Badge').innerText = `${sign}${accGrowth}%`;
+                    document.getElementById('cardGrowth2Badge').className = parseFloat(accGrowth) >= 0 ? 'text-[11px] font-bold text-emerald-400 tabular-nums' : 'text-[11px] font-bold text-rose-400 tabular-nums';
+                    document.getElementById('cardPrev2Label').innerText = `(전년 ${formatSales(avg25)})`;
+                } else {
+                    document.getElementById('cardGrowth2Badge').innerText = '-';
+                    document.getElementById('cardPrev2Label').innerText = '(전년 없음)';
+                }
+            } else {
+                const mVal26 = focusBrand.val26 || 0;
+                const mVal25 = focusBrand.val25 || 0;
+                const mGrowth = mVal25 > 0 ? (((mVal26 - mVal25) / mVal25) * 100).toFixed(1) : null;
+                document.getElementById('cardMetric2Label').innerText = `${PERIOD_NAMES[currentPeriod]} 실적`;
+                document.getElementById('cardMetric2Value').innerText = formatSales(mVal26);
+                if (mGrowth !== null) {
+                    const sign = parseFloat(mGrowth) > 0 ? '▲ +' : (parseFloat(mGrowth) < 0 ? '▼ ' : '');
+                    document.getElementById('cardGrowth2Badge').innerText = `${sign}${mGrowth}%`;
+                    document.getElementById('cardGrowth2Badge').className = parseFloat(mGrowth) >= 0 ? 'text-[11px] font-bold text-emerald-400 tabular-nums' : 'text-[11px] font-bold text-rose-400 tabular-nums';
+                    document.getElementById('cardPrev2Label').innerText = `(전년 ${formatSales(mVal25)})`;
+                } else {
+                    document.getElementById('cardGrowth2Badge').innerText = '-';
+                    document.getElementById('cardPrev2Label').innerText = '(전년 없음)';
+                }
+            }
+
+            renderMonthlyChart(storeObj, focusBrand.brand);
+
+            const displayList = [...salesSortedList];
+            if (currentSort === 'growth') {
+                displayList.sort((a, b) => {
+                    const gA = a.growth !== null ? a.growth : -999999;
+                    const gB = b.growth !== null ? b.growth : -999999;
+                    return gB - gA;
+                });
+            }
+
+            document.getElementById('brandCountBadge').innerText = `${displayList.length}개`;
+
+            if (displayList.length === 0) {
+                listEl.className = 'w-full';
+                listEl.innerHTML = `<div class="bg-white p-10 rounded-2xl border border-slate-100 text-center text-sm text-slate-400">집계된 브랜드 매출 데이터가 없습니다.</div>`;
+                return;
+            }
+
+            // 요약표 모드
+            if (currentViewMode === 'table') {
+                listEl.className = 'w-full overflow-x-auto';
+                const tableRows = displayList.map((item) => {
+                    const rankBadge = item.salesRank === 1
+                        ? 'bg-amber-500 text-white'
+                        : (item.salesRank <= 3 ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-700');
+
+                    let growthCell = `<span class="text-xs text-slate-400">-</span>`;
+                    if (item.growth !== null) {
+                        const sign = item.growth > 0 ? '+' : '';
+                        const cls = item.growth >= 0 ? 'text-emerald-600 bg-emerald-50' : 'text-rose-600 bg-rose-50';
+                        const arrow = item.growth >= 0 ? '▲' : '▼';
+                        growthCell = `<span class="inline-block px-2 py-1 rounded text-xs font-bold tabular-nums ${cls}">${arrow} ${sign}${item.growth.toFixed(1)}%</span>`;
+                    }
+
+                    return `
+                        <tr class="border-b border-slate-100 last:border-b-0 hover:bg-slate-50/80 transition">
+                            <td class="py-3 pl-4 pr-2 text-center w-14">
+                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-extrabold ${rankBadge}">${item.salesRank}</span>
+                            </td>
+                            <td class="py-3 px-2">
+                                <div class="text-sm font-bold text-slate-900">${item.brand}</div>
+                                <div class="text-xs text-slate-400 tabular-nums mt-0.5">${formatToEok(item.close25)} · 점유 ${item.share.toFixed(1)}%</div>
+                            </td>
+                            <td class="py-3 px-2 text-right text-sm font-extrabold text-slate-900 tabular-nums whitespace-nowrap">
+                                ${formatSales(item.val26)}
+                                <div class="text-[11px] text-slate-400 font-normal mt-0.5">25년 매출 ${item.val25 > 0 ? formatSales(item.val25) : '-'}</div>
+                                ${currentPeriod !== 'accum' ? `<div class="text-[11px] text-slate-500 font-medium">${selectedMonth}월 누계 ${formatSales(item.ytd26)}</div>` : ''}
+                            </td>
+                            <td class="py-3 pl-2 pr-4 text-right whitespace-nowrap">${growthCell}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                listEl.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden min-w-[500px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200/70 text-xs font-bold text-slate-500">
+                                    <th class="py-2.5 pl-4 pr-2 text-center w-14">순위</th>
+                                    <th class="py-2.5 px-2">브랜드</th>
+                                    <th class="py-2.5 px-2 text-right">26년 실적</th>
+                                    <th class="py-2.5 pl-2 pr-4 text-right">신장률</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                return;
+            }
+
+            // 카드 보기 모드 (PC 레이아웃 연동 Grid 활성화)
+            listEl.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 lg:gap-5';
+            listEl.innerHTML = displayList.map((item) => {
+                const rank = item.salesRank;
+                const rankBadgeCls = rank === 1
+                    ? 'bg-amber-500 text-white shadow-amber-200/60'
+                    : (rank <= 3 ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700');
+
+                const barColorCls = rank === 1
+                    ? 'bg-amber-400'
+                    : (branch === 'gangwon' ? 'bg-teal-500' : (branch === 'gyeonggi' ? 'bg-blue-500' : 'bg-indigo-500'));
+
+                const barWidthPct = topBrandSales > 0 ? Math.max(4, Math.round((item.val26 / topBrandSales) * 100)) : 0;
+
+                let growthHtml = `<span class="inline-block text-[11px] lg:text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-md font-medium">전년 미집계</span>`;
+                if (item.growth !== null) {
+                    const sign = item.growth > 0 ? '+' : '';
+                    const pillCls = item.growth >= 0
+                        ? 'text-emerald-700 bg-emerald-50 border-emerald-200/60'
+                        : 'text-rose-700 bg-rose-50 border-rose-200/60';
+                    const arrow = item.growth >= 0 ? '▲' : '▼';
+                    growthHtml = `<span class="inline-block ${pillCls} border text-[11px] lg:text-xs font-bold px-2 py-1 rounded-md tabular-nums">${arrow} ${sign}${item.growth.toFixed(1)}%</span>`;
+                }
+
+                const brandAcc26 = acc26[item.brand] || item.val26;
+                const monthlyAvg = Math.round(brandAcc26 / Math.max(1, maxMonthWithData));
+                const ytdLabel = `${selectedMonth}월 누계`;
+
+                return `
+                    <div class="bg-white p-4 lg:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center space-x-3.5 min-w-0">
+                                <div class="w-11 h-11 rounded-xl ${rankBadgeCls} font-extrabold flex-shrink-0 flex items-center justify-center text-sm shadow-sm">
+                                    ${rank}위
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-base font-extrabold text-slate-900 truncate">${item.brand}</h4>
+                                    <p class="text-xs text-slate-400 mt-1 tabular-nums truncate">
+                                        ${formatToEok(item.close25)} · 점유 ${item.share.toFixed(1)}%
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <div class="text-lg font-extrabold text-slate-900 tabular-nums">${formatSales(item.val26)}</div>
+                                <div class="mt-1.5">${growthHtml}</div>
+                            </div>
+                        </div>
+
+                        <!-- 상권 1위 대비 상대 매출 가로 막대 -->
+                        <div class="mt-4 w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full ${barColorCls} rounded-full transition-all duration-500" style="width: ${barWidthPct}%;"></div>
+                        </div>
+
+                        <!-- 하단 세부 수치: 25년 매출 & 1~선택월 누계 & 월평균 -->
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2 text-[11px] lg:text-xs text-slate-500 tabular-nums">
+                            <span>25년 매출: <strong class="text-slate-700 font-bold">${item.val25 > 0 ? formatSales(item.val25) : '-'}</strong></span>
+                            <div class="flex items-center gap-2 text-slate-400">
+                                ${currentPeriod !== 'accum' ? `<span>${ytdLabel} <strong class="text-slate-700 font-semibold">${formatSales(item.ytd26)}</strong></span><span>·</span>` : ''}
+                                <span>월평균 <strong class="text-slate-700 font-semibold">${formatSales(monthlyAvg)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastBox');
+            if (!toast) return;
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPeriodUI();
+            loadGoogleSheetData();
+        });
+    </script>
+
+</body>
+</html>
