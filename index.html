@@ -270,11 +270,14 @@
     const GOOGLE_CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
     const ALLOWED_EMAILS = ["gudwnqn109@gmail.com"];
 
+    // ★ 여기에 새로운 메뉴 '투자비 현황'이 추가되었습니다.
     const MENU_ITEMS = [
       { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
       { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
       { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', category: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'amber' },
-      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' }
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
+      // 새롭게 추가된 메뉴
+      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', category: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', accent: 'indigo' }
     ];
 
     const ACCENT_STYLES = {
@@ -666,7 +669,6 @@
       });
     }
 
-    // ★ 로컬/미리보기 환경 여부에 상관없이 항상 iframe을 로드하도록 처리
     function mountViewerContent(containerEl, menuId) {
       if (!containerEl) return;
       const menuObj = MENU_ITEMS.find(m => m.id === menuId) || MENU_ITEMS[0];
@@ -819,7 +821,6 @@
     function initGoogleAuth() {
       isPreviewEnv = detectPreviewEnvironment();
 
-      // 로컬(파일) 접속 등에서 OAuth 서버 우회를 위해 미리보기 로그인 상태는 유지합니다.
       if (isPreviewEnv) {
         unlockPortal({ email: ALLOWED_EMAILS[0], name: 'WM중부 미리보기' }, true);
         return;
