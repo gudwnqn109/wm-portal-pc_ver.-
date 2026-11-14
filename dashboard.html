@@ -142,7 +142,6 @@
                 <span id="dYearActual" class="text-2xl lg:text-[28px] font-black tracking-tight text-slate-900 leading-none">-</span>
                 <span class="text-xs font-bold text-slate-400">백만원</span>
               </div>
-              <span id="dOpenDate" class="text-[10.5px] text-slate-400 font-semibold"></span>
             </div>
             <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
               <span class="text-slate-500">연누계목표 <strong id="dYearTarget" class="text-slate-800 font-extrabold">-백만</strong></span>
@@ -178,14 +177,14 @@
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
           
           <!-- 주간 매출 및 회원 고객 비중 -->
-          <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-2">
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-start gap-2">
+            <div class="flex items-center justify-between">
               <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                <i class="fa-solid fa-chart-column text-amber-500"></i><span>주간 매출 및 회원 고객 비중</span>
+                <i class="fa-solid fa-chart-column text-amber-500"></i><span id="wCardTitle1">주간 매출 및 회원 고객 비중</span>
               </h3>
               <span class="text-[10px] text-slate-400 font-semibold">단위: 천원 · 전년비</span>
             </div>
-            <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-200/60 space-y-2.5 flex-1 flex flex-col justify-between">
+            <div class="bg-slate-50/90 rounded-xl p-3 border border-slate-200/60 flex-1 flex flex-col justify-center gap-5">
               <div class="space-y-2">
                 <div class="flex items-center justify-between text-[11px]">
                   <span class="font-bold text-slate-600">전년 동기 대비 실적 비교</span>
@@ -210,7 +209,7 @@
                   </div>
                 </div>
               </div>
-              <div class="pt-2 border-t border-slate-200/70">
+              <div class="pt-3 border-t border-slate-200/70">
                 <div class="flex items-center justify-between text-[11px] mb-1">
                   <span class="font-bold text-slate-600">회원 고객매출 <strong id="wCustSales" class="text-slate-900 font-black ml-1">-</strong></span>
                   <span class="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">비중 <span id="wCustShare">-</span></span>
@@ -223,14 +222,14 @@
           </div>
 
           <!-- 고객 지표 및 첫구매 신규고객 -->
-          <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-2">
+          <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-start gap-2">
+            <div class="flex items-center justify-between">
               <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                <i class="fa-solid fa-users text-blue-600"></i><span>고객 지표 및 첫구매 신규고객</span>
+                <i class="fa-solid fa-users text-blue-600"></i><span id="wCardTitle2">주간 고객 지표 및 첫구매 신규고객</span>
               </h3>
               <span class="text-[10px] text-slate-400 font-semibold">단위: 명, 천원</span>
             </div>
-            <div class="space-y-2.5 flex-1 flex flex-col justify-between">
+            <div class="flex-1 flex flex-col justify-center gap-4">
               <div class="grid grid-cols-3 gap-2">
                 <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/70 text-center">
                   <div class="text-[10.5px] text-slate-500 font-bold">구매고객수</div>
@@ -286,13 +285,6 @@
               <i class="fa-solid fa-tags text-indigo-600"></i><span>5대 브랜드별 매출 구성 및 전년 대비 신장</span>
             </h3>
             <p class="text-[10.5px] text-slate-400 mt-0.5">매장 내 브랜드별 매출 비중(소수점 1자리) · 매출액(천원) · 지점 및 중부영업팀 평균 비교</p>
-          </div>
-          <div class="flex items-center gap-2.5 text-[10.5px] font-semibold text-slate-500">
-            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-slate-800 inline-block"></i>인디안</span>
-            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-blue-600 inline-block"></i>브루노바피</span>
-            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-emerald-600 inline-block"></i>데일리스트</span>
-            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-amber-500 inline-block"></i>더레이블</span>
-            <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-full bg-rose-500 inline-block"></i>두아니</span>
           </div>
         </div>
 
@@ -525,6 +517,18 @@
       if (num <= -0.0005) return `<span class="text-[10.5px] font-extrabold text-blue-600">(▼${pct}%)</span>`;
       return `<span class="text-[10.5px] font-bold text-slate-400">(0%)</span>`;
     };
+
+    function getPrevWeekRangeString() {
+      const base = new Date(currentYear, currentMonth - 1, currentDay);
+      const day = base.getDay();
+      const diffToMon = day === 0 ? -6 : 1 - day; // 이번 주 월요일 차이값
+      
+      const prevMon = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 7);
+      const prevSun = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 1);
+      
+      const format = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+      return `(${format(prevMon)} ~ ${format(prevSun)})`;
+    }
 
     // 매장명 정규화 매칭 함수 (일일 매출장에 있는 매장만 찾기)
     function findDailyMasterStore(rawName) {
@@ -1075,7 +1079,6 @@
       document.getElementById('dYearRateBadge').innerText = `${yRate.toFixed(1)}% 달성`;
       document.getElementById('dYearGrBadge').innerText = `${yGr >= 0 ? '+' : ''}${yGr.toFixed(1)}% 신장`;
       document.getElementById('dYearActual').innerText = fmtMilInt(d.yAct);
-      document.getElementById('dOpenDate').innerText = st.openDate && st.openDate !== '-' ? `개점 ${st.openDate}` : '';
       document.getElementById('dYearTarget').innerText = `${fmtMilInt(d.yTgt)}백만`;
       const yDiffEl = document.getElementById('dYearDiff');
       yDiffEl.innerText = `${yDiff >= 0 ? '+' : ''}${yDiff.toLocaleString()}백만`;
@@ -1102,6 +1105,10 @@
     // [2] 주간 리포트 & 우측 상단 5대 브랜드 무스크롤 렌더링
     function renderWeeklySection(st) {
       const w = st.weekly;
+      const rangeStr = getPrevWeekRangeString();
+      document.getElementById('wCardTitle1').innerText = `주간 매출 및 회원 고객 비중 ${rangeStr}`;
+      document.getElementById('wCardTitle2').innerText = `주간 고객 지표 및 첫구매 신규고객 ${rangeStr}`;
+
       document.getElementById('wSalesBadge').innerHTML = getBadge(w.salesGr);
       document.getElementById('wSales26').innerText = `${fmt(w.sales26)} 천원`;
       document.getElementById('wSales25').innerText = `${fmt(w.sales25)} 천원`;
