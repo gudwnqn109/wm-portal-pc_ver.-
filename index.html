@@ -961,7 +961,7 @@
           try {
             const pageText = iframe.contentDocument.body.innerText || '';
             if (pageText.includes('404') && pageText.includes('NOT_FOUND')) {
-              containerEl.innerHTML = `
+              containerEl.innerHTML = \`
                 <div class="h-full overflow-y-auto thin-scrollbar bg-[#F7F6F2] p-3.5 lg:p-4">
                   <div class="max-w-lg mx-auto space-y-3 animate-view">
                     <div class="bg-rose-50 text-rose-600 p-3 rounded-xl text-xs font-bold text-center border border-rose-200 shadow-sm mb-3">
@@ -970,7 +970,7 @@
                     \${getPreviewDemoMarkup(menuId)}
                   </div>
                 </div>
-              `;
+              \`;
             }
           } catch(e) {}
         };
@@ -979,18 +979,18 @@
       }
 
       // 미리보기 샌드박스 환경에서는 실제 6개 페이지의 레이아웃과 지표를 재현한 데모 UI 렌더링
-      containerEl.innerHTML = `
+      containerEl.innerHTML = \`
         <div class="h-full overflow-y-auto thin-scrollbar bg-slate-100/80 p-3.5 lg:p-4">
           <div class="max-w-lg mx-auto space-y-3 animate-view">
-            ${getPreviewDemoMarkup(menuObj.id)}
+            \${getPreviewDemoMarkup(menuObj.id)}
           </div>
         </div>
-      `;
+      \`;
     }
 
     function getPreviewDemoMarkup(menuId) {
       if (menuId === 'daily') {
-        return `
+        return \`
           <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between shadow-2xs">
             <div class="flex items-center gap-2.5">
               <div class="w-8 h-8 rounded-xl bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs">WM</div>
@@ -1033,11 +1033,11 @@
               </div>
             </div>
           </div>
-        `;
+        \`;
       }
 
       if (menuId === 'weekly') {
-        return `
+        return \`
           <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center shadow-sm">
             <div>
               <span class="bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM중부</span>
@@ -1085,11 +1085,11 @@
               <span>브루노 18% · 기타 10%</span>
             </div>
           </div>
-        `;
+        \`;
       }
 
       if (menuId === 'competitor') {
-        return `
+        return \`
           <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between">
             <div class="flex items-center gap-2.5">
               <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white text-xs flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></span>
@@ -1137,11 +1137,11 @@
               <div class="text-right"><div class="font-extrabold text-slate-900">748,500</div><div class="text-[10.5px] font-bold text-emerald-600">▲ +3.1%</div></div>
             </div>
           </div>
-        `;
+        \`;
       }
 
       if (menuId === 'sellthru') {
-        return `
+        return \`
           <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
             <div>
               <span class="bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM본부</span>
@@ -1169,11 +1169,11 @@
             <div class="flex justify-between items-center py-1.5 border-b border-slate-100"><span>2. 셋업 자켓 (FA)</span><span class="font-black text-emerald-600">29.8%</span></div>
             <div class="flex justify-between items-center py-1.5"><span>3. 니트 가디건 (BC)</span><span class="font-black text-amber-600">25.1%</span></div>
           </div>
-        `;
+        \`;
       }
 
       if (menuId === 'investment') {
-        return `
+        return \`
           <div class="rounded-2xl bg-gradient-to-br from-indigo-950 via-teal-950 to-slate-900 text-white p-4 shadow-md">
             <div class="flex justify-between text-[10px]">
               <span class="bg-white/15 px-2 py-0.5 rounded font-bold">서울지점 · 대리점</span>
@@ -1197,10 +1197,10 @@
               <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden"><div class="bg-indigo-600 h-full rounded-full" style="width:100%"></div></div>
             </div>
           </div>
-        `;
+        \`;
       }
 
-      return `
+      return \`
         <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
           <div>
             <span class="text-[10px] text-indigo-300 font-bold">중부영업팀 통합 앱</span>
@@ -1225,7 +1225,7 @@
             <p class="text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">인디안 경량 다운 베스트 100·105 사이즈 추가 리오더 출고 요청.</p>
           </div>
         </div>
-      `;
+      \`;
     }
 
     // =========================================================================
