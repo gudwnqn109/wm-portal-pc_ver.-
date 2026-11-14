@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <!-- [직접 접속 차단 보안 코드] -->
+  <script>
+    if (window.self === window.top) {
+      window.location.replace('./index.html');
+    }
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WM중부영업팀 투자비 현황 (PC버전)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <!-- FontAwesome 6.4 Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body class="bg-[#F7F6F2] text-slate-800 antialiased min-h-screen selection:bg-indigo-100 overflow-x-hidden">
+
+  <!-- 메인 앱 컨테이너 (PC 최적화 풀위드) -->
+  <div class="w-full min-h-screen flex flex-col relative">
+
+    <!-- 상단 고정 헤더 바 (포털 테마에 맞춘 테두리 및 여백) -->
+    <header class="bg-white/95 backdrop-blur-md px-6 pt-4 pb-3.5 sticky top-0 z-30 border-b border-[#E6E4DD] flex items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3 min-w-0">
+        <div id="headerIconBox" class="w-10 h-10 rounded-xl bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-indigo-100 transition-colors duration-300">
+          <i class="fa-solid fa-building-columns text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-base font-extrabold text-slate-900 leading-tight truncate">WM중부영업팀 투자비 현황</h1>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span id="syncStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+              <span id="syncStatusDot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+              <span id="syncStatusText">데이터 불러오는 중...</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 우측 유틸리티 버튼 그룹 -->
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button type="button" onclick="refreshSheetData()" title="구글 시트 새로고침" class="w-9 h-9 rounded-xl bg-[#F7F6F2] border border-[#E6E4DD] hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition">
+          <i id="refreshIcon" class="fa-solid fa-rotate-right text-sm"></i>
+        </button>
+        <button type="button" onclick="openSheetModal()" title="구글 시트 주소 연동" class="w-9 h-9 rounded-xl bg-[#F7F6F2] border border-[#E6E4DD] hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition">
+          <i class="fa-solid fa-link text-sm"></i>
+        </button>
+        <button type="button" onclick="openHelpModal()" title="화면 보는 법 안내" class="w-9 h-9 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center transition">
+          <i class="fa-solid fa-question text-sm"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- 본문 영역 (최대 1400px 제한, 그리드 레이아웃) -->
+    <main class="flex-1 overflow-y-auto px-6 py-6 max-w-[1400px] w-full mx-auto space-y-6">
+
+      <!-- 1. 최상단 필터 패널 (탭 + 검색 가로 배치) -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <!-- 지점 4분할 탭바 -->
+        <div class="bg-white p-1.5 rounded-xl border border-[#E6E4DD] shadow-sm flex gap-1 w-full md:w-auto tabular-nums">
+          <button type="button" onclick="selectBranch('all')" id="tab_all" class="py-2 px-3 lg:px-4 rounded-lg text-xs font-bold transition bg-slate-900 text-white shadow-xs truncate">
+            중부영업팀 (99)
+          </button>
+          <button type="button" onclick="selectBranch('서울')" id="tab_서울" class="py-2 px-3 lg:px-4 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition truncate">
+            서울 (25)
+          </button>
+          <button type="button" onclick="selectBranch('경기')" id="tab_경기" class="py-2 px-3 lg:px-4 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition truncate">
+            경기 (33)
+          </button>
+          <button type="button" onclick="selectBranch('강원')" id="tab_강원" class="py-2 px-3 lg:px-4 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition truncate">
+            강원 (41)
+          </button>
+        </div>
+
+        <!-- 매장·지역·점주 통합 검색창 -->
+        <div class="relative w-full md:max-w-md shadow-sm">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <i class="fa-solid fa-magnifying-glass text-sm"></i>
+          </span>
+          <input
+            type="text"
+            id="storeSearchInput"
+            oninput="handleSearchInput()"
+            placeholder="매장명, 지역 또는 점주명 검색 (예: 인천, 이정화)"
+            class="w-full pl-10 pr-10 py-3 bg-white border border-[#E6E4DD] rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+          />
+          <button type="button" id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+            <i class="fa-solid fa-circle-xmark text-base"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. 권역 및 매장 선택 (PC: 2컬럼 병렬 배치) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- 지역 필터 -->
+        <div class="bg-white p-4 rounded-2xl border border-[#E6E4DD] shadow-sm space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700">지역(시·군·구) 선택</span>
+            <div class="flex items-center gap-2">
+              <span id="regionCountLabel" class="text-xs text-slate-400 tabular-nums">총 42개 권역</span>
+              <button type="button" id="toggleRegionExpandBtn" onclick="toggleRegionExpand()" class="text-xs font-bold text-indigo-600 hover:underline">전체 보기</button>
+            </div>
+          </div>
+          <div id="regionChipsContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-1"></div>
+        </div>
+
+        <!-- 매장 필터 -->
+        <div class="bg-white p-4 rounded-2xl border border-[#E6E4DD] shadow-sm space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-700">매장 선택</span>
+            <div class="flex items-center gap-2">
+              <span id="storeCountLabel" class="text-xs font-bold text-indigo-600 tabular-nums">0개 매장</span>
+              <button type="button" id="toggleStoreExpandBtn" onclick="toggleStoreExpand()" class="text-xs font-bold text-indigo-600 hover:underline">전체 보기</button>
+            </div>
+          </div>
+          <div id="storeChipsContainer" class="flex gap-1.5 overflow-x-auto no-scrollbar py-1"></div>
+        </div>
+      </div>
+
+      <!-- 3. 핵심 투자비 요약 히어로 카드 (PC 가로 확장형) -->
+      <div id="heroSummaryCard" class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-6 lg:p-8 text-white shadow-lg relative overflow-hidden border border-indigo-800/40 transition-all duration-300">
+        <div id="heroGlow" class="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 lg:gap-10">
+          
+          <!-- 좌측: 타이틀 및 점주 -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-3">
+              <span id="heroBranchBadge" class="text-xs font-bold px-2.5 py-1 rounded bg-white/15 text-white">서울지점</span>
+              <span id="heroRegionBadge" class="text-xs font-semibold px-2.5 py-1 rounded bg-white/10 text-indigo-200">서울</span>
+              <span id="heroTypeBadge" class="text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">대리점</span>
+            </div>
+            <h2 id="heroStoreTitle" class="text-2xl lg:text-3xl font-extrabold tracking-tight text-white truncate">-</h2>
+            <p id="heroOwnerSubtitle" class="text-sm text-indigo-200/90 font-medium mt-1.5 truncate">대표자 - · 실운영 -</p>
+          </div>
+
+          <!-- 중앙: 대형 지표 2개 (투자비 & 인테리어) -->
+          <div class="flex flex-row gap-4 shrink-0 w-full lg:w-auto overflow-x-auto no-scrollbar">
+            <!-- 좌측: 총 투자비 -->
+            <div class="bg-white/10 backdrop-blur-md p-4 lg:p-5 rounded-xl border border-white/10 flex-1 lg:w-48 flex flex-col justify-between">
+              <div>
+                <span id="heroInvestLabel" class="text-xs font-medium text-indigo-200 tracking-tight block">총 투자비 (보증+권리)</span>
+                <div class="flex items-baseline gap-1 mt-1.5">
+                  <span id="summaryTotalInvest" class="text-3xl font-black text-white tracking-tight leading-none">-</span>
+                  <span id="summaryTotalInvestUnit" class="text-sm text-indigo-200 font-semibold">백만</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-2.5 border-t border-white/10 text-xs text-white/80 font-medium truncate" id="summaryTotalInvestSub">
+                보증 - + 권리 -
+              </div>
+            </div>
+
+            <!-- 우측: 인테리어 총액 -->
+            <div class="bg-white/10 backdrop-blur-md p-4 lg:p-5 rounded-xl border border-white/10 flex-1 lg:w-48 flex flex-col justify-between">
+              <div>
+                <span id="heroInteriorLabel" class="text-xs font-medium text-indigo-200 tracking-tight block">인테리어 총액</span>
+                <div class="flex items-baseline gap-1 mt-1.5">
+                  <span id="summaryInteriorTotal" class="text-3xl font-black text-white tracking-tight leading-none">-</span>
+                  <span id="summaryInteriorUnit" class="text-sm text-indigo-200 font-semibold">백만</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-2.5 border-t border-white/10 text-xs text-emerald-300 font-semibold truncate" id="summaryInteriorSub">
+                매장 - · 본사 -
+              </div>
+            </div>
+          </div>
+
+          <!-- 우측: 하단 4칸 스트립 -->
+          <div class="grid grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-2 shrink-0 tabular-nums">
+            <div class="bg-black/25 rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center lg:w-24">
+              <div class="text-[10px] lg:text-[11px] text-white/65">월세</div>
+              <div id="stripRent" class="text-sm font-extrabold text-emerald-300 mt-1 truncate">-</div>
+            </div>
+            <div class="bg-black/25 rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center lg:w-24">
+              <div class="text-[10px] lg:text-[11px] text-white/65">매장평수</div>
+              <div id="stripArea" class="text-sm font-extrabold text-white mt-1 truncate">-</div>
+            </div>
+            <div class="bg-black/25 rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center lg:w-24">
+              <div class="text-[10px] lg:text-[11px] text-white/65">전면파사드</div>
+              <div id="stripFacade" class="text-sm font-extrabold text-white mt-1 truncate">-</div>
+            </div>
+            <div class="bg-black/25 rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center lg:w-24">
+              <div class="text-[10px] lg:text-[11px] text-white/65">평균마진</div>
+              <div id="stripMargin" class="text-sm font-extrabold text-amber-300 mt-1 truncate">-</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 4. 상세 정보 3단 카드 (PC: 3컬럼 그리드) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+        
+        <!-- 카드 1: 기본 제원 & 점주 운영정보 -->
+        <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+              <i class="fa-solid fa-store text-indigo-600"></i>
+              <span>기본 제원 & 점주 정보</span>
+            </div>
+            <span id="currentSelectedStoreName" class="text-xs font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">-</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs flex-1">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">최초 오픈일자</div>
+              <div id="detailOpenDate" class="font-bold text-slate-800 text-sm tabular-nums">-</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">최근 점정비 (내역)</div>
+              <div id="detailRenovDate" class="font-bold text-slate-800 text-xs leading-5 flex items-center flex-wrap gap-1">-</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">매장 평수</div>
+              <div id="detailArea" class="font-bold text-slate-800 text-sm">-</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">전면 파사드 (전/측)</div>
+              <div id="detailFront" class="font-bold text-slate-800 text-sm">-</div>
+            </div>
+          </div>
+
+          <!-- 점주 운영정보 -->
+          <div id="ownerInfoRow" class="pt-3 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500 px-1 border-t border-slate-100 shrink-0">
+            <div class="flex items-center gap-1.5">
+              <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-user-tie"></i>
+              </span>
+              <span>대표자:</span>
+              <strong id="detailRepName" class="text-slate-800 text-sm">-</strong>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
+                <i class="fa-solid fa-user-check"></i>
+              </span>
+              <span>실운영:</span>
+              <strong id="detailOpName" class="text-slate-800 text-sm">-</strong>
+              <span id="detailOpAge" class="text-slate-400 tabular-nums">(-)</span>
+              <span id="ownerDiffBadge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/70">위탁·가족운영</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카드 2: 투자비 및 인테리어 분담 -->
+        <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+            <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+              <i class="fa-solid fa-coins text-emerald-500"></i>
+              <span>투자비 및 인테리어 분담</span>
+            </div>
+            <span class="text-[10px] lg:text-[11px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md shrink-0">
+              총 투자 = 보증 + 권리
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 text-center text-xs tabular-nums flex-1">
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">전세보증금</div>
+              <div id="investDep" class="font-extrabold text-indigo-600 text-sm lg:text-base">-</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">권리금</div>
+              <div id="investPrem" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] text-slate-400 mb-1">월세</div>
+              <div id="investRent" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
+            </div>
+          </div>
+
+          <!-- 인테리어 분담 게이지 -->
+          <div class="pt-2 shrink-0">
+            <div class="flex justify-between items-center text-xs mb-2">
+              <span class="text-slate-600 font-bold">인테리어 분담 비율</span>
+              <span id="interiorRatioText" class="text-xs font-extrabold text-indigo-600 tabular-nums">매장 -% : 본사 -%</span>
+            </div>
+            <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex p-0.5 border border-slate-200/60">
+              <div id="barStoreRatio" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 50%"></div>
+              <div id="barHqRatio" class="bg-emerald-400 h-full rounded-full transition-all duration-300 ml-0.5" style="width: 50%"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mt-3 text-xs tabular-nums">
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span>매장 부담
+                  </span>
+                  <span id="interiorStoreVal" class="font-extrabold text-slate-900 text-sm">-</span>
+                </div>
+                <div id="interiorStoreExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-500 flex items-center gap-1.5 font-medium">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>본사 부담
+                  </span>
+                  <span id="interiorHqVal" class="font-extrabold text-slate-900 text-sm">-</span>
+                </div>
+                <div id="interiorHqExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 카드 3: 매장 마진율 구조 -->
+        <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-3 h-full">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <div>
+              <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                <i class="fa-solid fa-percent text-amber-500"></i>
+                <span>할인율 구간별 마진</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1">할인율별 매장 마진율 (최대 50% 기준)</p>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-500 font-medium">평균마진</span>
+              <span id="detailMarginAvg" class="font-black text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200/70 text-sm tabular-nums">-</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-5 gap-2 text-center tabular-nums pt-1 flex-1">
+            <div class="bg-slate-50 p-2 lg:p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1.5">정상</div>
+              <div id="mNormal" class="text-sm font-extrabold text-slate-800 mb-2">-</div>
+              <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div id="barMNormal" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="bg-slate-50 p-2 lg:p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1.5">30%</div>
+              <div id="m30" class="text-sm font-extrabold text-slate-800 mb-2">-</div>
+              <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div id="barM30" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="bg-slate-50 p-2 lg:p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1.5">40%</div>
+              <div id="m40" class="text-sm font-extrabold text-slate-800 mb-2">-</div>
+              <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div id="barM40" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="bg-slate-50 p-2 lg:p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1.5">50%</div>
+              <div id="m50" class="text-sm font-extrabold text-slate-800 mb-2">-</div>
+              <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div id="barM50" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="bg-slate-50 p-2 lg:p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1.5">균일</div>
+              <div id="mFlat" class="text-sm font-extrabold text-slate-800 mb-2">-</div>
+              <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div id="barMFlat" class="h-full bg-amber-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- 초보자 도움말 모달 -->
+    <div id="helpModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-5 max-h-[85vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-circle-info"></i>
+            </span>
+            <h3 class="text-base font-extrabold text-slate-900">한눈에 보는 투자비 현황 안내</h3>
+          </div>
+          <button type="button" onclick="closeHelpModal()" class="text-slate-400 hover:text-slate-700 p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+            <p class="font-bold text-slate-900">1. 지점 · 권역 · 매장 탐색 방법</p>
+            <p>상단 탭으로 지점을 전환하고, 지역 칩이나 검색창(매장명·지역·점주명)을 이용해 빠르게 조회할 수 있습니다.</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+            <p class="font-bold text-slate-900">2. 총 투자비 & 인테리어 분담</p>
+            <p>총 투자비는 전세보증금+권리금의 합계이며, 인테리어 분담은 매장/본사 부담액의 실제 원값을 기준으로 그래프에 표시됩니다.</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-1">
+            <p class="font-bold text-slate-900">3. 구글 스프레드시트 실시간 연동 방법</p>
+            <p>구글 시트 우측 상단 <strong>[공유]</strong>에서 일반 액세스를 <strong>‘링크가 있는 모든 사용자 (뷰어)’</strong>로 설정한 뒤, 시트 연동 설정을 저장하면 즉시 반영됩니다.</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeHelpModal()" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition">
+          확인했습니다
+        </button>
+      </div>
+    </div>
+
+    <!-- 구글 시트 연동 설정 모달 -->
+    <div id="sheetModal" class="hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-sm">
+              <i class="fa-solid fa-table"></i>
+            </span>
+            <h3 class="text-base font-extrabold text-slate-900">구글 시트 연동 설정</h3>
+          </div>
+          <button type="button" onclick="closeSheetModal()" class="text-slate-400 hover:text-slate-700 p-1">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+        <div class="space-y-3 text-sm text-slate-600">
+          <p>연동할 구글 스프레드시트 주소를 입력해 주세요. 시트 내에 <strong class="text-slate-800">매장투자비현황</strong> 및 <strong class="text-slate-800">권역순서</strong> 탭이 있어야 합니다.</p>
+          <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+          <p class="text-[11px] text-slate-400">※ 시트 공유 권한이 ‘링크가 있는 모든 사용자(뷰어)’로 열려 있어야 실시간 조회가 가능합니다.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button type="button" onclick="resetDefaultSheetUrl()" class="py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-bold transition">기본 시트로 초기화</button>
+          <button type="button" onclick="saveSheetUrl()" class="py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition">저장 및 연동하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 하단 토스트 알림 박스 -->
+    <div id="toastBox" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white text-sm font-medium px-5 py-3 rounded-full shadow-xl transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2 opacity-0 whitespace-nowrap">
+      <i class="fa-solid fa-circle-check text-emerald-400"></i>
+      <span id="toastMessage">데이터가 반영되었습니다.</span>
+    </div>
+
+  </div>
+
+  <script>
+    // =========================================================================
+    // 기존 스크립트 완벽하게 유지하되, PC 테마에 맞춰 적용 CSS 클래스만 일부 수정
+    // =========================================================================
+    const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/16vaYTfcQK1sMWvL-Rf6sWwtkYYwEvc9jfbfQX7ccSvY/edit";
+    const STORAGE_KEY_URL = "wm_invest_sheet_url";
+
+    const FALLBACK_REGION_ORDER = [
+      "서울","광명","화성","인천","부천","수원","김포","시흥","용인","안산",
+      "안양","군포","강릉","평택","광주","성남","원주","파주","포천","춘천",
+      "여주","의정부","속초","연천","오산","삼척","철원","동해","동두천","하남",
+      "영월","횡성","인제","이천","정선","태백","안성","고양","양평","양주",
+      "남양주","홍천"
+    ];
+
+    const RAW_COMPACT_STORES = [
+      ["서울","서울","명일점","2014.09","이정화","이정화","59","2017.08","재시설","35평","14m","37%","37%","37%","37%","25%","36.3%","7.1","80","252","332","78","-","78",77.66,0,77.66],
+      ["서울","서울","삼선교직영점","2005.09","문미정","문미정","48","2021.03","재시설","37평","9m","18%","18%","18%","18%","18%","18.0%","5.1","35","300","335","-","102","102",0,101.58,101.58],
+      ["서울","서울","사가정직영점","1997.09","강정규","강정규","59","2014.08","재시설","36평","12m","18%","18%","18%","18%","18%","18.0%","10.25","-","255","255","-","97","97",0,96.77,96.77],
+      ["서울","서울","상도점","1995.04","권연자","권연자","71","2014.08","재시설","40평","12m","38%","38%","38%","38%","25%","37.2%","8","-","220","220","52","31","83",51.776,31.038,82.814],
+      ["서울","서울","신당점","2011.08","정진용","정진용","42","2021.04","점주교체","40평","11m","36%","36%","36%","36%","25%","35.3%","5.8","100","100","200","7","7","7",7,7,7],
+      ["서울","서울","금호직영점","2004.08","양정희","양정희","51","2014.08","재시설","43평","7/3m","16%","16%","16%","16%","16%","16.0%","7.14","-","100","100","-","112","112",0,111.68,111.68],
+      ["서울","서울","미아직영점","1998.09","김인영","김인영","55","2013.08","재시설","32평","10m","16%","16%","16%","16%","16%","16.0%","6.5","-","600","600","-","79","79",0,79.11,79.11],
+      ["서울","서울","공항직영점","2025.07","양예순","양예순","55","2025.07","신규","35평","6m","18%","18%","18%","18%","18%","18.0%","5.5","-","200","200","-","69","69",0,69,69],
+      ["서울","서울","홍제점","1992.09","박순이","박순이","66","2013.08","재시설","1F:21 / 2F:28평","10/4m","33%","33%","32%","31%","25%","31.0%","9.2","-","300","300","19","37","56",18.78652,37.08,55.86652],
+      ["서울","서울","방학직영점","2007.08","조한호","조한호","49","2022.12","신규","100평","16/29m","17%","17%","17%","17%","17%","17.0%","3","-","500","500","-","264","264",0,264,264],
+      ["서울","서울","길동점","2022.02","박영수","박영수","52","2026.03","대리점전환","37평","10/10m","37%","37%","37%","37%","25%","35.5%","5.4","10","90","100","-","-","-",0,0,0],
+      ["서울","서울","자양점","2017.09","한상훈","심차윤","65","2017.08","신규","30평","8m","33%","33%","33%","33%","25%","32.1%","6.5","100","100","200","35","24","59",35,24,59],
+      ["서울","서울","먹골역점","2018.08","김용철","김용철","54","2018.08","신규","30평","12m","36%","36%","36%","36%","25%","34.4%","5.5","100","100","200","43","43","85",42.6,42.7,85.3],
+      ["서울","서울","난곡점","2019.03","박상민","박상민","57","2019.03","신규","30평","12m","34%","34%","34%","34%","25%","33.2%","6","150","100","250","32","32","64",32,32,64],
+      ["서울","서울","대림점","2019.05","이남숙","이남숙","63","2019.05","신규","25평","7m","34%","34%","34%","34%","25%","33.1%","6.2","120","100","220","50","41","91",50,41,91],
+      ["서울","서울","장안점","2017.9.6","이해자","이해자","70","2017.08","신규","25평","8m","33%","33%","32%","32%","25%","31.6%","4.5","100","80","180","30","13","43",30,12.9,42.9],
+      ["서울","서울","응암점","2026.04","김희윤","김희윤","51","2026.04","대리점전환","26평","8m","37%","37%","37%","37%","25%","35.5%","5","30","60","90","1","19","19",0.6,18.6,19.2],
+      ["서울","서울","암사점","2005.04","진창수","진창수","61","2021.10","신규","35평","10m","38%","38%","38%","38%","25%","37.2%","7","250","300","550","5","5","9",4.5,4.9,9.4],
+      ["서울","서울","중곡점","2022.09","김영철","김영철","51","2026.02","신규","36평","8.5m","37%","37%","37%","37%","25%","35.5%","6","20","100","120","50","50","100",50,50,100],
+      ["서울","서울","수유점","2024.07","정화자 / 정덕","정화자 / 정덕","57 / 53","2024.09","신규","25평","7/10m","38%","38%","38%","38%","25%","37.2%","5","120","100","220","19","19","37",18.53,18.53,37.06],
+      ["서울","서울","청량리점","2025.04","남정희","남정희","56","2025.04","신규","20평","5m","38%","38%","38%","38%","25%","36.0%","6","50","100","150","15","18","33",15,18,33],
+      ["서울","서울","화곡점","2026.03","민선미","민선미","55","2026.03","신규","33평","9m","36%","36%","36%","36%","25%","34.5%","5","100","60","160","50","43","93",50,42.9,92.9],
+      ["서울","서울","연신내점","2026.03","김보금","김보금","60","2026.03","신규","25평","7m","37%","37%","37%","37%","25%","35.5%","5","100","50","150","-","11","11",0,10.92,10.92],
+      ["서울","서울","서울시흥점","2026.04","조성진","조성진","62","2026.04","신규","40평","11m","38%","38%","38%","38%","25%","36.4%","7","160","160","320","30","25","55",30,25,55],
+      ["서울","서울","구로고대점","2026.09","김은미","김은미","52","2026.09","신규","25평","7m","35%","35%","35%","35%","25%","33.5%","4","70","50","120","25","27","52",25,27.4,52.4],
+      ["경기","광명","광명점","1995.11","박종민","황태순","61","2014.08","재시설","28평","7/14m","44%","44%","44%","44%","27%","41.6%","18.54","390","350","740","26","67","93",26.184,66.638,92.822],
+      ["경기","화성","봉담트레보시티","2005.02","유호종","유호종","49","2021.09","신규","27평","10m","36%","36%","36%","36%","25%","35.3%","6.8","150","100","250","8","8","16",8.42,7.53,15.95],
+      ["경기","화성","동탄직영점","2009.08","정병재","정병재","56","2026.05","신규","40평","12m","20%","20%","20%","20%","20%","20.0%","3.7","-","108","108","-","131","131",0,131,131],
+      ["경기","화성","화성남양점","2022.08","김정애","김정애","53","2026.08","대리점전환","60평","19m","35%","35%","35%","35%","25%","34.3%","5","-","100","100","-","19","19",0,18.864,18.864],
+      ["경기","인천","부평점","2007.04","남순민","안용일","62","2013.08","재시설","44평","5/4/6m","36%","36%","35%","35%","25%","35.3%","6.5","150","100","250","79","26","104",78.54,25.56,104.1],
+      ["경기","인천","간석점","2004.09","윤인구","윤인구","57","2025.09","매장이전","30평","8m","37%","37%","37%","37%","25%","35.5%","4","1","70","71","36","25","61",36,25,61],
+      ["경기","인천","계산점","2009.08","방승웅","방승웅","46","2026.08","매장이전","35평","10m","36%","36%","36%","36%","25%","35.4%","5.5","20","100","120","34","34","68",34,34,68],
+      ["경기","인천","송림점","2007.04","박준성","박준성","40","2013.08","재시설","46평","8.5m","33%","33%","33%","33%","25%","32.5%","자가","-","-","-","78","66","144",78.25,66.05,144.3],
+      ["경기","인천","인천신현점","2025.09","정운숙","정운숙","62","2025.09","신규","42평","7m","38%","38%","38%","38%","25%","36.0%","6","150","100","250","25","32","57",25,32,57],
+      ["경기","인천","인천학익점","2025.09","차광진","전경숙","66","2025.09","신규","22평","6m","33%","33%","33%","33%","25%","32.5%","2","20","50","70","6","5","11",5.5,5,10.5],
+      ["경기","인천","삼산점","2010.03","이혜숙","이혜숙","53","2021.04","점주교체","26평","7.6m","33%","33%","33%","33%","25%","32.5%","3.1","30","60","90","45","20","65",44.616,19.948,64.564],
+      ["경기","인천","인천검단점","2007.03","오은경","오은경","57","2021.04","점주교체","41평","6/6/5m","35%","35%","35%","35%","25%","34.4%","6.5","50","100","150","67","24","91",66.93,23.67,90.6],
+      ["경기","인천","강화점","2009.09","배인수","배인수","49","2025.03","매장이전","40평","8m","35%","35%","35%","35%","25%","32.5%","4","100","100","200","47","39","86",47,38.6,85.6],
+      ["경기","인천","부평아이즈빌점","2009.01","손상기","손수오","40","2018.10","점주교체","37평","9.5m","34%","34%","34%","34%","25%","33.5%","자가","-","-","-","51","20","71",50.93,20.36,71.29],
+      ["경기","인천","연수점","1997.08","김상우","김상우","49","2024.09","점주교체","35평","8m","34%","34%","34%","34%","25%","33.5%","4.5","10","100","110","34","22","55",33.7,21.6,55.3],
+      ["경기","인천","만수점","2006.05","이복란","이복란","54","2025.08","신규","1F:38 / 2F:43평","12/4m","36%","36%","36%","36%","25%","34.5%","5.5","2","100","102","5","5","10",5,5,10],
+      ["경기","인천","신포점","1994.10","백양현","백양현","71","2013.08","재시설","1F:21 / 2F:18평","6.5/1.5m","33%","33%","33%","33%","25%","32.5%","6","246","200","446","93","29","122",92.66,29.34,122],
+      ["경기","인천","주안점","2003.09","윤병우","윤병우","32","2025.09","대리점전환","63평","14/16m","35%","35%","35%","35%","25%","33.5%","4.5","30","100","130","30","-","30",30,0,30],
+      ["경기","부천","부천상동직영점","2011.09","정애영","정애영","48","2024.08","점주교체","70평","16m","18%","18%","18%","18%","18%","18.0%","8","-","100","100","55","23","78",54.6,23.4,78],
+      ["경기","부천","부천남부점","1995.04","김기수","김기수","61","2013.08","재시설","1F:15 / 2F:11평","7m","34%","34%","34%","34%","25%","33.5%","5","320","180","500","66","25","91",66.12,24.78,90.9],
+      ["경기","부천","부천북부점","2001.12","정상모","정상모","57","2023.05","점주교체","21평","5m","34%","34%","34%","34%","25%","33.5%","3","30","60","90","22","18","40",22,18,40],
+      ["경기","수원","수원북문점","1993.04","모준형","모준형","42","2016.08","재시설","38평","12m","35%","35%","35%","35%","25%","34.4%","7","120","150","270","35","23","58",35,22.6,57.6],
+      ["경기","수원","서수원직영점","2004.2.24","제현순","장균석","64","2024.2.24","신규","240평","36m","20%","20%","20%","20%","20%","19.0%","12","25","150","175","-","76","76",0,76,76],
+      ["경기","수원","수원남문점","2022.09","이승철","이승철","47","2025.04","점주교체","1F(정상):40 / 2F(상설):40평","7/11m","38%","38%","38%","38%","25%","37.2%","9","-","300","300","19","75","94",18.70533,74.82133,93.52667],
+      ["경기","김포","김포장기점","2012.08","이문섭","이문섭","64","2021.06","신규","58평","18/7m","33%","33%","33%","33%","25%","32.5%","7","100","100","200","83","-","83",83,0,83],
+      ["경기","시흥","시화점","2004.05","김형준","김형준","50","2022.02","점주교체","17평","6m","34%","34%","34%","34%","25%","33.5%","4.5","90","100","190","10","-","10",10,0,10],
+      ["경기","시흥","시흥신천점","1992.03","윤용철","윤용철","72","2025.05","신규","30평","7m","35%","35%","35%","35%","25%","34.2%","자가","-","-","-","3","3","6",3.1,3.1,6.2],
+      ["경기","용인","수원프리미엄점","2003.03","박남연","박남연","55","2021.04","점주교체","31평","11m","33%","33%","33%","33%","25%","32.5%","4.2","20","60","80","52","21","73",51.968,20.742,72.71],
+      ["경기","안산","안산한대점","2022.08","서미연","김영철","-","2024.10","신규","38평","12m","37%","37%","37%","37%","25%","34.5%","6.3","40","100","140","20","20","40",20,20,40],
+      ["경기","안산","안산선부점","2025.10","장선경","장선경","46","2025.10","신규","40평","8m","37%","37%","37%","37%","25%","35.5%","10","120","200","320","32","74","106",32,74,106],
+      ["경기","안양","안양관양점","2025.09","김정한","김정한","60","2025.09","신규","22평","6/6/9m","35%","35%","35%","35%","25%","33.5%","3.5","-","50","50","32","32","64",32,32,64],
+      ["경기","안양","안양중앙점","2023.08","구은자","구은자","55","2023.08","신규","70평","14m","37%","37%","37%","37%","25%","36.3%","10.6","-","150","150","101","101","202",100.75,100.75,201.5],
+      ["경기","군포","경기금정점","2001.06","이남숙","이남숙","62","2018.03","점주교체","35평","8m","33%","33%","33%","33%","25%","32.5%","5.5","30","100","130","57","21","77",56.67,20.73,77.4],
+      ["강원","강릉","강릉죽헌직영점","2008.07","김순렬","김순렬","65","2019.02","중간교체","178평","26/20m","20%","20%","20%","20%","20%","20.0%","본사건물","-","-","-","-","313","313",0,313,313],
+      ["강원","강릉","강릉중앙점","2024.05","김미자","김미자","63","2024.04","신규오픈","26평","18m","35%","35%","35%","35%","25%","33.0%","5","-","100","100","40","40","80",40,40,80],
+      ["강원","용인","용인점","1989.09","한상숙","한상숙","55","2013.08","재시설","61평","15/8m","39%","39%","39%","39%","25%","36.2%","8.6","198","500","698","75","61","136",75.2,60.7,135.9],
+      ["강원","용인","용인보라직영점","2010.04","정명숙","정명숙","58","2025.02","중간교체","120평","32m","18%","18%","18%","18%","17%","18.0%","본사건물","-","-","-","-","160","160",0,160,160],
+      ["강원","평택","안중점","1997.12","김향숙","김향숙","67","2011.09","재시설","40평","14m","30%","29%","28%","27%","25%","26.6%","자가","-","-","-","84","7","91",83.596,7.33,90.926],
+      ["강원","평택","평택서정점","2024.06","노두례","노두례","70","2024.06","신규","25평","12m","31%","31%","31%","31%","25%","29.8%","2","23","30","53","35","35","70",35,35,70],
+      ["강원","평택","평택중앙점","2022.09","우종경","우종경","57","2022.09","신규오픈","28평","7m","34%","34%","34%","34%","25%","32.2%","2.5","-","50","50","15","15","31",15.25,15.25,30.5],
+      ["강원","광주","경기광주점","2000.11","이왕섭","이왕섭","50","2020.03","신규오픈","45평","9m","37%","37%","37%","37%","25%","34.6%","7","-","150","150","76","69","144",75.545,68.605,144.15],
+      ["강원","성남","성남중앙점","1988.11","안병주","안병주","61","2011.11","재시설","38평","8m","32%","32%","32%","32%","25%","30.6%","7.5","-","350","350","23","6","29",23,5.86,28.86],
+      ["강원","성남","성남신흥점","2007.08","박복옥","박복옥","64","2014.05","확장 이전","35평","6m","32%","32%","32%","32%","25%","30.6%","6","40","100","140","67","26","93",67,25.623,92.623],
+      ["강원","원주","문막광터직영점","2008.08","문수경","곽시연","56","2025.08","중간교체","98평","14m","20%","20%","20%","20%","20%","20.0%","12","-","400","400","-","189","189",0,188.89,188.89],
+      ["강원","원주","원주중앙점","2026.04","원명식","원명식","43","2026.04","대리점전환","30평","9m","35%","35%","35%","35%","25%","33.0%","5.4","-","100","100","-","93","93",0,93.41,93.41],
+      ["강원","파주","파주점","2008.05","전옥형","석봉준","57","2013.08","재시설","45평","9m","32%","31%","31%","31%","25%","29.8%","6","90","100","190","58","22","79",57.74,21.66,79.4],
+      ["강원","파주","문산점","2010.02","석봉준","전옥형","55","2016.08","재시설","23평","7m","31%","30%","30%","30%","25%","29.0%","3","50","100","150","25","33","58",24.64,33.3,57.94],
+      ["강원","포천","송우점","2004.09","조연화","조연화","54","2025.04","점주교체","36평","10m","34%","34%","34%","34%","25%","32.2%","5","200","800","1,000","65","5","70",65,5,70],
+      ["강원","춘천","춘천점","1987.09","윤경희","윤경희","58","2017.04","이전오픈","40평","8m","33%","33%","33%","33%","25%","31.4%","5.5","100","100","200","40","75","115",40,75,115],
+      ["강원","여주","여주점","1992.03","최철수","최철수","47","2020.09","점주교체","36평","8m","33%","33%","33%","33%","25%","31.4%","5","150","200","350","70","3","72",69.7,2.52,72.22],
+      ["강원","의정부","의정부제일점","2023.08","윤순애","윤순애","60","2023.08","신규","53평","7m","38%","38%","37%","37%","25%","34.6%","11.6","160","150","310","82","73","155",82.2,72.8,155],
+      ["강원","의정부","의정부녹양점","2023.03","이성환","이성환","71","2023.03","신규","30평","10/13m","34%","34%","34%","34%","25%","32.2%","3.9","-","40","40","80","15","95",80,15.3,95.3],
+      ["강원","속초","속초점","1997.09","김복녀","김복녀","67","2018.06","신규","39평","10m","31%","30%","30%","30%","25%","29.0%","3","100","150","250","27","20","47",27,20,47],
+      ["강원","연천","전곡점","2023.03","김태수","김태수","53","2023.03","신규","60평","18m","33%","33%","33%","33%","25%","31.4%","3","-","50","50","102","60","162",102,60,162],
+      ["강원","오산","오산점","1994.03","이영미","이영미","64","2022.08","매장축소","25평","7m","32%","32%","32%","32%","25%","30.6%","2.5","200","250","450","85","31","116",85.23,31.23,116.46],
+      ["강원","삼척","삼척점","2000.09","이원구","이원구","67","2013.08","재시설","60평","17m","31%","31%","31%","31%","25%","29.8%","5.5","60","80","140","64","61","125",64.42,60.58,125],
+      ["강원","철원","철원점","1999.02","임대수","임대수","66","2014.09","확장/재시설","58평","12m","32%","31%","31%","31%","25%","29.8%","자가","-","-","-","90","36","126",90,35.936,125.936],
+      ["강원","동해","동해점","1996.03","신승도","신승도","62","2013.08","재시설","49평","9m","30%","30%","30%","30%","25%","29.0%","4.5","280","150","430","62","23","84",61.7493,22.509,84.2583],
+      ["강원","동두천","동두천점","1993.11","손대석","손대석","62","2016.09","재시설","32평","14m","31%","31%","31%","30%","25%","29.0%","7","150","200","350","39","21","60",38.96,21.286,60.246],
+      ["강원","하남","하남점","2001.11","이상일","이상일","50","2017.08","재시설","30평","9m","34%","34%","34%","34%","25%","32.2%","4","150","60","210","80","6","87",80.45,6.148,86.598],
+      ["강원","영월","영월점","2005.01","하승학","하승학","60","2026.06","파사드교체","25평","7m","30%","30%","30%","30%","25%","27.4%","1.3","10","30","40","41","15","56",41.259,14.751,56.01],
+      ["강원","횡성","횡성점","2014.04","김보경","김보경","62","2022.04","컴팩트샵전환","16평","4m","30%","28%","27%","26%","25%","25.8%","1.5","40","70","110","40","16","56",39.7,16.209,55.909],
+      ["강원","인제","인제점","2008.01","이정호","이정호","54","2013.08","재시설","27평","9m","30%","30%","30%","30%","25%","29.0%","2","50","50","100","48","17","66",48.276,17.3,65.576],
+      ["강원","이천","이천부발점","2016.09","김승호","김승호","66","2016.09","신규","107평","31m","32%","32%","32%","32%","25%","30.6%","자가","-","-","-","72","108","180",72,108,180],
+      ["강원","이천","이천직영점","2021.12","조명일","조명일","59","2023.04","점주교체","45평","8m","18%","18%","18%","18%","18%","18.0%","6.5","-","200","200","-","125","125",0,125,125],
+      ["강원","정선","정선점","2017.9.6","전미숙","전미숙","63","2017.03","신규","15평","6m","30%","28%","27%","27%","25%","26.6%","자가","-","-","-","30","5","35",30,5,35],
+      ["강원","태백","태백점","2019.08","신순옥","신순옥","57","2019.08","신규","24평","5m","31%","31%","31%","31%","25%","30.5%","자가","-","-","-","-","12","12",0,12,12],
+      ["강원","안성","안성점","2019.09","성금숙","성금숙","50","2026.09","매장이전","37평","7m","34%","34%","34%","34%","25%","29.3%","4","-","30","30","28","28","56",28,28,56],
+      ["강원","고양","일산덕이직영점","2024.04","최영식","최영식","56","2026.02","중간교체","1층 85 / 2층 89평","30m","18%","18%","18%","18%","18%","18.0%","13","-","500","500","-","290","290",0,290,290],
+      ["강원","양평","양평점","2025.10","김은주","김은주","62","2025.10","신규","15평","4.4m","35%","35%","35%","35%","25%","33.0%","3.2","40","60","100","31","31","61",30.72,30.72,61.44],
+      ["강원","양주","양주점","2025.10","박연진","박연진","59","2025.10","신규","33평","12m","34%","34%","34%","34%","25%","33.3%","3.2","20","50","70","15","13","28",15,13,28],
+      ["강원","남양주","평내점","2026.05","정대진","정대진","50","2026.05","신규","40평","10m","35%","35%","35%","35%","25%","33.5%","4","20","50","70","15","11","26",15,10.9,25.9],
+      ["강원","남양주","장현점","2026.09","이용운","이용운","58","2026.09","신규","25평","10m","34%","34%","34%","34%","25%","32.2%","3","10","60","70","15","16","31",15,16,31],
+      ["강원","홍천","홍천점","2026.09","한영숙","한영숙","58","2026.09","신규","23평","20m","35%","35%","35%","35%","25%","33.5%","3.5","20","60","80","13","13","26",13,12.97,25.97]
+    ];
+
+    function hydrateCompactStores(rows) {
+      return rows.map(r => ({
+        branch: r[0],
+        region: r[1],
+        name: r[2],
+        open: r[3],
+        rep: r[4],
+        rOp: r[5],
+        rAge: r[6],
+        maint: r[7],
+        maintDesc: r[8],
+        area: r[9],
+        facade: r[10],
+        mNorm: r[11],
+        m30: r[12],
+        m40: r[13],
+        m50: r[14],
+        mUni: r[15],
+        mAvg: r[16],
+        rent: r[17],
+        prem: r[18],
+        dep: r[19],
+        totInvest: r[20],
+        iStore: r[21],
+        iHq: r[22],
+        iSum: r[23],
+        iStoreNum: r[24],
+        iHqNum: r[25],
+        iSumNum: r[26]
+      }));
+    }
+
+    let REGION_ORDER = [...FALLBACK_REGION_ORDER];
+    let STORE_DATA = hydrateCompactStores(RAW_COMPACT_STORES);
+    let currentSelectedBranch = "all"; 
+    let currentSelectedRegion = "전체 지역";
+    let currentStore = STORE_DATA[0];
+    let isRegionExpanded = false;
+    let isStoreExpanded = false;
+    let isLiveSynced = false;
+    let syncTimeoutId = null;
+
+    function getSavedSheetUrl() {
+      try {
+        return localStorage.getItem(STORAGE_KEY_URL) || DEFAULT_SHEET_URL;
+      } catch (e) {
+        return DEFAULT_SHEET_URL;
+      }
+    }
+
+    function extractSheetId(url) {
+      if (!url) return null;
+      const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (match && match[1]) return match[1];
+      if (url.trim().length > 25 && !url.includes("/")) return url.trim();
+      return null;
+    }
+
+    function setSyncStatus(mode, text) {
+      const badge = document.getElementById("syncStatusBadge");
+      const dot = document.getElementById("syncStatusDot");
+      const label = document.getElementById("syncStatusText");
+      if (!badge || !dot || !label) return;
+
+      label.innerText = text;
+      if (mode === "live") {
+        badge.className = "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
+      } else if (mode === "loading") {
+        badge.className = "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/70";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping";
+      } else {
+        badge.className = "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200/70";
+        dot.className = "w-1.5 h-1.5 rounded-full bg-slate-400";
+      }
+    }
+
+    function normalizeBranchName(raw) {
+      const s = String(raw || "").trim();
+      if (s.includes("서울")) return "서울";
+      if (s.includes("경기")) return "경기";
+      if (s.includes("강원")) return "강원";
+      return s || "서울";
+    }
+
+    function formatCellText(cell) {
+      if (!cell || cell.v === null || cell.v === undefined || cell.v === "") return "-";
+      if (cell.f !== undefined && cell.f !== null && String(cell.f).trim() !== "") {
+        return String(cell.f).trim();
+      }
+      return String(cell.v).trim();
+    }
+
+    function formatMarginCell(cell, isAverage = false) {
+      if (!cell || cell.v === null || cell.v === undefined || cell.v === "") return "-";
+      if (cell.f && String(cell.f).includes("%")) {
+        const rawPct = parseFloat(String(cell.f).replace("%", "").trim());
+        if (!isNaN(rawPct)) {
+          return isAverage ? `${rawPct.toFixed(1)}%` : `${Math.round(rawPct)}%`;
+        }
+        return String(cell.f).trim();
+      }
+      const num = parseFloat(cell.v);
+      if (!isNaN(num)) {
+        const pct = num <= 1 ? num * 100 : num;
+        return isAverage ? `${pct.toFixed(1)}%` : `${Math.round(pct)}%`;
+      }
+      return String(cell.v).trim();
+    }
+
+    function formatAmountCell(cell, addComma = false) {
+      if (!cell || cell.v === null || cell.v === undefined || cell.v === "") return "-";
+      const str = String(cell.v).trim();
+      if (str === "-" || str === "자가" || str === "본사건물") return str;
+      const num = parseFloat(str.replace(/,/g, ""));
+      if (!isNaN(num)) {
+        if (num === 0) return "-";
+        const rounded = Math.round(num * 100) / 100;
+        return addComma ? rounded.toLocaleString() : String(rounded);
+      }
+      return str;
+    }
+
+    function parseInteriorCell(cell) {
+      if (!cell || cell.v === null || cell.v === undefined || cell.v === "") {
+        return { text: "-", num: 0 };
+      }
+      const str = String(cell.v).trim();
+      if (str === "-") return { text: "-", num: 0 };
+      const num = parseFloat(str.replace(/,/g, ""));
+      if (!isNaN(num)) {
+        if (num === 0) return { text: "-", num: 0 };
+        return {
+          text: Math.round(num).toLocaleString(),
+          num: num
+        };
+      }
+      return { text: str, num: 0 };
+    }
+
+    function loadGoogleSheets(manualTrigger = false) {
+      const sheetUrl = getSavedSheetUrl();
+      const sheetId = extractSheetId(sheetUrl);
+
+      if (!sheetId) {
+        setSyncStatus("fallback", "기본 데이터 모드");
+        if (manualTrigger) showToast("올바른 구글 스프레드시트 주소를 입력해 주세요.");
+        return;
+      }
+
+      setSyncStatus("loading", "구글 시트 연동 중...");
+      const refreshIcon = document.getElementById("refreshIcon");
+      if (refreshIcon) refreshIcon.classList.add("fa-spin");
+
+      if (syncTimeoutId) clearTimeout(syncTimeoutId);
+      let resolvedMain = false;
+
+      syncTimeoutId = setTimeout(() => {
+        if (!resolvedMain) {
+          if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+          if (!isLiveSynced) {
+            setSyncStatus("fallback", "기본 데이터 모드");
+          }
+          if (manualTrigger) {
+            showToast("시트 응답이 지연되어 기본 데이터를 표시합니다. (공유 권한 확인 필요)");
+          }
+        }
+      }, 5000);
+
+      const oldRegionScript = document.getElementById("gviz_region_script");
+      if (oldRegionScript) oldRegionScript.remove();
+      const regionScript = document.createElement("script");
+      regionScript.id = "gviz_region_script";
+      regionScript.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("권역순서")}&tqx=responseHandler:handleRegionOrderJSONP&t=${Date.now()}`;
+      regionScript.onerror = () => {};
+      document.body.appendChild(regionScript);
+
+      const oldStoreScript = document.getElementById("gviz_store_script");
+      if (oldStoreScript) oldStoreScript.remove();
+      const storeScript = document.createElement("script");
+      storeScript.id = "gviz_store_script";
+      storeScript.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?sheet=${encodeURIComponent("매장투자비현황")}&tqx=responseHandler:handleStoreDataJSONP&t=${Date.now()}`;
+      storeScript.onerror = () => {
+        resolvedMain = true;
+        if (syncTimeoutId) clearTimeout(syncTimeoutId);
+        if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+        setSyncStatus("fallback", "기본 데이터 모드");
+        if (manualTrigger) showToast("시트 접근에 실패했습니다. 공유 설정을 확인해 주세요.");
+      };
+      document.body.appendChild(storeScript);
+
+      window._markMainSheetResolved = () => {
+        resolvedMain = true;
+        if (syncTimeoutId) clearTimeout(syncTimeoutId);
+        if (refreshIcon) refreshIcon.classList.remove("fa-spin");
+      };
+    }
+
+    window.handleRegionOrderJSONP = function(response) {
+      try {
+        if (!response || !response.table || !response.table.rows) return;
+        const cols = response.table.cols || [];
+        const rows = response.table.rows || [];
+
+        let regColIdx = cols.findIndex(c => c && c.label && String(c.label).includes("권역"));
+        let startRow = 0;
+
+        if (regColIdx === -1 && rows.length > 0) {
+          const firstCells = rows[0].c || [];
+          regColIdx = firstCells.findIndex(c => c && c.v && String(c.v).includes("권역"));
+          if (regColIdx !== -1) startRow = 1;
+        }
+        if (regColIdx === -1) regColIdx = cols.length > 1 ? 1 : 0;
+
+        const parsedRegions = [];
+        for (let i = startRow; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const val = cells[regColIdx] && cells[regColIdx].v ? String(cells[regColIdx].v).trim() : "";
+          if (val && val !== "권역명" && val !== "지역" && !parsedRegions.includes(val)) {
+            parsedRegions.push(val);
+          }
+        }
+
+        if (parsedRegions.length > 0) {
+          REGION_ORDER = parsedRegions;
+          renderRegionChips();
+        }
+      } catch (e) {
+        console.warn("권역순서 시트 파싱 건너뜀:", e);
+      }
+    };
+
+    window.handleStoreDataJSONP = function(response) {
+      if (window._markMainSheetResolved) window._markMainSheetResolved();
+      try {
+        if (!response || response.status === "error" || !response.table || !response.table.rows) {
+          setSyncStatus("fallback", "기본 데이터 모드");
+          return;
+        }
+
+        const cols = response.table.cols || [];
+        const rows = response.table.rows || [];
+        if (rows.length === 0) {
+          setSyncStatus("fallback", "기본 데이터 모드");
+          return;
+        }
+
+        const headerMap = {};
+        let dataStartRow = 0;
+
+        const mapHeaderText = (idx, rawText) => {
+          const h = String(rawText || "").replace(/\s+/g, "").trim();
+          if (!h) return;
+          if (h === "지점") headerMap.branch = idx;
+          else if (h === "지역" || h === "권역") headerMap.region = idx;
+          else if (h === "매장명") headerMap.name = idx;
+          else if (h.includes("최초오픈")) headerMap.open = idx;
+          else if (h === "대표자") headerMap.rep = idx;
+          else if (h.includes("실운영점주") || h === "실운영") headerMap.rOp = idx;
+          else if (h.includes("실운영나이") || h === "나이") headerMap.rAge = idx;
+          else if (h.includes("점정비일자") || h === "최근점정비") headerMap.maint = idx;
+          else if (h.includes("점정비내역") || h === "내역") headerMap.maintDesc = idx;
+          else if (h.includes("평수")) headerMap.area = idx;
+          else if (h.includes("파사드")) headerMap.facade = idx;
+          else if (h.includes("정상")) headerMap.mNorm = idx;
+          else if (h.includes("30%")) headerMap.m30 = idx;
+          else if (h.includes("40%")) headerMap.m40 = idx;
+          else if (h.includes("50%")) headerMap.m50 = idx;
+          else if (h.includes("균일")) headerMap.mUni = idx;
+          else if (h.includes("평균")) headerMap.mAvg = idx;
+          else if (h === "월세") headerMap.rent = idx;
+          else if (h === "권리금") headerMap.prem = idx;
+          else if (h.includes("보증금")) headerMap.dep = idx;
+          else if (h.includes("총투자비")) headerMap.totInvest = idx;
+          else if (h.includes("매장부담")) headerMap.iStore = idx;
+          else if (h.includes("본사부담") || h.includes("본사지원")) headerMap.iHq = idx;
+          else if (h.includes("인테리어_합계") || h.includes("인테리어합계") || h === "합계") headerMap.iSum = idx;
+        };
+
+        cols.forEach((c, idx) => {
+          if (c && c.label) mapHeaderText(idx, c.label);
+        });
+
+        if (headerMap.name === undefined && rows.length > 0) {
+          const firstRowCells = rows[0].c || [];
+          firstRowCells.forEach((c, idx) => {
+            if (c && c.v) mapHeaderText(idx, c.v);
+          });
+          if (headerMap.name !== undefined) dataStartRow = 1;
+        }
+
+        const idxOf = (key, fallbackIdx) => (headerMap[key] !== undefined ? headerMap[key] : fallbackIdx);
+
+        const parsedStores = [];
+        for (let i = dataStartRow; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const nameCell = cells[idxOf("name", 2)];
+          const storeName = nameCell && nameCell.v ? String(nameCell.v).trim() : "";
+          if (!storeName || storeName === "매장명" || storeName === "합계" || storeName === "총계") continue;
+
+          const branch = normalizeBranchName(formatCellText(cells[idxOf("branch", 0)]));
+          const region = formatCellText(cells[idxOf("region", 1)]);
+          const open = formatCellText(cells[idxOf("open", 3)]);
+          const rep = formatCellText(cells[idxOf("rep", 4)]);
+          const rOp = formatCellText(cells[idxOf("rOp", 5)]);
+          const rAge = formatCellText(cells[idxOf("rAge", 6)]);
+          const maint = formatCellText(cells[idxOf("maint", 7)]);
+          const maintDesc = formatCellText(cells[idxOf("maintDesc", 8)]);
+          const area = formatCellText(cells[idxOf("area", 9)]);
+          const facade = formatCellText(cells[idxOf("facade", 10)]);
+
+          const mNorm = formatMarginCell(cells[idxOf("mNorm", 11)], false);
+          const m30 = formatMarginCell(cells[idxOf("m30", 12)], false);
+          const m40 = formatMarginCell(cells[idxOf("m40", 13)], false);
+          const m50 = formatMarginCell(cells[idxOf("m50", 14)], false);
+          const mUni = formatMarginCell(cells[idxOf("mUni", 15)], false);
+          const mAvg = formatMarginCell(cells[idxOf("mAvg", 16)], true);
+
+          const rent = formatAmountCell(cells[idxOf("rent", 17)], false);
+          const prem = formatAmountCell(cells[idxOf("prem", 18)], true);
+          const dep = formatAmountCell(cells[idxOf("dep", 19)], true);
+          const totInvest = formatAmountCell(cells[idxOf("totInvest", 20)], true);
+
+          const storeInt = parseInteriorCell(cells[idxOf("iStore", 21)]);
+          const hqInt = parseInteriorCell(cells[idxOf("iHq", 22)]);
+          const sumInt = parseInteriorCell(cells[idxOf("iSum", 23)]);
+
+          parsedStores.push({
+            branch, region, name: storeName, open, rep,
+            rOp: rOp === "-" ? rep : rOp, rAge, maint, maintDesc, area, facade,
+            mNorm, m30, m40, m50, mUni, mAvg, rent, prem, dep, totInvest,
+            iStore: storeInt.text, iHq: hqInt.text, iSum: sumInt.text,
+            iStoreNum: storeInt.num, iHqNum: hqInt.num, iSumNum: sumInt.num
+          });
+        }
+
+        if (parsedStores.length > 0) {
+          STORE_DATA = parsedStores;
+          isLiveSynced = true;
+          setSyncStatus("live", `구글 시트 실시간 연동 (${STORE_DATA.length}개점)`);
+
+          const matched = STORE_DATA.find(s => currentStore && s.name === currentStore.name);
+          currentStore = matched || STORE_DATA[0];
+
+          updateBranchTabCounts();
+          renderRegionChips();
+          renderStoreChips();
+          selectStore(currentStore);
+          showToast(`구글 시트 연동 완료! (${STORE_DATA.length}개 매장 최신화)`);
+        } else {
+          setSyncStatus("fallback", "기본 데이터 모드");
+        }
+      } catch (err) {
+        console.error("매장투자비현황 파싱 오류:", err);
+        setSyncStatus("fallback", "기본 데이터 모드");
+      }
+    };
+
+    function refreshSheetData() {
+      loadGoogleSheets(true);
+    }
+
+    function getBranchFilteredStores() {
+      if (currentSelectedBranch === "all") return STORE_DATA;
+      return STORE_DATA.filter(s => s.branch === currentSelectedBranch);
+    }
+
+    function updateBranchTabCounts() {
+      const totalCnt = STORE_DATA.length;
+      const seoulCnt = STORE_DATA.filter(s => s.branch === "서울").length;
+      const gyeonggiCnt = STORE_DATA.filter(s => s.branch === "경기").length;
+      const gangwonCnt = STORE_DATA.filter(s => s.branch === "강원").length;
+
+      document.getElementById("tab_all").innerText = `중부영업팀 (${totalCnt})`;
+      document.getElementById("tab_서울").innerText = `서울 (${seoulCnt})`;
+      document.getElementById("tab_경기").innerText = `경기 (${gyeonggiCnt})`;
+      document.getElementById("tab_강원").innerText = `강원 (${gangwonCnt})`;
+    }
+
+    function applyBranchTheme(branchKey) {
+      const headerIconBox = document.getElementById("headerIconBox");
+      const heroCard = document.getElementById("heroSummaryCard");
+      const heroGlow = document.getElementById("heroGlow");
+      const heroInvestLabel = document.getElementById("heroInvestLabel");
+      const heroInteriorLabel = document.getElementById("heroInteriorLabel");
+      const totalUnit = document.getElementById("summaryTotalInvestUnit");
+      const interiorUnit = document.getElementById("summaryInteriorUnit");
+
+      // PC버전 레이아웃 클래스가 덮어씌워지지 않도록 수정
+      const baseHeroCardCls = "rounded-2xl p-6 lg:p-8 text-white shadow-lg relative overflow-hidden transition-all duration-300";
+      const baseGlowCls = "absolute -right-20 -bottom-20 w-64 h-64 opacity-20 rounded-full blur-3xl pointer-events-none";
+
+      if (branchKey === "경기") {
+        headerIconBox.className = "w-10 h-10 rounded-xl bg-blue-600 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-blue-100 transition-colors duration-300";
+        heroCard.className = `bg-gradient-to-br from-slate-900 via-blue-950 to-sky-950 border border-blue-800/40 ${baseHeroCardCls}`;
+        heroGlow.className = `bg-blue-500 ${baseGlowCls}`;
+        heroInvestLabel.className = "text-xs font-medium text-blue-200 tracking-tight block";
+        heroInteriorLabel.className = "text-xs font-medium text-blue-200 tracking-tight block";
+        totalUnit.className = "text-sm text-blue-200 font-semibold";
+        interiorUnit.className = "text-sm text-blue-200 font-semibold";
+      } else if (branchKey === "강원") {
+        headerIconBox.className = "w-10 h-10 rounded-xl bg-teal-600 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-teal-100 transition-colors duration-300";
+        heroCard.className = `bg-gradient-to-br from-slate-900 via-teal-950 to-emerald-950 border border-teal-800/40 ${baseHeroCardCls}`;
+        heroGlow.className = `bg-teal-500 ${baseGlowCls}`;
+        heroInvestLabel.className = "text-xs font-medium text-teal-200 tracking-tight block";
+        heroInteriorLabel.className = "text-xs font-medium text-teal-200 tracking-tight block";
+        totalUnit.className = "text-sm text-teal-200 font-semibold";
+        interiorUnit.className = "text-sm text-teal-200 font-semibold";
+      } else {
+        headerIconBox.className = "w-10 h-10 rounded-xl bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white shadow-md shadow-indigo-100 transition-colors duration-300";
+        heroCard.className = `bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 border border-indigo-800/40 ${baseHeroCardCls}`;
+        heroGlow.className = `bg-indigo-500 ${baseGlowCls}`;
+        heroInvestLabel.className = "text-xs font-medium text-indigo-200 tracking-tight block";
+        heroInteriorLabel.className = "text-xs font-medium text-indigo-200 tracking-tight block";
+        totalUnit.className = "text-sm text-indigo-200 font-semibold";
+        interiorUnit.className = "text-sm text-indigo-200 font-semibold";
+      }
+    }
+
+    function getActivePillBg() {
+      if (currentSelectedBranch === "경기") return "bg-blue-600 border-blue-600";
+      if (currentSelectedBranch === "강원") return "bg-teal-600 border-teal-600";
+      return "bg-indigo-600 border-indigo-600";
+    }
+
+    function selectBranch(branchKey) {
+      currentSelectedBranch = branchKey;
+      currentSelectedRegion = "전체 지역";
+      isRegionExpanded = false;
+      isStoreExpanded = false;
+
+      const input = document.getElementById("storeSearchInput");
+      if (input) input.value = "";
+      const clearBtn = document.getElementById("clearSearchBtn");
+      if (clearBtn) clearBtn.classList.add("hidden");
+
+      ["all", "서울", "경기", "강원"].forEach(key => {
+        const btn = document.getElementById(`tab_${key}`);
+        if (!btn) return;
+        if (key === branchKey) {
+          btn.className = "py-2 px-3 lg:px-4 rounded-lg text-xs font-bold transition bg-slate-900 text-white shadow-xs truncate";
+        } else {
+          btn.className = "py-2 px-3 lg:px-4 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition truncate";
+        }
+      });
+
+      applyBranchTheme(branchKey);
+      renderRegionChips();
+      renderStoreChips();
+    }
+
+    function toggleRegionExpand() {
+      isRegionExpanded = !isRegionExpanded;
+      renderRegionChips();
+    }
+
+    function toggleStoreExpand() {
+      isStoreExpanded = !isStoreExpanded;
+      renderStoreChips();
+    }
+
+    function renderRegionChips() {
+      const container = document.getElementById("regionChipsContainer");
+      if (!container) return;
+
+      const branchStores = getBranchFilteredStores();
+      const presentRegions = new Set(branchStores.map(s => s.region));
+
+      const orderedRegions = REGION_ORDER.filter(r => presentRegions.has(r));
+      presentRegions.forEach(r => {
+        if (!orderedRegions.includes(r)) orderedRegions.push(r);
+      });
+
+      document.getElementById("regionCountLabel").innerText = `총 ${orderedRegions.length}개 권역`;
+      const toggleBtn = document.getElementById("toggleRegionExpandBtn");
+      if (toggleBtn) toggleBtn.innerText = isRegionExpanded ? "접기" : "전체 보기";
+
+      container.className = isRegionExpanded
+        ? "flex flex-wrap gap-1.5 py-1"
+        : "flex gap-1.5 overflow-x-auto no-scrollbar py-1";
+
+      const regions = ["전체 지역", ...orderedRegions];
+      const activePillCls = getActivePillBg();
+
+      container.innerHTML = regions.map(reg => {
+        const isActive = reg === currentSelectedRegion;
+        const cls = isActive
+          ? `${activePillCls} text-white shadow-xs font-bold`
+          : "bg-[#F7F6F2] text-slate-600 border-[#E6E4DD] hover:bg-slate-200 font-medium";
+        return `<button type="button" onclick="selectRegion('${reg}')" class="whitespace-nowrap px-3.5 py-2 rounded-full text-xs transition-all border shrink-0 ${cls}">${reg}</button>`;
+      }).join("");
+    }
+
+    function selectRegion(region) {
+      currentSelectedRegion = region;
+      const input = document.getElementById("storeSearchInput");
+      if (input) input.value = "";
+      const clearBtn = document.getElementById("clearSearchBtn");
+      if (clearBtn) clearBtn.classList.add("hidden");
+
+      renderRegionChips();
+      renderStoreChips();
+    }
+
+    function renderStoreChips(customFiltered = null) {
+      const container = document.getElementById("storeChipsContainer");
+      if (!container) return;
+
+      let stores = customFiltered;
+      if (!stores) {
+        const branchStores = getBranchFilteredStores();
+        stores = currentSelectedRegion === "전체 지역"
+          ? branchStores
+          : branchStores.filter(s => s.region === currentSelectedRegion);
+      }
+
+      document.getElementById("storeCountLabel").innerText = `${stores.length}개 매장`;
+      const toggleBtn = document.getElementById("toggleStoreExpandBtn");
+      if (toggleBtn) toggleBtn.innerText = isStoreExpanded ? "접기" : "전체 보기";
+
+      container.className = isStoreExpanded
+        ? "flex flex-wrap gap-1.5 py-1"
+        : "flex gap-1.5 overflow-x-auto no-scrollbar py-1";
+
+      if (stores.length === 0) {
+        container.innerHTML = `
+          <div class="flex items-center justify-between w-full py-1 px-1">
+            <span class="text-xs text-slate-400">조회된 매장이 없습니다.</span>
+            ${currentSelectedBranch !== "all" ? `<button type="button" onclick="searchAcrossAllBranches()" class="text-[11px] font-bold text-indigo-600 hover:underline">전체 지점에서 찾기</button>` : ""}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = stores.map(st => {
+        const isSelected = currentStore && currentStore.name === st.name;
+        const cls = isSelected
+          ? "bg-slate-900 text-white border-slate-900 shadow-xs font-bold"
+          : "bg-[#F7F6F2] text-slate-700 border-[#E6E4DD] hover:border-slate-300 font-medium";
+        return `<button type="button" data-store-name="${st.name}" onclick="selectStoreByName('${st.name.replace(/'/g, "\\'")}')" class="store-chip whitespace-nowrap px-3.5 py-2 rounded-xl text-xs transition-all border shrink-0 ${cls}">${st.name}</button>`;
+      }).join("");
+
+      if (!stores.some(st => currentStore && st.name === currentStore.name)) {
+        selectStore(stores[0]);
+      }
+    }
+
+    function selectStoreByName(storeName) {
+      const found = STORE_DATA.find(s => s.name === storeName);
+      if (found) selectStore(found);
+    }
+
+    function getMaintBadgeStyle(desc) {
+      if (!desc || desc === "-") return "";
+      if (desc.includes("신규")) return "bg-emerald-50 text-emerald-700 border-emerald-200/70";
+      if (desc.includes("재시설")) return "bg-indigo-50 text-indigo-700 border-indigo-200/70";
+      if (desc.includes("점주") || desc.includes("중간")) return "bg-amber-50 text-amber-700 border-amber-200/70";
+      if (desc.includes("전환") || desc.includes("이전") || desc.includes("확장") || desc.includes("축소") || desc.includes("파사드")) {
+        return "bg-sky-50 text-sky-700 border-sky-200/70";
+      }
+      return "bg-slate-100 text-slate-700 border-slate-200";
+    }
+
+    function parsePercentNumber(pctStr) {
+      if (!pctStr || pctStr === "-") return 0;
+      const n = parseFloat(String(pctStr).replace("%", "").trim());
+      return isNaN(n) ? 0 : n;
+    }
+
+    function selectStore(st) {
+      if (!st) return;
+      currentStore = st;
+
+      document.querySelectorAll(".store-chip").forEach(btn => {
+        if (btn.getAttribute("data-store-name") === st.name) {
+          btn.className = "store-chip whitespace-nowrap px-3.5 py-2 rounded-xl text-xs transition-all border shrink-0 bg-slate-900 text-white border-slate-900 shadow-xs font-bold";
+        } else {
+          btn.className = "store-chip whitespace-nowrap px-3.5 py-2 rounded-xl text-xs transition-all border shrink-0 bg-[#F7F6F2] text-slate-700 border-[#E6E4DD] hover:border-slate-300 font-medium";
+        }
+      });
+
+      if (currentSelectedBranch === "all") {
+        applyBranchTheme(st.branch);
+      }
+
+      const isDirect = st.name.includes("직영");
+      document.getElementById("heroBranchBadge").innerText = `${st.branch}지점`;
+      document.getElementById("heroRegionBadge").innerText = st.region || "-";
+
+      const typeBadge = document.getElementById("heroTypeBadge");
+      if (isDirect) {
+        typeBadge.innerText = "직영점";
+        typeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-amber-400/20 text-amber-200 border border-amber-300/30 shrink-0";
+      } else {
+        typeBadge.innerText = "대리점";
+        typeBadge.className = "text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 shrink-0";
+      }
+
+      document.getElementById("heroStoreTitle").innerText = st.name;
+      const opDisplay = (st.rOp && st.rOp !== "-" && st.rOp !== st.rep)
+        ? `대표자 ${st.rep} · 실운영 ${st.rOp}`
+        : `대표자 · 실운영 ${st.rep || "-"}`;
+      document.getElementById("heroOwnerSubtitle").innerText = opDisplay;
+
+      const hasTotInvest = st.totInvest && st.totInvest !== "-";
+      const totInvestEl = document.getElementById("summaryTotalInvest");
+      const totUnitEl = document.getElementById("summaryTotalInvestUnit");
+
+      if (hasTotInvest) {
+        totInvestEl.innerText = st.totInvest;
+        totUnitEl.classList.remove("hidden");
+      } else if (st.rent === "자가" || st.rent === "본사건물") {
+        totInvestEl.innerText = st.rent;
+        totUnitEl.classList.add("hidden");
+      } else {
+        totInvestEl.innerText = "-";
+        totUnitEl.classList.add("hidden");
+      }
+
+      let investSubText = "보증 - + 권리 -";
+      if (st.rent === "자가") {
+        investSubText = "자가 건물 · 보증·권리 없음";
+      } else if (st.rent === "본사건물") {
+        investSubText = "본사 건물 · 보증·권리 없음";
+      } else {
+        investSubText = `보증 ${st.dep || "-"} + 권리 ${st.prem || "-"}`;
+      }
+      document.getElementById("summaryTotalInvestSub").innerText = investSubText;
+
+      const hasInterior = st.iSum && st.iSum !== "-";
+      const interiorEl = document.getElementById("summaryInteriorTotal");
+      const interiorUnitEl = document.getElementById("summaryInteriorUnit");
+
+      if (hasInterior) {
+        interiorEl.innerText = st.iSum;
+        interiorUnitEl.classList.remove("hidden");
+      } else {
+        interiorEl.innerText = "별도 없음";
+        interiorUnitEl.classList.add("hidden");
+      }
+      document.getElementById("summaryInteriorSub").innerText = `매장 ${st.iStore || "-"} · 본사 ${st.iHq || "-"}`;
+
+      const rentFormatted = (st.rent && st.rent !== "-")
+        ? ((st.rent === "자가" || st.rent === "본사건물") ? st.rent : `${st.rent}백만`)
+        : "-";
+      document.getElementById("stripRent").innerText = rentFormatted;
+      document.getElementById("stripArea").innerText = st.area || "-";
+      document.getElementById("stripFacade").innerText = st.facade || "-";
+      document.getElementById("stripMargin").innerText = st.mAvg || "-";
+
+      document.getElementById("currentSelectedStoreName").innerText = st.name;
+      document.getElementById("detailOpenDate").innerText = st.open || "-";
+
+      const renovEl = document.getElementById("detailRenovDate");
+      if (st.maint && st.maint !== "-") {
+        if (st.maintDesc && st.maintDesc !== "-") {
+          const badgeCls = getMaintBadgeStyle(st.maintDesc);
+          renovEl.innerHTML = `<span class="tabular-nums">${st.maint}</span> <span class="text-[10px] font-bold px-1.5 py-0.5 rounded border ${badgeCls}">${st.maintDesc}</span>`;
+        } else {
+          renovEl.innerText = st.maint;
+        }
+      } else {
+        renovEl.innerText = "-";
+      }
+
+      document.getElementById("detailArea").innerText = st.area || "-";
+      document.getElementById("detailFront").innerText = st.facade || "-";
+      document.getElementById("detailRepName").innerText = st.rep || "-";
+
+      let opAgeText = "";
+      if (st.rAge && st.rAge !== "-") {
+        if (st.rAge.includes("/")) {
+          const ages = st.rAge.split("/").map(a => a.trim() + "세");
+          opAgeText = `(${ages.join(" / ")})`;
+        } else {
+          opAgeText = `(${st.rAge}세)`;
+        }
+      }
+      document.getElementById("detailOpName").innerText = st.rOp || "-";
+      document.getElementById("detailOpAge").innerText = opAgeText;
+
+      const diffBadge = document.getElementById("ownerDiffBadge");
+      if (st.rOp && st.rep && st.rOp !== "-" && st.rep !== "-" && st.rOp !== st.rep) {
+        diffBadge.classList.remove("hidden");
+      } else {
+        diffBadge.classList.add("hidden");
+      }
+
+      document.getElementById("investDep").innerText = (st.dep && st.dep !== "-") ? `${st.dep}백만` : "-";
+      document.getElementById("investPrem").innerText = (st.prem && st.prem !== "-") ? `${st.prem}백만` : "-";
+      document.getElementById("investRent").innerText = rentFormatted;
+
+      document.getElementById("interiorStoreVal").innerText = (st.iStore && st.iStore !== "-") ? `${st.iStore}백만` : "-";
+      document.getElementById("interiorHqVal").innerText = (st.iHq && st.iHq !== "-") ? `${st.iHq}백만` : "-";
+
+      const storeExactEl = document.getElementById("interiorStoreExact");
+      const hqExactEl = document.getElementById("interiorHqExact");
+      if (st.iStoreNum > 0 && Math.abs(st.iStoreNum - Math.round(st.iStoreNum)) >= 0.05) {
+        storeExactEl.innerText = `원값 ${Number(st.iStoreNum.toFixed(2))}백만`;
+        storeExactEl.classList.remove("hidden");
+      } else {
+        storeExactEl.classList.add("hidden");
+      }
+      if (st.iHqNum > 0 && Math.abs(st.iHqNum - Math.round(st.iHqNum)) >= 0.05) {
+        hqExactEl.innerText = `원값 ${Number(st.iHqNum.toFixed(2))}백만`;
+        hqExactEl.classList.remove("hidden");
+      } else {
+        hqExactEl.classList.add("hidden");
+      }
+
+      const sNum = st.iStoreNum || 0;
+      const hNum = st.iHqNum || 0;
+      const tNum = st.iSumNum || 0;
+      const ratioBase = (sNum + hNum) > 0 ? (sNum + hNum) : tNum;
+
+      if (ratioBase > 0) {
+        const sPct = Math.round((sNum / ratioBase) * 100);
+        const hPct = 100 - sPct;
+        document.getElementById("interiorRatioText").innerText = `매장 ${sPct}% : 본사 ${hPct}%`;
+        document.getElementById("barStoreRatio").style.width = `${sPct}%`;
+        document.getElementById("barHqRatio").style.width = `${hPct}%`;
+      } else {
+        document.getElementById("interiorRatioText").innerText = "분담 정보 없음";
+        document.getElementById("barStoreRatio").style.width = "50%";
+        document.getElementById("barHqRatio").style.width = "50%";
+      }
+
+      document.getElementById("detailMarginAvg").innerText = st.mAvg || "-";
+      document.getElementById("mNormal").innerText = st.mNorm || "-";
+      document.getElementById("m30").innerText = st.m30 || "-";
+      document.getElementById("m40").innerText = st.m40 || "-";
+      document.getElementById("m50").innerText = st.m50 || "-";
+      document.getElementById("mFlat").innerText = st.mUni || "-";
+
+      const scaleBar = (pctStr) => `${Math.min(100, Math.max(0, Math.round((parsePercentNumber(pctStr) / 50) * 100)))}%`;
+      document.getElementById("barMNormal").style.width = scaleBar(st.mNorm);
+      document.getElementById("barM30").style.width = scaleBar(st.m30);
+      document.getElementById("barM40").style.width = scaleBar(st.m40);
+      document.getElementById("barM50").style.width = scaleBar(st.m50);
+      document.getElementById("barMFlat").style.width = scaleBar(st.mUni);
+    }
+
+    function handleSearchInput() {
+      const input = document.getElementById("storeSearchInput");
+      const clearBtn = document.getElementById("clearSearchBtn");
+      if (!input || !clearBtn) return;
+
+      const query = input.value.trim().toLowerCase();
+      if (query.length > 0) {
+        clearBtn.classList.remove("hidden");
+        const basePool = getBranchFilteredStores();
+        const filtered = basePool.filter(st =>
+          st.name.toLowerCase().includes(query) ||
+          st.region.toLowerCase().includes(query) ||
+          st.rep.toLowerCase().includes(query) ||
+          st.rOp.toLowerCase().includes(query)
+        );
+        renderStoreChips(filtered);
+      } else {
+        clearBtn.classList.add("hidden");
+        renderStoreChips();
+      }
+    }
+
+    function searchAcrossAllBranches() {
+      const query = document.getElementById("storeSearchInput").value.trim();
+      selectBranch("all");
+      const input = document.getElementById("storeSearchInput");
+      input.value = query;
+      handleSearchInput();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById("storeSearchInput");
+      const clearBtn = document.getElementById("clearSearchBtn");
+      input.value = "";
+      clearBtn.classList.add("hidden");
+      renderStoreChips();
+      input.focus();
+    }
+
+    function openHelpModal() {
+      document.getElementById("helpModal").classList.remove("hidden");
+    }
+    function closeHelpModal() {
+      document.getElementById("helpModal").classList.add("hidden");
+    }
+    function openSheetModal() {
+      document.getElementById("sheetUrlInput").value = getSavedSheetUrl();
+      document.getElementById("sheetModal").classList.remove("hidden");
+    }
+    function closeSheetModal() {
+      document.getElementById("sheetModal").classList.add("hidden");
+    }
+
+    function saveSheetUrl() {
+      const val = document.getElementById("sheetUrlInput").value.trim();
+      if (!extractSheetId(val)) {
+        showToast("유효한 구글 스프레드시트 URL을 입력해 주세요.");
+        return;
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY_URL, val);
+      } catch (e) {}
+      closeSheetModal();
+      loadGoogleSheets(true);
+    }
+
+    function resetDefaultSheetUrl() {
+      try {
+        localStorage.removeItem(STORAGE_KEY_URL);
+      } catch (e) {}
+      document.getElementById("sheetUrlInput").value = DEFAULT_SHEET_URL;
+      closeSheetModal();
+      loadGoogleSheets(true);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toastBox");
+      if (!toast) return;
+      document.getElementById("toastMessage").innerText = msg;
+      toast.classList.remove("opacity-0");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0");
+      }, 2600);
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateBranchTabCounts();
+      renderRegionChips();
+      renderStoreChips();
+      selectStore(STORE_DATA[0]);
+      loadGoogleSheets(false);
+    });
+  </script>
+</body>
+</html>
