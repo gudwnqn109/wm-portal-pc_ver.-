@@ -50,26 +50,16 @@
     }
 
     @keyframes fadeSlideUp {
-      from {
-        opacity: 0;
-        transform: translateY(6px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .animate-view {
       animation: fadeSlideUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     @keyframes sheetSlideUp {
-      from {
-        transform: translateY(100%);
-      }
-      to {
-        transform: translateY(0);
-      }
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
     }
     .animate-sheet {
       animation: sheetSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -86,14 +76,9 @@
 </head>
 <body class="bg-[#E7E5DF] h-screen w-screen flex justify-center items-center overflow-hidden">
 
-  <!-- =====================================================================
-       [메인 포털 프레임 컨테이너]
-       ===================================================================== -->
   <div id="portalShell" class="w-full h-full bg-[#F7F6F2] flex flex-col lg:flex-row relative overflow-hidden">
 
-    <!-- ===================================================================
-         [1. Google OAuth 2.0 보안 잠금 화면 (#authOverlay)]
-         =================================================================== -->
+    <!-- [1. Google OAuth 2.0 보안 잠금 화면] -->
     <div id="authOverlay" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-6 text-white text-center">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
         <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl mx-auto mb-5 shadow-lg shadow-amber-500/30 tracking-tight">
@@ -103,22 +88,15 @@
         <p class="text-xs text-slate-400 mt-2 mb-7 leading-relaxed">
           승인된 본사 Google 계정으로 로그인 후<br>이용 가능합니다.
         </p>
-
-        <!-- 구글 공식 로그인 버튼 렌더링 컨테이너 -->
         <div id="googleBtnWrapper" class="flex justify-center w-full min-h-[44px]"></div>
-
-        <!-- 인증 오류 안내 메시지 -->
         <p id="authErrorMsg" class="text-xs text-rose-400 font-semibold mt-4 hidden"></p>
       </div>
-
       <div class="mt-6 text-[11px] text-slate-500">
         <i class="fa-solid fa-shield-halved mr-1"></i> 사내 인가 사용자 전용 보안 시스템
       </div>
     </div>
 
-    <!-- ===================================================================
-         [2. PC 전용 좌측 고정 사이드바 (250px)]
-         =================================================================== -->
+    <!-- [2. PC 전용 좌측 고정 사이드바 (250px)] -->
     <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20">
       <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
         <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
@@ -133,11 +111,7 @@
       </div>
 
       <div class="px-3 pt-3.5 pb-2 space-y-2.5">
-        <button
-          id="sidebarHomeBtn"
-          onclick="goHome()"
-          class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition"
-        >
+        <button id="sidebarHomeBtn" onclick="goHome()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition">
           <span class="flex items-center gap-2.5">
             <i class="fa-solid fa-house text-xs w-4 text-center"></i>
             <span>홈 대시보드</span>
@@ -147,13 +121,7 @@
 
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-          <input
-            type="text"
-            id="sidebarSearchInput"
-            oninput="renderDesktopSidebar()"
-            placeholder="메뉴 검색..."
-            class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none transition"
-          />
+          <input type="text" id="sidebarSearchInput" oninput="renderDesktopSidebar()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none transition" />
         </div>
       </div>
 
@@ -170,70 +138,35 @@
               <div id="sidebarUserEmail" class="text-[10.5px] font-mono text-zinc-400 truncate">-</div>
             </div>
           </div>
-          <button
-            onclick="handleLogout()"
-            class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition shrink-0"
-            title="로그아웃"
-          >
+          <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition shrink-0" title="로그아웃">
             <i class="fa-solid fa-right-from-bracket text-xs"></i>
           </button>
         </div>
       </div>
     </aside>
 
-    <!-- ===================================================================
-         [3. 우측 메인 영역]
-         =================================================================== -->
+    <!-- [3. 우측 메인 영역] -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2]">
       <header class="bg-[#F7F6F2]/95 backdrop-blur-md px-4 lg:px-6 py-3 border-b border-[#E6E4DD] flex items-center justify-between gap-3 shrink-0 z-20">
         <div class="flex items-center gap-2.5 min-w-0">
-          <button
-            onclick="goHome()"
-            class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md tracking-tight shrink-0 active:scale-95 transition"
-          >
-            WM중부
-          </button>
-          <button
-            id="mobileHomeBtn"
-            onclick="goHome()"
-            class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0"
-            title="홈으로 이동"
-          >
+          <button onclick="goHome()" class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md tracking-tight shrink-0 active:scale-95 transition">WM중부</button>
+          <button id="mobileHomeBtn" onclick="goHome()" class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0" title="홈으로 이동">
             <i class="fa-solid fa-house text-xs"></i>
           </button>
-          <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight truncate">
-            WM중부 통합 영업 포털
-          </h1>
-          <span id="headerSubtitle" class="hidden sm:inline-block text-xs font-medium text-zinc-500 truncate">
-            영업 리포트 허브
-          </span>
+          <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight truncate">WM중부 통합 영업 포털</h1>
+          <span id="headerSubtitle" class="hidden sm:inline-block text-xs font-medium text-zinc-500 truncate">영업 리포트 허브</span>
         </div>
 
         <div class="flex items-center gap-2 shrink-0">
           <div class="bg-[#E9E7E0] p-1 rounded-xl flex items-center gap-1 border border-[#DFDDD4]">
-            <button
-              id="btnModeSingle"
-              onclick="setViewSplitMode(1)"
-              class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition"
-            >
-              <i class="fa-regular fa-square text-[11px]"></i>
-              <span>1분할 (단독)</span>
+            <button id="btnModeSingle" onclick="setViewSplitMode(1)" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition">
+              <i class="fa-regular fa-square text-[11px]"></i><span>1분할 (단독)</span>
             </button>
-            <button
-              id="btnModeSplit"
-              onclick="setViewSplitMode(2)"
-              class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition"
-            >
-              <i class="fa-solid fa-table-columns text-[11px]"></i>
-              <span>2분할 (비교)</span>
+            <button id="btnModeSplit" onclick="setViewSplitMode(2)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-table-columns text-[11px]"></i><span>2분할 (비교)</span>
             </button>
           </div>
-
-          <button
-            onclick="openAllMenusDrawer()"
-            class="lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-white hover:bg-zinc-800 flex items-center justify-center text-xs transition active:scale-95"
-            title="전체 메뉴"
-          >
+          <button onclick="openAllMenusDrawer()" class="lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-white hover:bg-zinc-800 flex items-center justify-center text-xs transition active:scale-95" title="전체 메뉴">
             <i class="fa-solid fa-bars"></i>
           </button>
         </div>
@@ -244,9 +177,7 @@
         <div class="max-w-6xl mx-auto space-y-4 pb-8">
           <div class="flex flex-wrap items-center justify-between gap-2 px-0.5">
             <div id="categoryPillsContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
-            <span class="text-[11px] font-medium text-zinc-500">
-              ★ 즐겨찾기 상단 우선 배치 · 카드 클릭 시 설정된 뷰어로 열립니다
-            </span>
+            <span class="text-[11px] font-medium text-zinc-500">★ 즐겨찾기 상단 우선 배치 · 카드 클릭 시 설정된 뷰어로 열립니다</span>
           </div>
           <div id="bentoGridContainer" class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4"></div>
         </div>
@@ -304,7 +235,7 @@
         <div class="px-5 pt-1.5 pb-3 flex items-center justify-between shrink-0">
           <div class="flex items-center gap-2">
             <h3 class="text-[17px] font-extrabold text-[#18181B] tracking-tight">전체 메뉴</h3>
-            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full">3개</span>
+            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full"></span>
           </div>
           <button onclick="closeAllMenusDrawer()" class="w-8 h-8 rounded-full bg-white border border-[#E6E4DD] text-zinc-500 hover:text-[#18181B] flex items-center justify-center transition active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
@@ -339,10 +270,10 @@
     const GOOGLE_CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
     const ALLOWED_EMAILS = ["gudwnqn109@gmail.com"];
 
-    // 1. 여기서 사용하지 않는 메뉴 3개 제거 완료!
     const MENU_ITEMS = [
       { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
       { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
+      { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', category: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'amber' },
       { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' }
     ];
 
@@ -352,14 +283,14 @@
       indigo: { iconBg: 'bg-indigo-500/12', iconText: 'text-indigo-700', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
     };
 
-    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v3'; // 스토리지 충돌 방지용 키 변경
-    let pinnedMenuIds = ['daily'];
+    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v4';
+    let pinnedMenuIds = ['daily', 'sellthru_fw'];
     let selectedCategory = '전체';
     let currentView = 'home';
     let splitMode = 1;
     let singleMenuId = 'daily';
     let leftMenuId = 'daily';
-    let rightMenuId = 'competitor';
+    let rightMenuId = 'sellthru_fw';
     let currentUser = null;
     let isPreviewEnv = false;
 
@@ -395,7 +326,7 @@
           }
         }
       } catch (e) {}
-      pinnedMenuIds = validIds.has('daily') ? ['daily'] : [];
+      pinnedMenuIds = validIds.has('daily') ? ['daily', 'sellthru_fw'] : [];
     }
 
     function savePins() {
@@ -735,106 +666,34 @@
       });
     }
 
+    // ★ 로컬/미리보기 환경 여부에 상관없이 항상 iframe을 로드하도록 처리
     function mountViewerContent(containerEl, menuId) {
       if (!containerEl) return;
       const menuObj = MENU_ITEMS.find(m => m.id === menuId) || MENU_ITEMS[0];
 
-      if (!isPreviewEnv) {
-        containerEl.innerHTML = `
-          <div class="pane-loader absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center z-10 transition-opacity duration-200">
-            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-700 mb-2"></i>
-            <span class="text-xs font-semibold text-zinc-600">${menuObj.title} 불러오는 중...</span>
-          </div>
-        `;
-
-        const iframe = document.createElement('iframe');
-        iframe.src = menuObj.url;
-        if (currentUser) {
-          iframe.setAttribute('data-user-email', currentUser.email);
-        }
-        iframe.onload = () => {
-          const loader = containerEl.querySelector('.pane-loader');
-          if (loader) {
-            loader.style.opacity = '0';
-            setTimeout(() => { loader.style.display = 'none'; }, 180);
-          }
-          if (iframe.contentWindow && currentUser) {
-            iframe.contentWindow.postMessage({ type: 'WM_PORTAL_AUTH', user: currentUser }, '*');
-          }
-        };
-        containerEl.appendChild(iframe);
-        return;
-      }
-
       containerEl.innerHTML = `
-        <div class="h-full overflow-y-auto thin-scrollbar bg-slate-100/80 p-3.5 lg:p-4">
-          <div class="max-w-lg mx-auto space-y-3 animate-view">
-            ${getPreviewDemoMarkup(menuObj.id)}
-          </div>
+        <div class="pane-loader absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center z-10 transition-opacity duration-200">
+          <i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-700 mb-2"></i>
+          <span class="text-xs font-semibold text-zinc-600">${menuObj.title} 불러오는 중...</span>
         </div>
       `;
-    }
 
-    function getPreviewDemoMarkup(menuId) {
-      if (menuId === 'daily') {
-        return `
-          <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between shadow-2xs">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-blue-900 text-amber-400 font-black flex items-center justify-center text-xs">WM</div>
-              <div><div class="text-sm font-extrabold text-slate-900">WM중부 매출장</div><div class="text-[11px] text-emerald-600 font-bold">● 실시간 구글 시트 연동</div></div>
-            </div>
-            <span class="text-[11px] font-bold bg-slate-100 px-2.5 py-1 rounded-lg text-slate-700">총 100개 매장</span>
-          </div>
-          <div class="rounded-2xl bg-gradient-to-br from-blue-900 to-indigo-950 text-white p-4 shadow-md">
-            <div class="flex items-center justify-between text-xs"><span class="px-2 py-0.5 rounded bg-white/15 text-blue-100 font-bold">중부영업팀 당일</span><span class="px-2.5 py-0.5 rounded-full bg-amber-400 text-blue-950 font-black">104.2% 달성</span></div>
-            <div class="text-2xl font-black mt-2 tabular-nums">118.4 <span class="text-xs font-semibold text-blue-200">백만원</span></div>
-            <div class="mt-2.5 pt-2 border-t border-white/15 flex justify-between text-[11px] text-blue-200"><span>일목표 <strong class="text-white">113.6백만</strong></span><span class="text-amber-300 font-bold">+4.8백만 초과</span></div>
-          </div>
-          <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden text-xs tabular-nums">
-            <div class="px-3.5 py-2.5 bg-slate-50 border-b border-slate-200 font-bold text-slate-700 flex justify-between"><span>주요 매장 실시간 실적</span><span class="text-slate-400 font-normal">단위: 백만원</span></div>
-            <div class="divide-y divide-slate-100">
-              <div class="px-3.5 py-2.5 flex justify-between items-center"><div><div class="font-bold text-slate-900">방학직영점</div><div class="text-[10.5px] text-slate-400">서울 · 신현호</div></div><div class="text-right"><div class="font-black text-blue-600">4.8백만</div><div class="text-[10.5px] font-bold text-emerald-600">112.4% 달성</div></div></div>
-              <div class="px-3.5 py-2.5 flex justify-between items-center"><div><div class="font-bold text-slate-900">분당서현점</div><div class="text-[10.5px] text-slate-400">경기 · 신순호</div></div><div class="text-right"><div class="font-black text-blue-600">4.3백만</div><div class="text-[10.5px] font-bold text-emerald-600">106.8% 달성</div></div></div>
-              <div class="px-3.5 py-2.5 flex justify-between items-center"><div><div class="font-bold text-slate-900">강릉죽헌직영점</div><div class="text-[10.5px] text-slate-400">강원 · 김동하</div></div><div class="text-right"><div class="font-black text-blue-600">3.9백만</div><div class="text-[10.5px] font-bold text-blue-600">98.5% 달성</div></div></div>
-            </div>
-          </div>
-        `;
+      const iframe = document.createElement('iframe');
+      iframe.src = menuObj.url;
+      if (currentUser) {
+        iframe.setAttribute('data-user-email', currentUser.email);
       }
-      if (menuId === 'weekly') {
-        return `
-          <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center shadow-sm">
-            <div><span class="bg-amber-400 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM중부</span><h4 class="text-sm font-extrabold mt-1">주간 실적 리포트 (CFM)</h4></div>
-            <span class="text-xs font-extrabold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2.5 py-1 rounded-full">당월 서울 4위</span>
-          </div>
-          <div class="grid grid-cols-2 gap-2.5 tabular-nums">
-            <div class="bg-white p-3 rounded-xl border border-slate-200"><div class="text-[10.5px] text-slate-500 font-bold">주간 전체매출</div><div class="text-base font-black text-slate-900 mt-1">16,320천원</div><div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 9% 전년비</div></div>
-            <div class="bg-white p-3 rounded-xl border border-slate-200"><div class="text-[10.5px] text-slate-500 font-bold">주간 구매고객</div><div class="text-base font-black text-slate-900 mt-1">86명</div><div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 10% 전년비</div></div>
-            <div class="bg-amber-50/70 p-3 rounded-xl border border-amber-200/80"><div class="text-[10.5px] text-amber-900 font-bold">첫구매 (월누계)</div><div class="text-base font-black text-slate-900 mt-1">24명 <span class="text-[10px] text-amber-800 font-bold">/ 목표 35</span></div></div>
-            <div class="bg-white p-3 rounded-xl border border-slate-200"><div class="text-[10.5px] text-slate-500 font-bold">당월 누계매출</div><div class="text-base font-black text-slate-900 mt-1">29,450천원</div><div class="text-[10.5px] font-bold text-rose-600 mt-0.5">▲ 12% 전년비</div></div>
-          </div>
-          <div class="bg-slate-900 text-white p-3.5 rounded-2xl space-y-2 text-xs tabular-nums">
-            <div class="flex justify-between text-[11px] text-slate-400"><span>5대 브랜드 매출 비중</span><span class="text-amber-400 font-bold">합계 29,450천원</span></div>
-            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden flex gap-0.5"><div class="bg-slate-300 h-full" style="width:50%"></div><div class="bg-blue-500 h-full" style="width:18%"></div><div class="bg-emerald-500 h-full" style="width:22%"></div><div class="bg-amber-400 h-full" style="width:6%"></div><div class="bg-rose-500 h-full" style="width:4%"></div></div>
-            <div class="flex justify-between text-[11px] pt-1 text-slate-300"><span>인디안 50% · 데일리 22%</span><span>브루노 18% · 기타 10%</span></div>
-          </div>
-        `;
-      }
-      if (menuId === 'competitor') {
-        return `
-          <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between">
-            <div class="flex items-center gap-2.5"><span class="w-8 h-8 rounded-xl bg-indigo-600 text-white text-xs flex items-center justify-center"><i class="fa-solid fa-chart-line"></i></span><div><div class="text-sm font-extrabold text-slate-900">타브랜드 매출 현황</div><div class="text-[11px] text-slate-500">서울·경기·강원 상권 통합</div></div></div>
-            <span class="text-[11px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg">단위: 천원</span>
-          </div>
-          <div class="rounded-2xl bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 text-white p-4 shadow-md">
-            <div class="flex justify-between items-center"><span class="text-[10px] bg-white/15 px-2 py-0.5 rounded font-bold">서울지점 · 강동구</span><span class="text-[11px] text-emerald-300 font-bold">25년 마감 14.2억</span></div>
-            <div class="mt-2 flex items-center gap-2"><h4 class="text-lg font-extrabold">길동점 (웰메이드)</h4><span class="text-[11px] bg-indigo-700 px-2 py-0.5 rounded font-bold">상권 1위</span></div>
-            <div class="mt-3 pt-2.5 border-t border-white/15 space-y-1.5">
-              <div class="flex justify-between text-[11px]"><span>상권 내 비중 <strong class="text-emerald-300">28.4%</strong></span><span>상권 합계 3,465,400</span></div>
-              <div class="w-full h-2 bg-white/15 rounded-full overflow-hidden"><div class="h-full bg-emerald-400 rounded-full" style="width:28.4%"></div></div>
-            </div>
-          </div>
-        `;
-      }
+      iframe.onload = () => {
+        const loader = containerEl.querySelector('.pane-loader');
+        if (loader) {
+          loader.style.opacity = '0';
+          setTimeout(() => { loader.style.display = 'none'; }, 180);
+        }
+        if (iframe.contentWindow && currentUser) {
+          iframe.contentWindow.postMessage({ type: 'WM_PORTAL_AUTH', user: currentUser }, '*');
+        }
+      };
+      containerEl.appendChild(iframe);
     }
 
     function openAllMenusDrawer() {
@@ -960,6 +819,7 @@
     function initGoogleAuth() {
       isPreviewEnv = detectPreviewEnvironment();
 
+      // 로컬(파일) 접속 등에서 OAuth 서버 우회를 위해 미리보기 로그인 상태는 유지합니다.
       if (isPreviewEnv) {
         unlockPortal({ email: ALLOWED_EMAILS[0], name: 'WM중부 미리보기' }, true);
         return;
