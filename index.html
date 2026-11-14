@@ -4,143 +4,71 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>WM중부 통합 영업 포털</title>
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome 6.4 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Pretendard Web Font -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <!-- Google Identity Services SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-
   <style>
-    * {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-      box-sizing: border-box;
-    }
-
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background-color: #E7E5DF;
-      color: #18181B;
-      overflow: hidden;
-    }
-
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-
-    .thin-scrollbar::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    .thin-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .thin-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(161, 161, 170, 0.35);
-      border-radius: 9999px;
-    }
-
-    @keyframes fadeSlideUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-view {
-      animation: fadeSlideUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-
-    @keyframes sheetSlideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    .animate-sheet {
-      animation: sheetSlideUp 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    }
-
-    iframe {
-      border: none;
-      width: 100%;
-      height: 100%;
-      display: block;
-      background-color: #FFFFFF;
-    }
+    * { font-family: 'Pretendard', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; background: #E7E5DF; color: #18181B; overflow: hidden; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .thin-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+    .thin-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .thin-scrollbar::-webkit-scrollbar-thumb { background: rgba(161, 161, 170, 0.35); border-radius: 99px; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .animate-view { animation: fadeUp 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    .animate-sheet { animation: sheetUp 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    iframe { border: none; width: 100%; height: 100%; display: block; background: #FFF; }
   </style>
 </head>
 <body class="bg-[#E7E5DF] h-screen w-screen flex justify-center items-center overflow-hidden">
-
   <div id="portalShell" class="w-full h-full bg-[#F7F6F2] flex flex-col lg:flex-row relative overflow-hidden">
 
-    <!-- [1. Google OAuth 2.0 보안 잠금 화면] -->
+    <!-- [1. Google OAuth Auth] -->
     <div id="authOverlay" class="hidden fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex flex-col items-center justify-center p-6 text-white text-center">
       <div class="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl">
-        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl mx-auto mb-5 shadow-lg shadow-amber-500/30 tracking-tight">
-          WM
-        </div>
-        <h2 class="text-xl font-extrabold tracking-tight">WM중부 통합 영업 포털</h2>
-        <p class="text-xs text-slate-400 mt-2 mb-7 leading-relaxed">
-          승인된 본사 Google 계정으로 로그인 후<br>이용 가능합니다.
-        </p>
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-2xl mx-auto mb-5 shadow-lg tracking-tight">WM</div>
+        <h2 class="text-xl font-extrabold">WM중부 통합 영업 포털</h2>
+        <p class="text-xs text-slate-400 mt-2 mb-7 leading-relaxed">승인된 본사 Google 계정으로 로그인 후<br>이용 가능합니다.</p>
         <div id="googleBtnWrapper" class="flex justify-center w-full min-h-[44px]"></div>
         <p id="authErrorMsg" class="text-xs text-rose-400 font-semibold mt-4 hidden"></p>
       </div>
-      <div class="mt-6 text-[11px] text-slate-500">
-        <i class="fa-solid fa-shield-halved mr-1"></i> 사내 인가 사용자 전용 보안 시스템
-      </div>
     </div>
 
-    <!-- [2. PC 전용 좌측 고정 사이드바 (250px)] -->
+    <!-- [2. PC 사이드바] -->
     <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20">
       <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
         <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0 group-hover:scale-105 transition">
-            WM
-          </div>
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
           <div class="min-w-0">
-            <div class="text-[14.5px] font-extrabold tracking-tight text-white truncate">WM중부 통합 포털</div>
+            <div class="text-[14.5px] font-extrabold tracking-tight truncate">WM중부 통합 포털</div>
             <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES DASHBOARD</div>
           </div>
         </div>
       </div>
-
       <div class="px-3 pt-3.5 pb-2 space-y-2.5">
-        <button id="sidebarHomeBtn" onclick="goHome()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition">
-          <span class="flex items-center gap-2.5">
-            <i class="fa-solid fa-house text-xs w-4 text-center"></i>
-            <span>홈 대시보드</span>
-          </span>
+        <button id="sidebarHomeBtn" onclick="goHome()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 transition">
+          <span class="flex items-center gap-2.5"><i class="fa-solid fa-house text-xs w-4 text-center"></i><span>홈 대시보드</span></span>
           <span class="text-[9.5px] font-black px-1.5 py-0.5 rounded bg-zinc-950/15">HOME</span>
         </button>
-
         <div class="relative">
-          <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-          <input type="text" id="sidebarSearchInput" oninput="renderDesktopSidebar()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none transition" />
+          <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="sidebarSearchInput" oninput="renderDesktopSidebar()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 focus:outline-none transition" />
         </div>
       </div>
-
       <div id="sidebarMenuGroups" class="flex-1 overflow-y-auto thin-scrollbar px-3 py-2 space-y-4"></div>
-
       <div class="p-3.5 border-t border-zinc-800/90 bg-zinc-900/60">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 text-amber-400 flex items-center justify-center text-xs font-black shrink-0">
-              <i class="fa-solid fa-user-check"></i>
-            </div>
+            <div class="w-8 h-8 rounded-full bg-zinc-800 text-amber-400 flex items-center justify-center text-xs font-black shrink-0"><i class="fa-solid fa-user-check"></i></div>
             <div class="min-w-0">
-              <div id="sidebarUserName" class="text-xs font-bold text-zinc-200 truncate">WM중부 관리자</div>
-              <div id="sidebarUserEmail" class="text-[10.5px] font-mono text-zinc-400 truncate">-</div>
+              <div id="sidebarUserName" class="text-xs font-bold text-zinc-200 truncate">관리자</div>
+              <div id="sidebarUserEmail" class="text-[10.5px] text-zinc-400 truncate">-</div>
             </div>
           </div>
-          <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 flex items-center justify-center transition shrink-0" title="로그아웃">
-            <i class="fa-solid fa-right-from-bracket text-xs"></i>
-          </button>
+          <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-zinc-800 hover:text-rose-400 text-zinc-400 flex items-center justify-center transition shrink-0"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
         </div>
       </div>
     </aside>
@@ -149,745 +77,297 @@
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2]">
       <header class="bg-[#F7F6F2]/95 backdrop-blur-md px-4 lg:px-6 py-3 border-b border-[#E6E4DD] flex items-center justify-between gap-3 shrink-0 z-20">
         <div class="flex items-center gap-2.5 min-w-0">
-          <button onclick="goHome()" class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md tracking-tight shrink-0 active:scale-95 transition">WM중부</button>
-          <button id="mobileHomeBtn" onclick="goHome()" class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0" title="홈으로 이동">
-            <i class="fa-solid fa-house text-xs"></i>
-          </button>
-          <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight truncate">WM중부 통합 영업 포털</h1>
+          <button onclick="goHome()" class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md shrink-0 transition">WM중부</button>
+          <button id="mobileHomeBtn" onclick="goHome()" class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition shrink-0"><i class="fa-solid fa-house text-xs"></i></button>
+          <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold tracking-tight truncate">WM중부 통합 영업 포털</h1>
           <span id="headerSubtitle" class="hidden sm:inline-block text-xs font-medium text-zinc-500 truncate">영업 리포트 허브</span>
         </div>
-
         <div class="flex items-center gap-2 shrink-0">
           <div class="bg-[#E9E7E0] p-1 rounded-xl flex items-center gap-1 border border-[#DFDDD4]">
-            <button id="btnModeSingle" onclick="setViewSplitMode(1)" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition">
-              <i class="fa-regular fa-square text-[11px]"></i><span>1분할 (단독)</span>
-            </button>
-            <button id="btnModeSplit" onclick="setViewSplitMode(2)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition">
-              <i class="fa-solid fa-table-columns text-[11px]"></i><span>2분할 (비교)</span>
-            </button>
+            <button id="btnModeSingle" onclick="setSplitMode(1)" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white flex items-center gap-1.5 transition"><i class="fa-regular fa-square text-[11px]"></i><span class="hidden sm:inline">1분할</span></button>
+            <button id="btnModeSplit" onclick="setSplitMode(2)" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition"><i class="fa-solid fa-table-columns text-[11px]"></i><span class="hidden sm:inline">2분할</span></button>
           </div>
-          <button onclick="openAllMenusDrawer()" class="lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-white hover:bg-zinc-800 flex items-center justify-center text-xs transition active:scale-95" title="전체 메뉴">
-            <i class="fa-solid fa-bars"></i>
-          </button>
+          <button onclick="toggleDrawer(true)" class="lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-white flex items-center justify-center text-xs"><i class="fa-solid fa-bars"></i></button>
         </div>
       </header>
 
-      <!-- 홈 화면 (#homeView) -->
-      <main id="homeView" class="flex-1 overflow-y-auto thin-scrollbar bg-[#F7F6F2] p-4 lg:p-6">
+      <!-- 홈 화면 -->
+      <main id="homeView" class="flex-1 overflow-y-auto thin-scrollbar p-4 lg:p-6">
         <div class="max-w-6xl mx-auto space-y-4 pb-8">
           <div class="flex flex-wrap items-center justify-between gap-2 px-0.5">
-            <div id="categoryPillsContainer" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
-            <span class="text-[11px] font-medium text-zinc-500">★ 즐겨찾기 상단 우선 배치 · 카드 클릭 시 설정된 뷰어로 열립니다</span>
+            <div id="catPills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
+            <span class="text-[11px] font-medium text-zinc-500">★ 즐겨찾기 상단 우선 배치</span>
           </div>
-          <div id="bentoGridContainer" class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4"></div>
+          <div id="bentoGrid" class="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4"></div>
         </div>
       </main>
 
-      <!-- 뷰어 화면 (#viewerView) -->
-      <section id="viewerView" class="hidden flex-1 flex flex-col min-h-0 h-full overflow-hidden bg-white">
-        <div id="singleViewContainer" class="flex-1 flex flex-col min-h-0 h-full overflow-hidden">
-          <div id="quickSwitcherBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0 scroll-smooth"></div>
-          <div id="singleViewerBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
+      <!-- 뷰어 화면 -->
+      <section id="viewerView" class="hidden flex-1 flex flex-col min-h-0 bg-white">
+        <div id="singleView" class="flex-1 flex flex-col min-h-0">
+          <div id="quickBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"></div>
+          <div id="singleBody" class="flex-1 relative bg-white overflow-hidden"></div>
         </div>
-
-        <div id="splitViewContainer" class="hidden flex-1 min-h-0 h-full grid gap-3 p-3 bg-[#E7E5DF] overflow-hidden" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
-          <div class="min-h-0 flex flex-col bg-white rounded-2xl border border-[#DFDDD4] shadow-sm overflow-hidden animate-view">
-            <div class="bg-[#18181B] text-white px-3 py-2 flex items-center justify-between gap-2 shrink-0">
-              <div class="flex items-center gap-2 min-w-0 flex-1">
-                <span class="px-2 py-0.5 rounded bg-amber-400 text-zinc-950 font-black text-[10.5px] shrink-0">좌측</span>
-                <div class="relative flex-1 min-w-0 max-w-[230px]">
-                  <select id="leftPaneSelect" onchange="changeSplitPaneMenu('left', this.value)" class="w-full appearance-none bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-extrabold pl-2.5 pr-7 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-amber-400 truncate cursor-pointer transition"></select>
-                  <i class="fa-solid fa-chevron-down text-[10px] text-amber-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                </div>
-              </div>
-              <div class="flex items-center gap-1 shrink-0">
-                <button onclick="swapSplitPanes()" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-300 flex items-center justify-center text-xs transition"><i class="fa-solid fa-right-left"></i></button>
-                <button onclick="expandPaneToSingle('left')" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center text-xs transition"><i class="fa-solid fa-expand"></i></button>
-              </div>
-            </div>
-            <div id="leftPaneBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
-          </div>
-
-          <div class="min-h-0 flex flex-col bg-white rounded-2xl border border-[#DFDDD4] shadow-sm overflow-hidden animate-view">
-            <div class="bg-[#18181B] text-white px-3 py-2 flex items-center justify-between gap-2 shrink-0">
-              <div class="flex items-center gap-2 min-w-0 flex-1">
-                <span class="px-2 py-0.5 rounded bg-zinc-700 text-amber-300 font-black text-[10.5px] shrink-0">우측</span>
-                <div class="relative flex-1 min-w-0 max-w-[230px]">
-                  <select id="rightPaneSelect" onchange="changeSplitPaneMenu('right', this.value)" class="w-full appearance-none bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-extrabold pl-2.5 pr-7 py-1.5 rounded-lg border border-zinc-700 focus:outline-none focus:border-amber-400 truncate cursor-pointer transition"></select>
-                  <i class="fa-solid fa-chevron-down text-[10px] text-amber-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                </div>
-              </div>
-              <div class="flex items-center gap-1 shrink-0">
-                <button onclick="swapSplitPanes()" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-amber-300 flex items-center justify-center text-xs transition"><i class="fa-solid fa-right-left"></i></button>
-                <button onclick="expandPaneToSingle('right')" class="w-7 h-7 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white flex items-center justify-center text-xs transition"><i class="fa-solid fa-expand"></i></button>
-              </div>
-            </div>
-            <div id="rightPaneBody" class="flex-1 min-h-0 relative bg-white overflow-hidden"></div>
-          </div>
+        <div id="splitView" class="hidden flex-1 min-h-0 grid gap-3 p-3 bg-[#E7E5DF]" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+          <!-- 좌측/우측 동적 생성 대상 -->
         </div>
       </section>
     </div>
 
-    <!-- 전체 메뉴 드로어 -->
-    <div id="allMenusDrawer" class="hidden fixed inset-0 z-40 flex flex-col justify-end bg-zinc-950/45 backdrop-blur-[2px]" onclick="closeAllMenusDrawer()">
-      <div class="bg-[#F7F6F2] rounded-t-3xl border-t border-[#E6E4DD] max-h-[85%] flex flex-col shadow-2xl animate-sheet" onclick="event.stopPropagation()">
+    <!-- 모바일 메뉴 드로어 -->
+    <div id="drawer" class="hidden fixed inset-0 z-40 flex flex-col justify-end bg-zinc-950/45 backdrop-blur-[2px]" onclick="toggleDrawer(false)">
+      <div class="bg-[#F7F6F2] rounded-t-3xl border-t max-h-[85%] flex flex-col shadow-2xl animate-sheet" onclick="event.stopPropagation()">
         <div class="pt-3 pb-1 flex justify-center shrink-0"><div class="w-10 h-1 rounded-full bg-zinc-300"></div></div>
-        <div class="px-5 pt-1.5 pb-3 flex items-center justify-between shrink-0">
-          <div class="flex items-center gap-2">
-            <h3 class="text-[17px] font-extrabold text-[#18181B] tracking-tight">전체 메뉴</h3>
-            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full"></span>
-          </div>
-          <button onclick="closeAllMenusDrawer()" class="w-8 h-8 rounded-full bg-white border border-[#E6E4DD] text-zinc-500 hover:text-[#18181B] flex items-center justify-center transition active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
+        <div class="px-5 py-2 flex items-center justify-between shrink-0">
+          <h3 class="text-[17px] font-extrabold">전체 메뉴 <span id="drawCount" class="ml-1 text-[11px] bg-amber-500/15 text-amber-800 px-2 py-0.5 rounded-full"></span></h3>
+          <button onclick="toggleDrawer(false)" class="w-8 h-8 rounded-full bg-white border text-zinc-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div id="drawerMenuList" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-4 space-y-4"></div>
-        <div class="px-5 py-3.5 bg-white border-t border-[#E6E4DD] flex items-center justify-between shrink-0">
-          <div class="flex items-center gap-2 min-w-0">
-            <div class="w-7 h-7 rounded-full bg-zinc-900 text-amber-400 flex items-center justify-center text-[11px] font-black shrink-0"><i class="fa-solid fa-user-check"></i></div>
-            <span id="drawerUserEmail" class="text-xs font-mono font-semibold text-zinc-600 truncate"></span>
-          </div>
-          <button onclick="closeAllMenusDrawer(); handleLogout();" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shrink-0">
-            <i class="fa-solid fa-right-from-bracket text-[11px]"></i><span>로그아웃</span>
-          </button>
+        <div id="drawerList" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-4 space-y-4"></div>
+        <div class="px-5 py-3.5 bg-white border-t flex justify-between shrink-0">
+          <div class="flex items-center gap-2"><div class="w-7 h-7 rounded-full bg-zinc-900 text-amber-400 flex justify-center items-center text-[11px]"><i class="fa-solid fa-user-check"></i></div><span id="drawerEmail" class="text-xs font-mono font-semibold text-zinc-600"></span></div>
+          <button onclick="toggleDrawer(false); handleLogout();" class="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 text-xs font-bold flex gap-1.5 items-center"><i class="fa-solid fa-right-from-bracket"></i><span>로그아웃</span></button>
         </div>
       </div>
     </div>
 
     <!-- 로그아웃 모달 -->
-    <div id="logoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-[2px] p-5" onclick="closeLogoutModal()">
-      <div class="w-full max-w-xs bg-white border border-[#E6E4DD] rounded-2xl p-5 shadow-2xl text-center animate-view" onclick="event.stopPropagation()">
-        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-3"><i class="fa-solid fa-right-from-bracket text-sm"></i></div>
-        <h3 class="text-[15px] font-extrabold text-[#18181B]">로그아웃 하시겠습니까?</h3>
-        <p class="text-xs text-zinc-500 mt-1">다시 이용하려면 인가된 Google 계정으로 로그인해야 합니다.</p>
+    <div id="logoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/50 backdrop-blur-[2px] p-5" onclick="$('logoutModal').classList.add('hidden')">
+      <div class="w-full max-w-xs bg-white rounded-2xl p-5 shadow-2xl text-center animate-view" onclick="event.stopPropagation()">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex justify-center items-center mx-auto mb-3"><i class="fa-solid fa-right-from-bracket"></i></div>
+        <h3 class="text-[15px] font-extrabold">로그아웃 하시겠습니까?</h3>
         <div class="grid grid-cols-2 gap-2 mt-4">
-          <button onclick="closeLogoutModal()" class="py-2 rounded-xl bg-[#F7F6F2] hover:bg-zinc-200/70 text-zinc-700 text-xs font-bold transition">취소</button>
-          <button onclick="confirmLogout()" class="py-2 rounded-xl bg-[#18181B] hover:bg-zinc-800 text-white text-xs font-bold transition">로그아웃</button>
+          <button onclick="$('logoutModal').classList.add('hidden')" class="py-2 rounded-xl bg-[#F7F6F2] text-xs font-bold">취소</button>
+          <button onclick="confirmLogout()" class="py-2 rounded-xl bg-[#18181B] text-white text-xs font-bold">로그아웃</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    const GOOGLE_CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
-    const ALLOWED_EMAILS = ["gudwnqn109@gmail.com"];
-
-    // ★ 여기에 새로운 메뉴 '투자비 현황'이 추가되었습니다.
-    const MENU_ITEMS = [
-      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
-      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
-      { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', category: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'amber' },
-      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
-      // 새롭게 추가된 메뉴
-      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', category: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', accent: 'indigo' }
+    // Config
+    const CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
+    const ALLOWED = ["gudwnqn109@gmail.com"];
+    const PIN_KEY = 'wm_portal_pinned_menus_v4';
+    const MENU = [
+      { id: 'dashboard', title: '통합 대시보드', subtitle: '매장별 실시간 매출 및 상권 분석', url: './dashboard.html.html', cat: '매출·실적', badge: 'MAIN', icon: 'fa-solid fa-gauge-high', acc: 'amber' },
+      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', cat: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', acc: 'amber' },
+      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', cat: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', acc: 'blue' },
+      { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', cat: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', acc: 'amber' },
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', cat: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', acc: 'indigo' },
+      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' }
     ];
-
-    const ACCENT_STYLES = {
-      amber: { iconBg: 'bg-amber-500/15', iconText: 'text-amber-700', badge: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
-      blue: { iconBg: 'bg-blue-500/12', iconText: 'text-blue-700', badge: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
-      indigo: { iconBg: 'bg-indigo-500/12', iconText: 'text-indigo-700', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
+    const ACC = {
+      amber: { bg: 'bg-amber-500/15', txt: 'text-amber-700', bdg: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
+      blue:  { bg: 'bg-blue-500/12', txt: 'text-blue-700', bdg: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
+      indigo:{ bg: 'bg-indigo-500/12', txt: 'text-indigo-700', bdg: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
     };
 
-    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v4';
-    let pinnedMenuIds = ['daily', 'sellthru_fw'];
-    let selectedCategory = '전체';
-    let currentView = 'home';
-    let splitMode = 1;
-    let singleMenuId = 'daily';
-    let leftMenuId = 'daily';
-    let rightMenuId = 'sellthru_fw';
-    let currentUser = null;
-    let isPreviewEnv = false;
+    // State
+    const $ = id => document.getElementById(id);
+    let pins = ['dashboard', 'daily', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
+    let smId = 'dashboard', lmId = 'dashboard', rmId = 'daily';
+    let user = null, isPrev = false;
 
-    function detectPreviewEnvironment() {
-      try {
-        const isFramed = window.self !== window.top;
-        const host = window.location.hostname || '';
-        const proto = window.location.protocol || '';
-        return (
-          isFramed ||
-          host.includes('googleusercontent.com') ||
-          host.includes('usercontent.goog') ||
-          host.includes('localhost') ||
-          host === '' ||
-          proto === 'blob:' ||
-          proto === 'about:' ||
-          proto === 'file:'
-        );
-      } catch (e) {
-        return true;
-      }
+    // Helpers
+    const getM = id => MENU.find(m => m.id === id) || MENU[0];
+    const isPin = id => pins.includes(id);
+    const sortM = arr => [...arr].sort((a,b) => (pins.indexOf(a.id)>-1?-1:1) - (pins.indexOf(b.id)>-1?-1:1));
+    const groupBy = arr => arr.reduce((acc, m) => ((acc[m.cat] = acc[m.cat] || []).push(m), acc), {});
+    const toggleDrawer = show => $('drawer').classList[show?'remove':'add']('hidden');
+
+    function togglePin(id, e) {
+      if(e) e.stopPropagation();
+      pins = isPin(id) ? pins.filter(x => x !== id) : [...pins, id];
+      localStorage.setItem(PIN_KEY, JSON.stringify(pins));
+      syncUI();
     }
 
-    function loadPins() {
-      const validIds = new Set(MENU_ITEMS.map(m => m.id));
-      try {
-        const raw = localStorage.getItem(PIN_STORAGE_KEY);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed)) {
-            pinnedMenuIds = parsed.filter(id => validIds.has(id));
-            return;
-          }
-        }
-      } catch (e) {}
-      pinnedMenuIds = validIds.has('daily') ? ['daily', 'sellthru_fw'] : [];
+    function syncUI() {
+      renderSide(); renderHome(); renderQuick(); renderDrawer();
+      if(split === 2) renderSplitPanes();
+      updateHeader();
     }
 
-    function savePins() {
-      try {
-        localStorage.setItem(PIN_STORAGE_KEY, JSON.stringify(pinnedMenuIds));
-      } catch (e) {}
-    }
-
-    function getAccentStyle(accent) {
-      return ACCENT_STYLES[accent] || ACCENT_STYLES.amber;
-    }
-
-    function isMenuPinned(menuId) {
-      return pinnedMenuIds.includes(menuId);
-    }
-
-    function sortMenusByPin(items) {
-      return [...items].sort((a, b) => {
-        const aPinIdx = pinnedMenuIds.indexOf(a.id);
-        const bPinIdx = pinnedMenuIds.indexOf(b.id);
-        const aPinned = aPinIdx !== -1;
-        const bPinned = bPinIdx !== -1;
-        if (aPinned && bPinned) return aPinIdx - bPinIdx;
-        if (aPinned) return -1;
-        if (bPinned) return 1;
-        return 0;
-      });
-    }
-
-    function toggleMenuPin(menuId, event) {
-      if (event) event.stopPropagation();
-      if (isMenuPinned(menuId)) {
-        pinnedMenuIds = pinnedMenuIds.filter(id => id !== menuId);
+    // UI Renders
+    function updateHeader() {
+      $('btnModeSingle').className = split===1 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white flex gap-1.5' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex gap-1.5';
+      $('btnModeSplit').className = split===2 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-amber-400 flex gap-1.5' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex gap-1.5';
+      
+      const homeBtn = $('sidebarHomeBtn');
+      if (view === 'home') {
+        homeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 transition';
+        $('headerTitle').innerText = 'WM중부 통합 영업 포털';
+        const d = new Date();
+        $('headerSubtitle').innerText = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
       } else {
-        pinnedMenuIds.push(menuId);
-      }
-      savePins();
-      syncPortalUI();
-    }
-
-    function syncPortalUI() {
-      renderDesktopSidebar();
-      renderHome();
-      renderQuickSwitcherBar();
-      populateSplitSelects();
-      updateHeaderAndToggleUI();
-      document.getElementById('drawerMenuCountBadge').innerText = `${MENU_ITEMS.length}개`;
-      if (!document.getElementById('allMenusDrawer').classList.contains('hidden')) {
-        renderDrawerMenuList();
+        homeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-300 transition';
+        const m = getM(split===1 ? smId : lmId);
+        $('headerTitle').innerText = split===1 ? m.title : `${getM(lmId).title} ⇄ ${getM(rmId).title}`;
+        $('headerSubtitle').innerText = split===1 ? m.subtitle : '2분할 비교 모드';
       }
     }
 
-    function updateHeaderAndToggleUI() {
-      const btn1 = document.getElementById('btnModeSingle');
-      const btn2 = document.getElementById('btnModeSplit');
-      const sideHomeBtn = document.getElementById('sidebarHomeBtn');
-      const mobileHomeBtn = document.getElementById('mobileHomeBtn');
-      const titleEl = document.getElementById('headerTitle');
-      const subEl = document.getElementById('headerSubtitle');
-
-      if (splitMode === 1) {
-        btn1.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white shadow-2xs flex items-center gap-1.5 transition';
-        btn2.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition';
-      } else {
-        btn1.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 hover:text-[#18181B] flex items-center gap-1.5 transition';
-        btn2.className = 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-amber-400 shadow-2xs flex items-center gap-1.5 transition';
-      }
-
-      if (currentView === 'home') {
-        sideHomeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition';
-        if (mobileHomeBtn) mobileHomeBtn.className = 'lg:hidden w-8 h-8 rounded-lg bg-[#18181B] text-amber-400 border border-[#18181B] flex items-center justify-center transition active:scale-95 shrink-0';
-        titleEl.innerText = 'WM중부 통합 영업 포털';
-        const now = new Date();
-        const days = ['일', '월', '화', '수', '목', '금', '토'];
-        subEl.innerText = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
-      } else {
-        sideHomeBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition';
-        if (mobileHomeBtn) mobileHomeBtn.className = 'lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition active:scale-95 shrink-0';
-
-        if (splitMode === 1) {
-          const m = MENU_ITEMS.find(item => item.id === singleMenuId) || MENU_ITEMS[0];
-          titleEl.innerText = m.title;
-          subEl.innerText = m.subtitle;
-        } else {
-          const lm = MENU_ITEMS.find(item => item.id === leftMenuId) || MENU_ITEMS[0];
-          const rm = MENU_ITEMS.find(item => item.id === rightMenuId) || MENU_ITEMS[2];
-          titleEl.innerText = `${lm.title}  ⇄  ${rm.title}`;
-          subEl.innerText = '2분할 좌·우 비교 모드';
-        }
-      }
-    }
-
-    function renderDesktopSidebar() {
-      const container = document.getElementById('sidebarMenuGroups');
-      if (!container) return;
-
-      const searchInput = document.getElementById('sidebarSearchInput');
-      const q = (searchInput ? searchInput.value : '').trim().toLowerCase();
-      const filtered = MENU_ITEMS.filter(item =>
-        !q || item.title.toLowerCase().includes(q) || item.category.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q)
-      );
-
-      const grouped = {};
-      filtered.forEach(item => {
-        if (!grouped[item.category]) grouped[item.category] = [];
-        grouped[item.category].push(item);
-      });
-
-      container.innerHTML = Object.entries(grouped).map(([categoryName, items]) => {
-        const sortedItems = sortMenusByPin(items);
-        return `
-          <div class="space-y-1">
-            <div class="px-2.5 pb-0.5">
-              <span class="text-[10.5px] font-bold tracking-wider text-zinc-500 uppercase">${categoryName}</span>
-            </div>
-            <div class="space-y-0.5">
-              ${sortedItems.map(item => {
-                const isActive = currentView === 'viewer' && (splitMode === 1 ? singleMenuId === item.id : (leftMenuId === item.id || rightMenuId === item.id));
-                const pinned = isMenuPinned(item.id);
-                return `
-                  <div onclick="openMenu('${item.id}')" class="group flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer transition ${isActive ? 'bg-zinc-800/95 text-white font-bold ring-1 ring-amber-400/40' : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/80 font-medium'}">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <i class="${item.icon} text-xs w-4 text-center ${isActive ? 'text-amber-400' : 'text-zinc-500 group-hover:text-zinc-300'}"></i>
-                      <span class="text-xs truncate">${item.title}</span>
-                    </div>
-                    <button onclick="toggleMenuPin('${item.id}', event)" class="w-6 h-6 rounded-lg flex items-center justify-center transition ${pinned ? 'text-amber-400' : 'text-zinc-600 opacity-0 group-hover:opacity-100'}" title="${pinned ? '즐겨찾기 해제' : '즐겨찾기 고정'}">
-                      <i class="fa-solid fa-star text-[10px]"></i>
-                    </button>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
+    function renderSide() {
+      const q = ($('sidebarSearchInput')?.value || '').trim().toLowerCase();
+      const groups = groupBy(MENU.filter(m => !q || m.title.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q)));
+      
+      $('sidebarMenuGroups').innerHTML = Object.entries(groups).map(([cat, items]) => `
+        <div class="space-y-1"><div class="px-2.5 pb-0.5 text-[10.5px] font-bold text-zinc-500">${cat}</div>
+          <div class="space-y-0.5">${sortM(items).map(m => {
+            const act = view==='viewer' && (split===1 ? smId===m.id : (lmId===m.id||rmId===m.id));
+            return `<div onclick="openM('${m.id}')" class="group flex justify-between px-3 py-2 rounded-xl cursor-pointer ${act?'bg-zinc-800/95 text-white font-bold ring-1 ring-amber-400':'text-zinc-400 hover:bg-zinc-900/80'}">
+              <div class="flex items-center gap-2.5"><i class="${m.icon} text-xs w-4 text-center ${act?'text-amber-400':''}"></i><span class="text-xs">${m.title}</span></div>
+              <button onclick="togglePin('${m.id}', event)" class="w-6 h-6 flex justify-center items-center ${isPin(m.id)?'text-amber-400':'opacity-0 group-hover:opacity-100'}"><i class="fa-solid fa-star text-[10px]"></i></button>
+            </div>`;
+          }).join('')}</div></div>
+      `).join('');
     }
 
     function renderHome() {
-      const categoryCounts = {};
-      MENU_ITEMS.forEach(item => {
-        categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
-      });
-
-      const uniqueCategories = Object.keys(categoryCounts);
-      if (selectedCategory !== '전체' && !uniqueCategories.includes(selectedCategory)) {
-        selectedCategory = '전체';
-      }
-
-      const categories = ['전체', ...uniqueCategories];
-      document.getElementById('categoryPillsContainer').innerHTML = categories.map(cat => {
-        const isActive = selectedCategory === cat;
-        const count = cat === '전체' ? MENU_ITEMS.length : categoryCounts[cat];
-        return `
-          <button onclick="selectCategory('${cat}')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition active:scale-95 ${isActive ? 'bg-[#18181B] text-white font-bold shadow-xs' : 'bg-white text-zinc-600 hover:text-[#18181B] border border-[#E6E4DD] font-semibold'}">
-            <span>${cat}</span>
-            <span class="text-[10.5px] ${isActive ? 'text-amber-400' : 'text-zinc-400'}">${count}</span>
-          </button>
-        `;
+      const cats = ['전체', ...new Set(MENU.map(m=>m.cat))];
+      $('catPills').innerHTML = cats.map(c => {
+        const act = selCat === c, cnt = c === '전체' ? MENU.length : MENU.filter(m=>m.cat===c).length;
+        return `<button onclick="selCat='${c}'; renderHome()" class="px-3.5 py-1.5 rounded-full text-xs font-semibold ${act?'bg-[#18181B] text-white':'bg-white text-zinc-600 border'}"><span>${c}</span> <span class="${act?'text-amber-400':'text-zinc-400'}">${cnt}</span></button>`;
       }).join('');
 
-      let filteredItems = MENU_ITEMS;
-      if (selectedCategory !== '전체') {
-        filteredItems = MENU_ITEMS.filter(m => m.category === selectedCategory);
-      }
-      const gridItems = sortMenusByPin(filteredItems);
-
-      const gridContainer = document.getElementById('bentoGridContainer');
-      gridContainer.innerHTML = gridItems.map(item => {
-        const style = getAccentStyle(item.accent);
-        const pinned = isMenuPinned(item.id);
-        return `
-          <article onclick="openMenu('${item.id}')" class="group bg-white border border-[#E6E4DD] hover:border-[#18181B]/45 hover:shadow-lg rounded-2xl lg:rounded-3xl p-4 lg:p-5 flex flex-col justify-between min-h-[152px] lg:min-h-[176px] cursor-pointer transition-all duration-200 active:scale-[0.98] shadow-[0_2px_8px_rgba(24,24,27,0.03)] animate-view">
-            <div class="flex items-start justify-between">
-              <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-xl lg:rounded-2xl ${style.iconBg} ${style.iconText} flex items-center justify-center text-[15px] lg:text-base shrink-0 group-hover:scale-105 transition-transform"><i class="${item.icon}"></i></div>
-              <button onclick="toggleMenuPin('${item.id}', event)" class="w-7 h-7 -mr-1 -mt-0.5 rounded-lg flex items-center justify-center hover:bg-[#F7F6F2] transition active:scale-90 ${pinned ? 'text-amber-500' : 'text-zinc-300 hover:text-zinc-500'}" title="${pinned ? '즐겨찾기 해제' : '즐겨찾기 고정'}"><i class="fa-solid fa-star text-xs"></i></button>
-            </div>
-            <div class="mt-4">
-              <div class="flex items-center gap-1.5">
-                <span class="text-[9.5px] lg:text-[10px] font-extrabold border px-1.5 py-0.5 rounded ${style.badge}">${item.badge}</span>
-                <span class="text-[10.5px] lg:text-[11px] font-semibold text-zinc-400 truncate">${item.category}</span>
-              </div>
-              <h3 class="text-[15px] lg:text-[17px] font-extrabold text-[#18181B] tracking-tight mt-1.5 truncate group-hover:text-amber-700 transition-colors">${item.title}</h3>
-              <p class="text-[11px] lg:text-xs font-medium text-zinc-500 truncate mt-1">${item.subtitle}</p>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-
-    function selectCategory(cat) {
-      selectedCategory = cat;
-      renderHome();
-    }
-
-    function goHome(updateHash = true) {
-      currentView = 'home';
-      document.getElementById('viewerView').classList.add('hidden');
-      document.getElementById('homeView').classList.remove('hidden');
-
-      if (updateHash && window.location.hash) {
-        try {
-          if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-          } else {
-            window.location.hash = '';
-          }
-        } catch (e) {
-          window.location.hash = '';
-        }
-      }
-      syncPortalUI();
-    }
-
-    function setViewSplitMode(mode) {
-      splitMode = mode;
-      if (currentView === 'home') {
-        if (mode === 2) openViewer();
-        else updateHeaderAndToggleUI();
-        return;
-      }
-      if (mode === 2 && leftMenuId === rightMenuId) {
-        const fallback = MENU_ITEMS.find(m => m.id !== leftMenuId);
-        if (fallback) rightMenuId = fallback.id;
-      }
-      openViewer();
-    }
-
-    function openMenu(menuId, updateHash = true) {
-      if (!currentUser || (!isPreviewEnv && !ALLOWED_EMAILS.includes(currentUser.email))) {
-        document.getElementById('authOverlay').classList.remove('hidden');
-        return;
-      }
-      const menu = MENU_ITEMS.find(m => m.id === menuId);
-      if (!menu) return;
-
-      closeAllMenusDrawer();
-
-      if (splitMode === 1) {
-        singleMenuId = menu.id;
-        leftMenuId = menu.id;
-      } else {
-        leftMenuId = menu.id;
-        if (rightMenuId === leftMenuId) {
-          const alt = MENU_ITEMS.find(m => m.id !== leftMenuId);
-          if (alt) rightMenuId = alt.id;
-        }
-      }
-
-      if (updateHash && splitMode === 1 && window.location.hash !== `#${menu.id}`) {
-        window.location.hash = menu.id;
-      }
-      openViewer();
-    }
-
-    function openViewer() {
-      currentView = 'viewer';
-      document.getElementById('homeView').classList.add('hidden');
-      document.getElementById('viewerView').classList.remove('hidden');
-
-      const singleContainer = document.getElementById('singleViewContainer');
-      const splitContainer = document.getElementById('splitViewContainer');
-
-      if (splitMode === 1) {
-        splitContainer.classList.add('hidden');
-        singleContainer.classList.remove('hidden');
-        renderQuickSwitcherBar();
-        mountViewerContent(document.getElementById('singleViewerBody'), singleMenuId);
-      } else {
-        singleContainer.classList.add('hidden');
-        splitContainer.classList.remove('hidden');
-        populateSplitSelects();
-        mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
-        mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
-      }
-
-      renderDesktopSidebar();
-      updateHeaderAndToggleUI();
-    }
-
-    function populateSplitSelects() {
-      const leftSel = document.getElementById('leftPaneSelect');
-      const rightSel = document.getElementById('rightPaneSelect');
-      if (!leftSel || !rightSel) return;
-
-      leftSel.innerHTML = MENU_ITEMS.map(m => `<option value="${m.id}" ${m.id === leftMenuId ? 'selected' : ''}>${m.title} (${m.category})</option>`).join('');
-      rightSel.innerHTML = MENU_ITEMS.map(m => `<option value="${m.id}" ${m.id === rightMenuId ? 'selected' : ''}>${m.title} (${m.category})</option>`).join('');
-    }
-
-    function changeSplitPaneMenu(side, newMenuId) {
-      if (side === 'left') {
-        leftMenuId = newMenuId;
-        mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
-      } else {
-        rightMenuId = newMenuId;
-        mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
-      }
-      renderDesktopSidebar();
-      updateHeaderAndToggleUI();
-    }
-
-    function swapSplitPanes() {
-      const temp = leftMenuId;
-      leftMenuId = rightMenuId;
-      rightMenuId = temp;
-      populateSplitSelects();
-      mountViewerContent(document.getElementById('leftPaneBody'), leftMenuId);
-      mountViewerContent(document.getElementById('rightPaneBody'), rightMenuId);
-      updateHeaderAndToggleUI();
-    }
-
-    function expandPaneToSingle(side) {
-      singleMenuId = (side === 'left') ? leftMenuId : rightMenuId;
-      splitMode = 1;
-      openViewer();
-    }
-
-    function renderQuickSwitcherBar() {
-      const orderedItems = sortMenusByPin(MENU_ITEMS);
-      const container = document.getElementById('quickSwitcherBar');
-      if (!container) return;
-
-      container.innerHTML = orderedItems.map(item => {
-        const isActive = item.id === singleMenuId;
-        const pinned = isMenuPinned(item.id);
-        return `
-          <button data-tab-id="${item.id}" onclick="openMenu('${item.id}')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition active:scale-95 ${isActive ? 'bg-[#18181B] text-white font-bold shadow-xs' : 'bg-white text-zinc-600 hover:text-[#18181B] border border-[#E6E4DD] font-semibold'}">
-            <i class="${item.icon} text-[10.5px] ${isActive ? 'text-amber-400' : ''}"></i>
-            <span>${item.title}</span>
-            ${pinned && !isActive ? '<i class="fa-solid fa-star text-[8px] text-amber-500"></i>' : ''}
-          </button>
-        `;
-      }).join('');
-
-      requestAnimationFrame(() => {
-        const activeTab = container.querySelector(`[data-tab-id="${singleMenuId}"]`);
-        if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      });
-    }
-
-    function mountViewerContent(containerEl, menuId) {
-      if (!containerEl) return;
-      const menuObj = MENU_ITEMS.find(m => m.id === menuId) || MENU_ITEMS[0];
-
-      containerEl.innerHTML = `
-        <div class="pane-loader absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center z-10 transition-opacity duration-200">
-          <i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-700 mb-2"></i>
-          <span class="text-xs font-semibold text-zinc-600">${menuObj.title} 불러오는 중...</span>
-        </div>
-      `;
-
-      const iframe = document.createElement('iframe');
-      iframe.src = menuObj.url;
-      if (currentUser) {
-        iframe.setAttribute('data-user-email', currentUser.email);
-      }
-      iframe.onload = () => {
-        const loader = containerEl.querySelector('.pane-loader');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => { loader.style.display = 'none'; }, 180);
-        }
-        if (iframe.contentWindow && currentUser) {
-          iframe.contentWindow.postMessage({ type: 'WM_PORTAL_AUTH', user: currentUser }, '*');
-        }
-      };
-      containerEl.appendChild(iframe);
-    }
-
-    function openAllMenusDrawer() {
-      document.getElementById('drawerMenuCountBadge').innerText = `${MENU_ITEMS.length}개`;
-      renderDrawerMenuList();
-      document.getElementById('allMenusDrawer').classList.remove('hidden');
-    }
-
-    function closeAllMenusDrawer() {
-      document.getElementById('allMenusDrawer').classList.add('hidden');
-    }
-
-    function renderDrawerMenuList() {
-      const container = document.getElementById('drawerMenuList');
-      const grouped = {};
-      MENU_ITEMS.forEach(item => {
-        if (!grouped[item.category]) grouped[item.category] = [];
-        grouped[item.category].push(item);
-      });
-
-      container.innerHTML = Object.entries(grouped).map(([categoryName, items]) => {
-        const sortedItems = sortMenusByPin(items);
-        return `
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between px-1">
-              <span class="text-[11px] font-extrabold text-zinc-500">${categoryName}</span>
-              <span class="text-[11px] font-semibold text-zinc-400">${sortedItems.length}개</span>
-            </div>
-            <div class="bg-white border border-[#E6E4DD] rounded-2xl divide-y divide-[#F0EEE9] overflow-hidden">
-              ${sortedItems.map(item => {
-                const style = getAccentStyle(item.accent);
-                const pinned = isMenuPinned(item.id);
-                return `
-                  <div onclick="openMenu('${item.id}')" class="px-3.5 py-3 flex items-center justify-between gap-2.5 cursor-pointer hover:bg-[#FAF9F6] active:bg-[#F3F1EB] transition">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <div class="w-9 h-9 rounded-xl ${style.iconBg} ${style.iconText} flex items-center justify-center text-[14px] shrink-0"><i class="${item.icon}"></i></div>
-                      <div class="min-w-0">
-                        <div class="flex items-center gap-1.5"><span class="text-[14px] font-bold text-[#18181B] truncate">${item.title}</span><span class="text-[9.5px] font-extrabold border px-1.5 py-0.2 rounded shrink-0 ${style.badge}">${item.badge}</span></div>
-                        <p class="text-[11.5px] text-zinc-500 truncate mt-0.5">${item.subtitle}</p>
-                      </div>
-                    </div>
-                    <button onclick="toggleMenuPin('${item.id}', event)" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F7F6F2] transition ${pinned ? 'text-amber-500' : 'text-zinc-300'}" title="즐겨찾기 고정"><i class="fa-solid fa-star text-[11px]"></i></button>
-                  </div>
-                `;
-              }).join('')}
-            </div>
+      $('bentoGrid').innerHTML = sortM(selCat==='전체' ? MENU : MENU.filter(m=>m.cat===selCat)).map(m => `
+        <article onclick="openM('${m.id}')" class="group bg-white border border-[#E6E4DD] hover:shadow-lg rounded-2xl p-4 lg:p-5 flex flex-col justify-between cursor-pointer active:scale-95 animate-view">
+          <div class="flex justify-between items-start">
+            <div class="w-10 h-10 rounded-xl ${ACC[m.acc].bg} ${ACC[m.acc].txt} flex justify-center items-center group-hover:scale-105 transition"><i class="${m.icon}"></i></div>
+            <button onclick="togglePin('${m.id}', event)" class="text-xs p-1 ${isPin(m.id)?'text-amber-500':'text-zinc-300'}"><i class="fa-solid fa-star"></i></button>
           </div>
-        `;
-      }).join('');
+          <div class="mt-4">
+            <div class="flex gap-1.5 items-center"><span class="text-[9px] font-extrabold border px-1.5 py-0.5 rounded ${ACC[m.acc].bdg}">${m.badge}</span><span class="text-[10px] text-zinc-400">${m.cat}</span></div>
+            <h3 class="text-[15px] font-extrabold mt-1.5 truncate group-hover:text-amber-700">${m.title}</h3>
+            <p class="text-[11px] text-zinc-500 truncate mt-1">${m.subtitle}</p>
+          </div>
+        </article>
+      `).join('');
     }
 
-    function parseJwt(token) {
+    function renderQuick() {
+      $('quickBar').innerHTML = sortM(MENU).map(m => `
+        <button onclick="openM('${m.id}')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition ${m.id===smId?'bg-[#18181B] text-white font-bold':'bg-white text-zinc-600 border'}">
+          <i class="${m.icon} text-[10px] ${m.id===smId?'text-amber-400':''}"></i><span>${m.title}</span>${isPin(m.id)&&m.id!==smId?'<i class="fa-solid fa-star text-[8px] text-amber-500"></i>':''}
+        </button>`).join('');
+    }
+
+    function renderDrawer() {
+      $('drawCount').innerText = `${MENU.length}개`;
+      $('drawerList').innerHTML = Object.entries(groupBy(MENU)).map(([c, items]) => `
+        <div class="space-y-1.5"><div class="flex justify-between px-1 text-[11px] text-zinc-500 font-bold"><span>${c}</span></div>
+        <div class="bg-white border rounded-2xl divide-y overflow-hidden">${sortM(items).map(m => `
+          <div onclick="openM('${m.id}')" class="px-3 py-3 flex justify-between cursor-pointer hover:bg-zinc-50">
+            <div class="flex gap-3"><div class="w-9 h-9 rounded-xl flex justify-center items-center ${ACC[m.acc].bg} ${ACC[m.acc].txt}"><i class="${m.icon}"></i></div>
+            <div><div class="flex gap-1.5"><span class="text-sm font-bold">${m.title}</span><span class="text-[9px] border px-1 rounded ${ACC[m.acc].bdg}">${m.badge}</span></div><p class="text-[11px] text-zinc-500">${m.subtitle}</p></div></div>
+            <button onclick="togglePin('${m.id}', event)" class="${isPin(m.id)?'text-amber-500':'text-zinc-300'}"><i class="fa-solid fa-star text-[11px]"></i></button>
+          </div>`).join('')}</div></div>
+      `).join('');
+    }
+
+    // Split Pane Logic
+    function getPaneHtml(side, mId) {
+      const opts = MENU.map(m => `<option value="${m.id}" ${m.id===mId?'selected':''}>${m.title}</option>`).join('');
+      return `
+        <div class="flex flex-col bg-white rounded-2xl border shadow-sm h-full overflow-hidden animate-view">
+          <div class="bg-[#18181B] text-white px-3 py-2 flex justify-between gap-2 shrink-0">
+            <div class="flex gap-2 items-center flex-1"><span class="px-2 py-0.5 rounded text-[10px] font-black ${side==='L'?'bg-amber-400 text-black':'bg-zinc-700 text-amber-300'}">${side==='L'?'좌측':'우측'}</span>
+            <select onchange="changeSplit('${side}', this.value)" class="flex-1 bg-zinc-800 text-xs font-bold px-2 py-1 rounded-lg border-zinc-700 text-white outline-none cursor-pointer">${opts}</select></div>
+            <div class="flex gap-1"><button onclick="swapSplit()" class="w-7 h-7 bg-zinc-800 text-zinc-300 rounded-lg flex justify-center items-center"><i class="fa-solid fa-right-left"></i></button>
+            <button onclick="smId='${mId}'; setSplitMode(1);" class="w-7 h-7 bg-zinc-800 text-zinc-300 rounded-lg flex justify-center items-center"><i class="fa-solid fa-expand"></i></button></div>
+          </div>
+          <div id="paneBody${side}" class="flex-1 relative bg-white overflow-hidden"></div>
+        </div>`;
+    }
+
+    function renderSplitPanes() {
+      $('splitView').innerHTML = getPaneHtml('L', lmId) + getPaneHtml('R', rmId);
+      loadIframe('paneBodyL', lmId); loadIframe('paneBodyR', rmId);
+    }
+    function changeSplit(s, id) { s==='L' ? lmId=id : rmId=id; renderSplitPanes(); updateHeader(); renderSide(); }
+    function swapSplit() { [lmId, rmId] = [rmId, lmId]; renderSplitPanes(); updateHeader(); }
+
+    function loadIframe(containerId, mId) {
+      const c = $(containerId); if(!c) return;
+      c.innerHTML = `<div class="absolute inset-0 bg-white/80 flex flex-col justify-center items-center z-10 loader"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-600"></i></div>
+                     <iframe src="${getM(mId).url}" onload="this.previousElementSibling.style.display='none'"></iframe>`;
+    }
+
+    // Navigation & Auth
+    function setSplitMode(m) {
+      split = m;
+      if (view === 'home' && m === 2) openM(lmId);
+      else if (view !== 'home') openM(split === 1 ? smId : lmId);
+      else updateHeader();
+    }
+
+    function goHome() {
+      view = 'home'; $('viewerView').classList.add('hidden'); $('homeView').classList.remove('hidden');
+      window.location.hash = ''; syncUI();
+    }
+
+    function openM(id) {
+      if(!user && !isPrev) return $('authOverlay').classList.remove('hidden');
+      toggleDrawer(false); view = 'viewer';
+      if(split === 1) { smId = lmId = id; window.location.hash = id; } 
+      else { lmId = id; if(rmId===lmId) rmId = MENU.find(m=>m.id!==id)?.id; }
+      
+      $('homeView').classList.add('hidden'); $('viewerView').classList.remove('hidden');
+      if(split === 1) { $('splitView').classList.add('hidden'); $('singleView').classList.remove('hidden'); loadIframe('singleBody', smId); }
+      else { $('singleView').classList.add('hidden'); $('splitView').classList.remove('hidden'); renderSplitPanes(); }
+      syncUI();
+    }
+
+    function handleAuth(res) {
       try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-        return JSON.parse(jsonPayload);
-      } catch (e) {
-        return null;
-      }
+        const payload = JSON.parse(atob(res.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if(ALLOWED.includes(payload.email)) {
+          user = { email: payload.email, name: payload.name };
+          localStorage.setItem('wm_user', JSON.stringify(user));
+          initPortal();
+        } else $('authErrorMsg').innerHTML = `권한 없음 (${payload.email})`, $('authErrorMsg').classList.remove('hidden');
+      } catch(e) {}
     }
 
-    function handleCredentialResponse(response) {
-      const data = parseJwt(response.credential);
-      const errorMsgEl = document.getElementById('authErrorMsg');
-
-      if (!data || !data.email) {
-        errorMsgEl.innerText = "계정 정보를 확인할 수 없습니다.";
-        errorMsgEl.classList.remove('hidden');
-        return;
-      }
-
-      if (ALLOWED_EMAILS.includes(data.email)) {
-        const userObj = { email: data.email, name: data.name || 'WM중부 관리자' };
-        try { localStorage.setItem('wm_portal_user', JSON.stringify(userObj)); } catch(e) {}
-        unlockPortal(userObj, false);
-      } else {
-        errorMsgEl.innerHTML = `접근 권한이 없는 계정입니다.<br><span class="text-slate-300">(${data.email})</span>`;
-        errorMsgEl.classList.remove('hidden');
-        try { localStorage.removeItem('wm_portal_user'); } catch(e) {}
-      }
+    function initPortal() {
+      $('authOverlay').classList.add('hidden');
+      $('sidebarUserName').innerText = user?.name || '관리자';
+      $('sidebarUserEmail').innerText = user?.email || '';
+      $('drawerEmail').innerText = user?.email || '';
+      const h = window.location.hash.replace('#','');
+      h && MENU.some(m=>m.id===h) ? openM(h) : goHome();
     }
 
-    function unlockPortal(userObj, isDemo = false) {
-      if (!isDemo && (!userObj || !ALLOWED_EMAILS.includes(userObj.email))) {
-        try { localStorage.removeItem('wm_portal_user'); } catch(e) {}
-        return;
-      }
-
-      currentUser = userObj;
-      document.getElementById('authOverlay').classList.add('hidden');
-
-      const drawerEmail = document.getElementById('drawerUserEmail');
-      const sidebarEmail = document.getElementById('sidebarUserEmail');
-      const sidebarName = document.getElementById('sidebarUserName');
-      if (drawerEmail) drawerEmail.innerText = userObj.email;
-      if (sidebarEmail) sidebarEmail.innerText = userObj.email;
-      if (sidebarName) sidebarName.innerText = userObj.name || 'WM중부 관리자';
-
-      const hashMenuId = window.location.hash.replace('#', '');
-      if (hashMenuId && MENU_ITEMS.some(m => m.id === hashMenuId)) {
-        openMenu(hashMenuId, false);
-      } else {
-        goHome(false);
-      }
-    }
-
-    function handleLogout() {
-      document.getElementById('logoutModal').classList.remove('hidden');
-    }
-
-    function closeLogoutModal() {
-      document.getElementById('logoutModal').classList.add('hidden');
-    }
-
-    function confirmLogout() {
-      try { localStorage.removeItem('wm_portal_user'); } catch(e) {}
-      currentUser = null;
-      closeLogoutModal();
-      location.reload();
-    }
-
-    function initGoogleAuth() {
-      isPreviewEnv = detectPreviewEnvironment();
-
-      if (isPreviewEnv) {
-        unlockPortal({ email: ALLOWED_EMAILS[0], name: 'WM중부 미리보기' }, true);
-        return;
-      }
-
-      let savedUser = null;
-      try {
-        savedUser = localStorage.getItem('wm_portal_user');
-      } catch (e) {
-        console.warn('보안 설정/시크릿 모드로 인한 localStorage 접근 차단 감지');
-      }
-
-      if (savedUser) {
-        try {
-          const userObj = JSON.parse(savedUser);
-          if (userObj && ALLOWED_EMAILS.includes(userObj.email)) {
-            unlockPortal(userObj, false);
-            return;
-          }
-        } catch (e) {
-          try { localStorage.removeItem('wm_portal_user'); } catch(err) {}
-        }
-      }
-
-      document.getElementById('authOverlay').classList.remove('hidden');
-
-      let attempts = 0;
-      const checkGsi = setInterval(() => {
-        attempts++;
-        if (window.google && google.accounts && google.accounts.id) {
-          clearInterval(checkGsi);
-          google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleCredentialResponse
-          });
-          google.accounts.id.renderButton(
-            document.getElementById("googleBtnWrapper"),
-            { theme: "filled_blue", size: "large", shape: "pill", width: 240, text: "signin_with" }
-          );
-        } else if (attempts > 50) {
-          clearInterval(checkGsi);
-          const wrapper = document.getElementById("googleBtnWrapper");
-          if(wrapper) {
-            wrapper.innerHTML = '<p class="text-[11px] text-rose-400 font-semibold mt-2 leading-relaxed">구글 로그인 모듈을 불러올 수 없습니다.<br>광고 차단기나 사내망 보안(Cloudflare 등) 설정을 확인해주세요.</p>';
-          }
-        }
-      }, 100);
-    }
+    function confirmLogout() { localStorage.removeItem('wm_user'); location.reload(); }
+    function handleLogout() { $('logoutModal').classList.remove('hidden'); }
 
     window.addEventListener('hashchange', () => {
-      if (!currentUser || (!isPreviewEnv && !ALLOWED_EMAILS.includes(currentUser.email))) return;
-      const hashMenuId = window.location.hash.replace('#', '');
-      if (hashMenuId && MENU_ITEMS.some(m => m.id === hashMenuId)) {
-        if (currentView !== 'viewer' || splitMode !== 1 || singleMenuId !== hashMenuId) {
-          splitMode = 1;
-          openMenu(hashMenuId, false);
-        }
-      } else if (currentView !== 'home') {
-        goHome(false);
-      }
+      if(!user && !isPrev) return;
+      const h = window.location.hash.replace('#','');
+      if (h && MENU.some(m=>m.id===h) && (view!=='viewer' || smId!==h)) { split=1; openM(h); }
+      else if (!h && view !== 'home') goHome();
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadPins();
-      syncPortalUI();
-      initGoogleAuth();
-    });
+    window.onload = () => {
+      try { pins = JSON.parse(localStorage.getItem(PIN_KEY)) || pins; } catch(e){}
+      isPrev = (window.self !== window.top) || location.hostname.includes('localhost') || !location.hostname;
+      if (isPrev) { user = { email: ALLOWED[0], name: '미리보기' }; initPortal(); }
+      else {
+        try { user = JSON.parse(localStorage.getItem('wm_user')); } catch(e){}
+        if(user && ALLOWED.includes(user.email)) initPortal();
+        else {
+          $('authOverlay').classList.remove('hidden');
+          let cnt = 0; const t = setInterval(() => {
+            if(window.google?.accounts) {
+              clearInterval(t);
+              google.accounts.id.initialize({ client_id: CLIENT_ID, callback: handleAuth });
+              google.accounts.id.renderButton($("googleBtnWrapper"), { theme: "filled_blue", size: "large", shape: "pill", width: 240 });
+            } else if(++cnt > 50) { clearInterval(t); $("googleBtnWrapper").innerHTML='<p class="text-rose-400 text-xs">구글 로그인을 불러올 수 없습니다.</p>'; }
+          }, 100);
+        }
+      }
+      syncUI();
+    };
   </script>
 </body>
 </html>
