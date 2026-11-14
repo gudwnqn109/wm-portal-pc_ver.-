@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FW 주간 매장별 판매율 대시보드 (PC/시트연동)</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <style>
+    body { 
+      font-family: 'Pretendard', sans-serif; 
+      background-color: #F7F6F2; 
+      color: #18181B;
+      margin: 0; 
+    }
+    .bar-bg { background-color: #E6E4DD; border-radius: 9999px; overflow: hidden; height: 8px; }
+    .bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s ease; }
+    
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(161, 161, 170, 0.4); border-radius: 9999px; }
+  </style>
+</head>
+<body class="pb-12 min-h-screen flex flex-col">
+
+  <!-- 상단 컨트롤 헤더 -->
+  <header class="bg-white border-b border-[#E6E4DD] sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2 py-0.5 rounded tracking-tight">WM중부</span>
+          <h1 class="text-lg font-extrabold tracking-tight text-[#18181B]">FW 매장별 판매율 대시보드</h1>
+        </div>
+        <p id="dateInfo" class="text-xs text-zinc-500 mt-1 font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-notch fa-spin text-amber-500" id="syncIcon"></i>
+          <span id="syncStatusText">구글 시트 데이터 연동 중...</span>
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="loadGoogleSheetData()" class="bg-white border border-[#E6E4DD] hover:bg-zinc-50 text-zinc-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>새로고침</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 검색 및 필터 바 -->
+    <div class="max-w-7xl mx-auto px-5 pb-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-[#F7F6F2] p-3 rounded-xl border border-[#DFDDD4]">
+        <div>
+          <label class="block text-[10.5px] font-extrabold text-zinc-500 uppercase mb-1.5 pl-1">1. 지점 선택</label>
+          <select id="branchSelect" onchange="onBranchChange()" class="w-full bg-white border border-[#E6E4DD] rounded-lg px-3 py-2 text-sm font-semibold text-[#18181B] focus:ring-2 focus:ring-amber-400 focus:outline-none transition">
+            <option value="ALL">전체 합계 로딩 중...</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10.5px] font-extrabold text-zinc-500 uppercase mb-1.5 pl-1">2. 매장 검색</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass text-zinc-400 text-xs absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" id="storeSearchInput" oninput="handleSearchInput()" placeholder="용인점, WMH099..." class="w-full bg-white border border-[#E6E4DD] rounded-lg pl-8 pr-3 py-2 text-sm font-medium text-[#18181B] focus:ring-2 focus:ring-amber-400 focus:outline-none transition" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10.5px] font-extrabold text-zinc-500 uppercase mb-1.5 pl-1">3. 조회 대상 선택</label>
+          <select id="storeSelect" onchange="renderDashboard()" class="w-full bg-[#18181B] border border-[#18181B] text-amber-400 rounded-lg px-3 py-2 text-sm font-bold focus:ring-2 focus:ring-amber-400 focus:outline-none transition cursor-pointer">
+            <option value="SUMMARY">👉 대기 중...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-5 mt-6 space-y-6">
+
+    <!-- 선택 정보 배너 -->
+    <div id="targetBanner" class="bg-white p-4 rounded-2xl border border-[#DFDDD4] shadow-sm flex flex-wrap items-center justify-between gap-4 hidden animate-view">
+      <div class="flex items-center gap-3">
+        <span class="px-2.5 py-1 bg-zinc-800 text-amber-300 rounded-lg font-black text-xs shrink-0" id="badgeType">지점합계</span>
+        <div>
+          <h2 class="font-extrabold text-lg text-[#18181B]" id="targetTitle">-</h2>
+          <p class="text-xs text-zinc-500 font-medium mt-0.5" id="targetSub">-</p>
+        </div>
+      </div>
+      <div class="text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-lg border border-zinc-200" id="targetGrade">
+        종합 등급: -
+      </div>
+    </div>
+
+    <!-- 시즌 선택 탭 -->
+    <div class="flex gap-2 border-b border-[#E6E4DD] pb-3">
+      <button onclick="setSeason('가을')" id="tab-가을" class="season-tab px-5 py-2 rounded-xl text-sm font-extrabold bg-[#18181B] text-white shadow-sm transition active:scale-95">🍂 가을 시즌</button>
+      <button onclick="setSeason('겨울')" id="tab-겨울" class="season-tab px-5 py-2 rounded-xl text-sm font-bold bg-white text-zinc-600 hover:text-[#18181B] hover:bg-zinc-50 border border-[#DFDDD4] transition active:scale-95">❄️ 겨울 시즌</button>
+      <button onclick="setSeason('FW사계절')" id="tab-FW사계절" class="season-tab px-5 py-2 rounded-xl text-sm font-bold bg-white text-zinc-600 hover:text-[#18181B] hover:bg-zinc-50 border border-[#DFDDD4] transition active:scale-95">👔 FW 사계절</button>
+    </div>
+
+    <!-- [파트 1] 브랜드별 판매율 요약 -->
+    <section>
+      <div class="flex items-center justify-between mb-3 pl-1">
+        <h2 class="text-[15px] font-extrabold text-[#18181B]">📌 브랜드별 금액 판매율 (<span id="seasonLabel1" class="text-amber-600">가을</span>)</h2>
+        <span class="text-[11px] font-medium text-zinc-400 bg-white px-2 py-0.5 rounded border border-[#E6E4DD]">판매금액 ÷ 공급금액</span>
+      </div>
+      <div id="brandSummaryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- 로딩 스켈레톤 -->
+        <div class="col-span-full py-12 text-center text-zinc-400 font-medium text-sm">
+          시트 데이터를 불러오는 중입니다...
+        </div>
+      </div>
+    </section>
+
+    <!-- [파트 2] 복종별 수량 판매율 상세 -->
+    <section class="bg-white rounded-2xl shadow-sm border border-[#DFDDD4] overflow-hidden">
+      <div class="p-4 border-b border-[#E6E4DD] bg-zinc-50/50 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-[15px] font-extrabold text-[#18181B]">👕 아이템별 수량 판매율 상세 (<span id="seasonLabel2" class="text-amber-600">가을</span>)</h2>
+          <p class="text-[11px] text-zinc-500 mt-1 font-medium">출고수량 대비 판매수량 및 지점/전국 평균 비교</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div id="brandFilterBtns" class="flex flex-wrap gap-1.5"></div>
+          <select id="sortSelect" onchange="renderDashboard()" class="bg-white border border-[#DFDDD4] rounded-lg px-3 py-1.5 text-xs font-bold text-[#18181B] focus:outline-none shadow-sm cursor-pointer ml-2">
+            <option value="default">기본 정렬순</option>
+            <option value="rate_desc">🔥 판매율 높은순</option>
+            <option value="sale_desc">📈 판매량 많은순</option>
+            <option value="out_desc">📦 출고량 많은순</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-[#F7F6F2] text-zinc-500 text-xs font-extrabold uppercase border-b border-[#E6E4DD]">
+              <th class="py-3 px-4">브랜드</th>
+              <th class="py-3 px-3 text-center">코드</th>
+              <th class="py-3 px-4">복종명 (아이템)</th>
+              <th class="py-3 px-3 text-right">출고</th>
+              <th class="py-3 px-3 text-right">판매</th>
+              <th class="py-3 px-3 text-right">재고</th>
+              <th class="py-3 px-4 text-right">판매율</th>
+              <th class="py-3 px-3 text-right">지점평균</th>
+              <th class="py-3 px-3 text-right">전국평균</th>
+              <th class="py-3 px-4 text-center w-32 hidden sm:table-cell">그래프</th>
+            </tr>
+          </thead>
+          <tbody id="itemTableBody" class="divide-y divide-[#F0EEE9]">
+            <tr><td colspan="10" class="py-10 text-center text-zinc-400 font-medium">데이터 로딩 중...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const DEFAULT_GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1LaxftgRnopl8GMdLwTd2fpWCX-2ObHJzmXm45Ixsu0c/edit?gid=1705650572#gid=1705650572";
+    
+    const BRANCH_MAP = { 'F': '서울', 'G': '경기', 'H': '강원' };
+    
+    let parsedData = null;
+    let currentSeason = '가을';
+    let currentBrand = 'ALL';
+
+    function getBranchKor(code) {
+      return BRANCH_MAP[code] ? `${BRANCH_MAP[code]}지점` : (code ? `${code}지점` : '전국');
+    }
+
+    function parseNum(val) {
+      if (!val) return 0;
+      if (typeof val === 'number') return val;
+      let n = parseFloat(String(val).replace(/,/g, '').replace(/%/g, '').trim());
+      return isNaN(n) ? 0 : n;
+    }
+
+    function extractSheetId(input) {
+      const match = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      return match ? match[1] : input;
+    }
+
+    function loadGoogleSheetData() {
+      const sheetId = extractSheetId(DEFAULT_GOOGLE_SHEET_URL);
+      const icon = document.getElementById('syncIcon');
+      const text = document.getElementById('syncStatusText');
+      
+      icon.className = 'fa-solid fa-circle-notch fa-spin text-amber-500';
+      text.innerText = '구글 시트 실시간 연동 중...';
+      text.className = 'text-xs text-amber-600 mt-1 font-bold flex items-center gap-1.5';
+
+      const oldScript = document.getElementById('gviz_jsonp_script');
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement('script');
+      script.id = 'gviz_jsonp_script';
+      // '정상' 시트 강제 조회
+      script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGoogleSheetJSONP&sheet=${encodeURIComponent('정상')}&headers=0&t=${Date.now()}`;
+      
+      script.onerror = () => {
+        icon.className = 'fa-solid fa-circle-exclamation text-rose-500';
+        text.innerText = '데이터 연동 실패. 시트 공유 권한을 확인해주세요.';
+        text.className = 'text-xs text-rose-500 mt-1 font-bold flex items-center gap-1.5';
+      };
+      
+      document.body.appendChild(script);
+    }
+
+    // Google 시트 데이터 스키마 정의 (sellthru.html 로직 적용)
+    function buildExactSheetSchema() {
+      const mainBrands4 = [['IN', '인디안'], ['BF', '브루노바피'], ['DL', '데일리스트'], ['RE', '더레이블']];
+      const mainBrands5 = [...mainBrands4, ['합계', '합계']];
+      const fwBrands2 = [['BF', '브루노바피'], ['DU', '두아니']];
+      const fwBrands3 = [...fwBrands2, ['합계', '합계']];
+      const metrics = ['등급', '공급금액', '판매금액', '매출금액', '판매율'];
+
+      const summaryMeta = [];
+      let col = 3; 
+
+      ['가을', '겨울'].forEach(season => {
+        metrics.forEach(metric => {
+          const list = (metric === '등급') ? mainBrands4 : mainBrands5;
+          list.forEach(([bCode, bName]) => { summaryMeta.push({ col: col++, season, metric, brandCode: bCode, brandName: bName }); });
+        });
+      });
+
+      metrics.forEach(metric => {
+        const list = (metric === '등급') ? fwBrands2 : fwBrands3;
+        list.forEach(([bCode, bName]) => { summaryMeta.push({ col: col++, season: 'FW사계절', metric, brandCode: bCode, brandName: bName }); });
+      });
+
+      const itemGroups = [
+        { season: "가을", brandCode: "IN", brandName: "인디안", items: [["AL", "티셔츠 긴팔"], ["BC", "니트 가디건"], ["BH", "니트 하프터틀"], ["BL", "니트(긴팔)"], ["BP", "니트 폴로"], ["BR", "니트 라운드"], ["BV", "니트 베스트"], ["CL", "점퍼 긴팔"], ["DA", "셋업긴바지"], ["DL", "긴바지"], ["EH", "핸드메이드 하프코트"], ["FA", "셋업자켓"], ["FU", "캐주얼 쟈켓"], ["JN", "가죽 납빠"], ["KA", "사파리"], ["NL", "남방 긴팔"], ["합계", "합계"]] },
+        { season: "가을", brandCode: "BF", brandName: "브루노바피", items: [["BC", "니트 가디건"], ["BP", "니트 폴로"], ["BR", "니트 라운드"], ["CL", "점퍼 긴팔"], ["DA", "셋업긴바지"], ["DL", "긴바지"], ["FA", "셋업자켓"], ["FF", "포멀 쟈켓"], ["GA", "정장 자켓"], ["GB", "정장 바지"], ["GC", "정장 베스트"], ["NL", "남방 긴팔"], ["TL", "드레스셔츠 긴팔"], ["합계", "합계"]] },
+        { season: "가을", brandCode: "DL", brandName: "데일리스트", items: [["AL", "티셔츠 긴팔"], ["AS", "티셔츠 반팔"], ["BC", "니트 가디건"], ["BL", "니트(긴팔)"], ["BS", "니트(반팔)"], ["CL", "점퍼 긴팔"], ["DA", "셋업긴바지"], ["DK", "스커트"], ["DL", "긴바지"], ["EB", "바바리"], ["FA", "셋업자켓"], ["FU", "캐주얼 쟈켓"], ["MJ", "쟈켓/점퍼"], ["MP", "바지"], ["MS", "스커트"], ["NL", "남방 긴팔"], ["NS", "남방 반팔"], ["OA", "원피스"], ["QC", "베스트 캐주얼"], ["합계", "합계"]] },
+        { season: "가을", brandCode: "RE", brandName: "더레이블", items: [["AL", "티셔츠 긴팔"], ["BH", "니트 하프터틀"], ["BL", "니트(긴팔)"], ["BR", "니트 라운드"], ["CL", "점퍼 긴팔"], ["DL", "긴바지"], ["FU", "캐주얼 쟈켓"], ["KA", "사파리"], ["NL", "남방 긴팔"], ["QC", "베스트 캐주얼"], ["합계", "합계"]] },
+        { season: "겨울", brandCode: "IN", brandName: "인디안", items: [["AL", "티셔츠 긴팔"], ["BC", "니트 가디건"], ["BF", "니트 롱터틀"], ["BH", "니트 하프터틀"], ["BL", "니트(긴팔)"], ["BO", "니트 오픈베스트"], ["BP", "니트 폴로"], ["BR", "니트 라운드"], ["BV", "니트 베스트"], ["CL", "점퍼 긴팔"], ["DL", "긴바지"], ["EH", "핸드메이드 하프코트"], ["FU", "캐주얼 쟈켓"], ["KA", "사파리"], ["NL", "남방 긴팔"], ["QC", "베스트 캐주얼"], ["합계", "합계"]] },
+        { season: "겨울", brandCode: "BF", brandName: "브루노바피", items: [["BF", "니트 롱터틀"], ["BP", "니트 폴로"], ["BR", "니트 라운드"], ["CL", "점퍼 긴팔"], ["DA", "셋업긴바지"], ["DL", "긴바지"], ["EL", "롱코트"], ["FA", "셋업자켓"], ["FF", "포멀 쟈켓"], ["GA", "정장 자켓"], ["GB", "정장 바지"], ["합계", "합계"]] },
+        { season: "겨울", brandCode: "DL", brandName: "데일리스트", items: [["AL", "티셔츠 긴팔"], ["BC", "니트 가디건"], ["BL", "니트(긴팔)"], ["BV", "니트 베스트"], ["DA", "셋업긴바지"], ["DK", "스커트"], ["DL", "긴바지"], ["EA", "하프코트"], ["FA", "셋업자켓"], ["FU", "캐주얼 쟈켓"], ["JF", "데이텀 FUR류"], ["JN", "가죽 납빠"], ["KA", "사파리"], ["KD", "다운 사파리"], ["MP", "바지"], ["QC", "베스트 캐주얼"], ["합계", "합계"]] },
+        { season: "겨울", brandCode: "RE", brandName: "더레이블", items: [["BC", "니트 가디건"], ["BF", "니트 롱터틀"], ["BH", "니트 하프터틀"], ["BL", "니트(긴팔)"], ["BO", "니트 오픈베스트"], ["BR", "니트 라운드"], ["BV", "니트 베스트"], ["CL", "점퍼 긴팔"], ["DL", "긴바지"], ["FU", "캐주얼 쟈켓"], ["NL", "남방 긴팔"], ["합계", "합계"]] },
+        { season: "FW사계절", brandCode: "BF", brandName: "브루노바피", items: [["SN", "넥타이"], ["합계", "합계"]] },
+        { season: "FW사계절", brandCode: "DU", brandName: "두아니", items: [["UA", "숄더, 호보"], ["UB", "보스턴, 토트"], ["UE", "크로스"], ["VA", "자동"], ["XA", "양말1족"], ["XE", "모자"], ["XF", "스카프"], ["XG", "머플러"], ["YA", "장갑"], ["YS", "구두/신발"], ["합계", "합계"]] }
+      ];
+
+      const itemMeta = [];
+      itemGroups.forEach(g => {
+        g.items.forEach(([iCode, iName]) => {
+          itemMeta.push({ colOut: col, colSale: col + 1, colRate: col + 2, season: g.season, brandCode: g.brandCode, brandName: g.brandName, itemCode: iCode, itemName: iName });
+          col += 3;
+        });
+      });
+
+      return { summaryMeta, itemMeta };
+    }
+
+    window.handleGoogleSheetJSONP = function(response) {
+      try {
+        const rawRows = response.table.rows || [];
+        const rows = rawRows.map(r => (r.c || []).map(cell => (cell && cell.v !== undefined && cell.v !== null) ? cell.v : null));
+        
+        let baseDate = '업데이트됨';
+        for (let r = 0; r < Math.min(6, rows.length); r++) {
+          if (!rows[r]) continue;
+          const found = rows[r].find(c => String(c || '').includes('기준일자'));
+          if (found) baseDate = String(found).replace(/기준일자\s*:\s*/g, '').trim();
+        }
+
+        const { summaryMeta, itemMeta } = buildExactSheetSchema();
+        const stores = [];
+        const branches = new Set();
+        
+        // WM중부 포털 기준: 서울(F), 경기(G), 강원(H) 지점만 포함
+        const targetBranches = new Set(['F', 'G', 'H']);
+
+        for (let r = 0; r < rows.length; r++) {
+          const row = rows[r];
+          if (!row) continue;
+          const branch = row[0] ? String(row[0]).trim() : '';
+          const code = row[1] ? String(row[1]).trim() : '';
+          const name = row[2] ? String(row[2]).trim() : '';
+
+          if (!branch || !code || ['지점', '합계', '등급별', '지점별'].includes(branch) || code.startsWith('#') || code.includes('매장코드')) continue;
+          if (!targetBranches.has(branch)) continue; // 타겟 지점 외 스킵
+
+          branches.add(branch);
+          stores.push({ branch, code, name, raw: row });
+        }
+
+        parsedData = { summaryMeta, itemMeta, stores, branches: Array.from(branches).sort() };
+        
+        const icon = document.getElementById('syncIcon');
+        const text = document.getElementById('syncStatusText');
+        icon.className = 'fa-solid fa-circle-check text-emerald-600';
+        text.innerText = `기준일자: ${baseDate} | ${stores.length}개 매장 로드 완료`;
+        text.className = 'text-xs text-emerald-700 mt-1 font-bold flex items-center gap-1.5';
+
+        initControls();
+        renderDashboard();
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    function initControls() {
+      const branchSelect = document.getElementById('branchSelect');
+      branchSelect.innerHTML = `<option value="ALL">전체 지점 (${parsedData.stores.length}개 매장)</option>`;
+      parsedData.branches.forEach(b => {
+        const cnt = parsedData.stores.filter(s => s.branch === b).length;
+        branchSelect.innerHTML += `<option value="${b}">${getBranchKor(b)} (${cnt}개)</option>`;
+      });
+      updateStoreDropdown();
+    }
+
+    function onBranchChange() {
+      document.getElementById('storeSearchInput').value = '';
+      updateStoreDropdown();
+      renderDashboard();
+    }
+
+    function handleSearchInput() {
+      updateStoreDropdown();
+      const storeSelect = document.getElementById('storeSelect');
+      storeSelect.selectedIndex = (document.getElementById('storeSearchInput').value.trim() !== '' && storeSelect.options.length > 1) ? 1 : 0;
+      renderDashboard();
+    }
+
+    function updateStoreDropdown() {
+      const branch = document.getElementById('branchSelect').value;
+      const kw = document.getElementById('storeSearchInput').value.trim().toLowerCase();
+      const storeSelect = document.getElementById('storeSelect');
+
+      let filtered = parsedData.stores;
+      if (branch !== 'ALL') filtered = filtered.filter(s => s.branch === branch);
+      if (kw) filtered = filtered.filter(s => s.name.toLowerCase().includes(kw) || s.code.toLowerCase().includes(kw));
+
+      const bKor = branch === 'ALL' ? '전체' : getBranchKor(branch);
+      storeSelect.innerHTML = `<option value="SUMMARY">👉 [${bKor}] 합계 보기 (${filtered.length}개)</option>`;
+      filtered.forEach(s => {
+        storeSelect.innerHTML += `<option value="${s.code}">[${BRANCH_MAP[s.branch]}] ${s.name} (${s.code})</option>`;
+      });
+    }
+
+    function setSeason(season) {
+      currentSeason = season;
+      currentBrand = 'ALL';
+      document.querySelectorAll('.season-tab').forEach(btn => {
+        btn.className = 'season-tab px-5 py-2 rounded-xl text-sm font-bold bg-white text-zinc-600 hover:text-[#18181B] hover:bg-zinc-50 border border-[#DFDDD4] transition active:scale-95';
+      });
+      document.getElementById(`tab-${season}`).className = 'season-tab px-5 py-2 rounded-xl text-sm font-extrabold bg-[#18181B] text-white shadow-sm transition active:scale-95';
+      document.getElementById('seasonLabel1').innerText = season;
+      document.getElementById('seasonLabel2').innerText = season;
+      renderDashboard();
+    }
+
+    function setBrandFilter(b) {
+      currentBrand = b;
+      renderDashboard();
+    }
+
+    function getTarget() {
+      const branch = document.getElementById('branchSelect').value;
+      const storeCode = document.getElementById('storeSelect').value;
+      const kw = document.getElementById('storeSearchInput').value.trim().toLowerCase();
+
+      if (storeCode !== 'SUMMARY') {
+        const found = parsedData.stores.find(s => s.code === storeCode);
+        return {
+          type: '개별매장',
+          title: found ? found.name : storeCode,
+          sub: found ? `매장코드: ${found.code} | 소속: ${getBranchKor(found.branch)}` : '',
+          branchCode: found ? found.branch : '',
+          grade: found ? (found.raw[3] || '-') : '-',
+          rows: found ? [found.raw] : []
+        };
+      } else {
+        let list = parsedData.stores;
+        if (branch !== 'ALL') list = list.filter(s => s.branch === branch);
+        if (kw) list = list.filter(s => s.name.toLowerCase().includes(kw) || s.code.toLowerCase().includes(kw));
+        return {
+          type: branch === 'ALL' ? 'WM중부 전체' : '지점합계',
+          title: branch === 'ALL' ? 'WM중부 전 지점 합계' : `${getBranchKor(branch)} 합계`,
+          sub: `총 ${list.length}개 매장 합산`,
+          branchCode: branch,
+          grade: '-',
+          rows: list.map(s => s.raw)
+        };
+      }
+    }
+
+    function calcAverages(seasonSummaryCols, seasonItems, branchCode) {
+      let natBr = {}, brBr = {}, natIt = {}, brIt = {};
+      let allSt = parsedData.stores, brSt = branchCode && branchCode !== 'ALL' ? allSt.filter(s => s.branch === branchCode) : allSt;
+
+      seasonSummaryCols.forEach(m => {
+        if (m.metric === '공급금액') {
+          let cSale = seasonSummaryCols.find(x => x.brandCode === m.brandCode && x.season === m.season && x.metric === '판매금액');
+          if(!cSale) return;
+          let nSup = 0, nSal = 0, bSup = 0, bSal = 0;
+          allSt.forEach(s => { nSup += parseNum(s.raw[m.col]); nSal += parseNum(s.raw[cSale.col]); });
+          brSt.forEach(s => { bSup += parseNum(s.raw[m.col]); bSal += parseNum(s.raw[cSale.col]); });
+          natBr[m.brandCode] = nSup > 0 ? (nSal / nSup) * 100 : 0;
+          brBr[m.brandCode] = bSup > 0 ? (bSal / bSup) * 100 : 0;
+        }
+      });
+
+      seasonItems.forEach(m => {
+        let nOut = 0, nSal = 0, bOut = 0, bSal = 0;
+        allSt.forEach(s => { nOut += parseNum(s.raw[m.colOut]); nSal += parseNum(s.raw[m.colSale]); });
+        brSt.forEach(s => { bOut += parseNum(s.raw[m.colOut]); bSal += parseNum(s.raw[m.colSale]); });
+        natIt[m.itemCode + '_' + m.brandCode] = nOut > 0 ? (nSal / nOut) * 100 : 0;
+        brIt[m.itemCode + '_' + m.brandCode] = bOut > 0 ? (bSal / bOut) * 100 : 0;
+      });
+      return { natBr, brBr, natIt, brIt };
+    }
+
+    function renderDashboard() {
+      if (!parsedData) return;
+      const target = getTarget();
+
+      document.getElementById('targetBanner').classList.remove('hidden');
+      document.getElementById('badgeType').innerText = target.type;
+      document.getElementById('targetTitle').innerText = target.title;
+      document.getElementById('targetSub').innerText = target.sub;
+      document.getElementById('targetGrade').innerText = target.grade !== '-' ? `종합 등급: ${target.grade}` : '종합 등급: 합계';
+
+      const sSum = parsedData.summaryMeta.filter(m => m.season === currentSeason);
+      const sItm = parsedData.itemMeta.filter(m => m.season === currentSeason);
+      const avgs = calcAverages(sSum, sItm, target.branchCode);
+
+      const brands = [];
+      sSum.forEach(m => { if (m.brandCode && !brands.find(b => b.code === m.brandCode)) brands.push({ code: m.brandCode, name: m.brandName }); });
+
+      // 파트 1: 브랜드 카드 렌더링
+      const brandCardsHtml = brands.map(b => {
+        const cSup = sSum.find(m => m.brandCode === b.code && m.metric === '공급금액');
+        const cSal = sSum.find(m => m.brandCode === b.code && m.metric === '판매금액');
+        const cGrd = sSum.find(m => m.brandCode === b.code && m.metric === '등급');
+
+        let sup = 0, sal = 0, grd = '-';
+        target.rows.forEach(r => {
+          if (cSup) sup += parseNum(r[cSup.col]);
+          if (cSal) sal += parseNum(r[cSal.col]);
+        });
+        if (target.rows.length === 1 && cGrd) grd = String(target.rows[0][cGrd.col] || '-').trim();
+        
+        const rate = sup > 0 ? (sal / sup) * 100 : 0;
+        const isTotal = (b.code === '합계');
+
+        return `
+          <div class="p-4 flex flex-col justify-between rounded-xl border ${isTotal ? 'bg-[#18181B] text-white border-[#18181B] shadow-md sm:col-span-2 lg:col-span-1' : 'bg-white border-[#DFDDD4] shadow-sm'}">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-extrabold text-[13px] ${isTotal ? 'text-amber-400' : 'text-[#18181B]'}">${b.name}</span>
+                ${grd !== '-' && grd !== '미입점' && !isTotal ? `<span class="text-[10.5px] px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 font-extrabold">${grd}등급</span>` : ''}
+                ${grd === '미입점' && !isTotal ? `<span class="text-[10.5px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-400 font-bold">미입점</span>` : ''}
+              </div>
+              <div class="text-[22px] font-black tracking-tight ${isTotal ? 'text-white' : 'text-[#18181B]'} mb-3">${rate.toFixed(1)}%</div>
+              <div class="bar-bg mb-4 ${isTotal ? 'bg-zinc-700' : ''}">
+                <div class="bar-fill ${rate >= 20 ? 'bg-emerald-500' : rate >= 12 ? 'bg-amber-500' : 'bg-rose-500'}" style="width: ${Math.min(rate * 2.5, 100)}%"></div>
+              </div>
+            </div>
+            <div class="space-y-1 text-[11px] pt-2 border-t ${isTotal ? 'border-zinc-700 text-zinc-400' : 'border-[#E6E4DD] text-zinc-500'}">
+              <div class="flex justify-between"><span>지점평균</span><span class="font-bold ${avgs.brBr[b.code] <= rate ? 'text-emerald-500' : 'text-rose-400'}">${(avgs.brBr[b.code]||0).toFixed(1)}%</span></div>
+              <div class="flex justify-between"><span>전국평균</span><span class="font-bold ${avgs.natBr[b.code] <= rate ? 'text-emerald-500' : 'text-rose-400'}">${(avgs.natBr[b.code]||0).toFixed(1)}%</span></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('brandSummaryGrid').innerHTML = brandCardsHtml;
+
+      // 브랜드 필터 버튼
+      const itemBrands = [];
+      sItm.forEach(m => { if (m.brandCode && !itemBrands.find(b => b.code === m.brandCode)) itemBrands.push({ code: m.brandCode, name: m.brandName }); });
+      let filterBtnsHtml = `<button onclick="setBrandFilter('ALL')" class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition ${currentBrand === 'ALL' ? 'bg-[#18181B] text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}">전체보기</button>`;
+      itemBrands.forEach(b => {
+        const act = currentBrand === b.code;
+        filterBtnsHtml += `<button onclick="setBrandFilter('${b.code}')" class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition ${act ? 'bg-amber-400 text-zinc-900 shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}">${b.name}</button>`;
+      });
+      document.getElementById('brandFilterBtns').innerHTML = filterBtnsHtml;
+
+      // 파트 2: 테이블 렌더링
+      let fItm = currentBrand === 'ALL' ? sItm : sItm.filter(m => m.brandCode === currentBrand);
+      let rData = fItm.map(m => {
+        let outQ = 0, salQ = 0;
+        target.rows.forEach(r => { outQ += parseNum(r[m.colOut]); salQ += parseNum(r[m.colSale]); });
+        const rate = outQ > 0 ? (salQ / outQ) * 100 : 0;
+        const key = m.itemCode + '_' + m.brandCode;
+        return { ...m, outQ, salQ, stkQ: outQ - salQ, rate, brAvg: avgs.brIt[key]||0, natAvg: avgs.natIt[key]||0 };
+      });
+
+      const sort = document.getElementById('sortSelect').value;
+      if (sort !== 'default') {
+        const nrm = rData.filter(d => d.itemCode !== '합계');
+        const tot = rData.filter(d => d.itemCode === '합계');
+        if (sort === 'rate_desc') nrm.sort((a, b) => b.rate - a.rate);
+        if (sort === 'sale_desc') nrm.sort((a, b) => b.salQ - a.salQ);
+        if (sort === 'out_desc') nrm.sort((a, b) => b.outQ - a.outQ);
+        rData = [...nrm, ...tot];
+      }
+
+      const tbodyHtml = rData.map(d => {
+        const isTot = d.itemCode === '합계';
+        const trCls = isTot ? 'bg-amber-50/50 font-extrabold text-[#18181B] border-t-2 border-amber-200' : 'hover:bg-zinc-50 font-medium text-zinc-800 transition-colors';
+        const rateCol = d.rate >= 20 ? 'text-emerald-600 font-extrabold' : d.rate >= 12 ? 'text-amber-600 font-bold' : 'text-zinc-600';
+        const barCol = d.rate >= 20 ? 'bg-emerald-500' : d.rate >= 12 ? 'bg-amber-500' : 'bg-zinc-400';
+
+        return `
+          <tr class="${trCls}">
+            <td class="py-3 px-4">${d.brandName}</td>
+            <td class="py-3 px-3 text-center text-xs font-mono text-zinc-400">${d.itemCode}</td>
+            <td class="py-3 px-4 text-[13px]">${d.itemName}</td>
+            <td class="py-3 px-3 text-right font-mono">${Math.round(d.outQ).toLocaleString()}</td>
+            <td class="py-3 px-3 text-right font-mono text-blue-600 font-bold">${Math.round(d.salQ).toLocaleString()}</td>
+            <td class="py-3 px-3 text-right font-mono text-zinc-400">${Math.round(d.stkQ).toLocaleString()}</td>
+            <td class="py-3 px-4 text-right font-mono ${rateCol}">${d.rate.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-right font-mono text-zinc-500">${d.brAvg.toFixed(1)}%</td>
+            <td class="py-3 px-3 text-right font-mono text-zinc-500">${d.natAvg.toFixed(1)}%</td>
+            <td class="py-3 px-4 hidden sm:table-cell align-middle">
+              <div class="bar-bg"><div class="bar-fill ${barCol}" style="width: ${Math.min(d.rate * 2, 100)}%"></div></div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('itemTableBody').innerHTML = tbodyHtml || '<tr><td colspan="10" class="py-10 text-center text-zinc-400 text-sm">해당 조건의 데이터가 없습니다.</td></tr>';
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadGoogleSheetData();
+    });
+  </script>
+</body>
+</html>
