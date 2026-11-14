@@ -136,14 +136,16 @@
       </div>
 
       <!-- 3. 메인 콘텐츠 영역 (좌측 요약 프로필 / 우측 상세 정보 분할) -->
-      <div class="flex flex-col lg:flex-row gap-6 items-start">
+      <!-- ★ items-stretch를 주어 좌우 높이를 똑같이 맞춥니다 -->
+      <div class="flex flex-col lg:flex-row gap-5 items-stretch">
         
         <!-- [좌측] 핵심 투자비 요약 (Hero Card) -->
-        <!-- lg:sticky를 주어 우측 스크롤 시 좌측 정보가 고정되도록 합니다. -->
-        <div id="heroSummaryCard" class="w-full lg:w-[320px] xl:w-[360px] shrink-0 bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden border border-indigo-800/40 transition-all duration-300 lg:sticky lg:top-6">
+        <div id="heroSummaryCard" class="w-full lg:w-[320px] xl:w-[360px] shrink-0 bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden border border-indigo-800/40 transition-all duration-300 flex flex-col">
           <div id="heroGlow" class="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-500 opacity-20 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div class="relative z-10 flex flex-col gap-6">
+          <!-- 좌측 콘텐츠가 부모 높이에 맞춰 유연하게 분산되도록 flex-1 적용 -->
+          <div class="relative z-10 flex flex-col flex-1">
+            
             <!-- 타이틀 및 점주 -->
             <div>
               <div class="flex items-center gap-2 mb-3">
@@ -156,7 +158,7 @@
             </div>
 
             <!-- 대형 지표 2개 -->
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3 mt-6">
               <!-- 총 투자비 -->
               <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex flex-col justify-between">
                 <div>
@@ -186,8 +188,8 @@
               </div>
             </div>
 
-            <!-- 하단 4칸 스트립 (2x2 그리드 배치) -->
-            <div class="grid grid-cols-2 gap-2 tabular-nums">
+            <!-- 하단 4칸 스트립 (mt-auto를 주어 항상 바닥에 밀착되게 설정) -->
+            <div class="grid grid-cols-2 gap-2 tabular-nums mt-auto pt-6">
               <div class="bg-black/25 rounded-xl p-3 border border-white/5 flex flex-col justify-center items-center">
                 <div class="text-[11px] text-white/65">월세</div>
                 <div id="stripRent" class="text-sm font-extrabold text-emerald-300 mt-1.5 truncate">-</div>
@@ -205,126 +207,132 @@
                 <div id="stripMargin" class="text-sm font-extrabold text-amber-300 mt-1.5 truncate">-</div>
               </div>
             </div>
+
           </div>
         </div>
 
         <!-- [우측] 상세 정보 그리드 영역 -->
-        <!-- 기본 제원과 투자비 카드는 좌우 배치, 마진 카드는 하단 전체 차지 -->
-        <div class="flex-1 w-full grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <!-- ★ flex-col 구성을 통해 안쪽 카드들이 공간을 나눠 갖게 설정 -->
+        <div class="flex-1 w-full flex flex-col gap-5 min-w-0">
           
-          <!-- 상세 카드 1: 기본 제원 & 점주 운영정보 -->
-          <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
-                <i class="fa-solid fa-store text-indigo-600"></i>
-                <span>기본 제원 & 점주 정보</span>
+          <!-- 상단 카드 1, 2 (좌우 병렬 배치) -->
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            
+            <!-- 상세 카드 1: 기본 제원 & 점주 운영정보 -->
+            <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                  <i class="fa-solid fa-store text-indigo-600"></i>
+                  <span>기본 제원 & 점주 정보</span>
+                </div>
+                <span id="currentSelectedStoreName" class="text-[11px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">-</span>
               </div>
-              <span id="currentSelectedStoreName" class="text-[11px] font-black text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">-</span>
+
+              <div class="grid grid-cols-2 gap-3 text-xs flex-1">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">최초 오픈일자</div>
+                  <div id="detailOpenDate" class="font-bold text-slate-800 text-sm tabular-nums">-</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">최근 점정비 (내역)</div>
+                  <div id="detailRenovDate" class="font-bold text-slate-800 text-xs leading-5 flex items-center flex-wrap gap-1">-</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">매장 평수</div>
+                  <div id="detailArea" class="font-bold text-slate-800 text-sm">-</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">전면 파사드 (전/측)</div>
+                  <div id="detailFront" class="font-bold text-slate-800 text-sm">-</div>
+                </div>
+              </div>
+
+              <!-- 점주 운영정보 -->
+              <div id="ownerInfoRow" class="pt-3 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500 px-1 border-t border-slate-100 shrink-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
+                    <i class="fa-solid fa-user-tie"></i>
+                  </span>
+                  <span>대표자:</span>
+                  <strong id="detailRepName" class="text-slate-800 text-sm">-</strong>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
+                    <i class="fa-solid fa-user-check"></i>
+                  </span>
+                  <span>실운영:</span>
+                  <strong id="detailOpName" class="text-slate-800 text-sm">-</strong>
+                  <span id="detailOpAge" class="text-slate-400 tabular-nums">(-)</span>
+                  <span id="ownerDiffBadge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/70">위탁·가족운영</span>
+                </div>
+              </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 text-xs flex-1">
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">최초 오픈일자</div>
-                <div id="detailOpenDate" class="font-bold text-slate-800 text-sm tabular-nums">-</div>
+            <!-- 상세 카드 2: 투자비 및 인테리어 분담 -->
+            <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
+                <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
+                  <i class="fa-solid fa-coins text-emerald-500"></i>
+                  <span>투자비 및 인테리어 분담</span>
+                </div>
+                <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
+                  총 투자 = 보증 + 권리
+                </span>
               </div>
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">최근 점정비 (내역)</div>
-                <div id="detailRenovDate" class="font-bold text-slate-800 text-xs leading-5 flex items-center flex-wrap gap-1">-</div>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">매장 평수</div>
-                <div id="detailArea" class="font-bold text-slate-800 text-sm">-</div>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">전면 파사드 (전/측)</div>
-                <div id="detailFront" class="font-bold text-slate-800 text-sm">-</div>
-              </div>
-            </div>
 
-            <!-- 점주 운영정보 -->
-            <div id="ownerInfoRow" class="pt-3 flex items-center justify-between flex-wrap gap-2 text-xs text-slate-500 px-1 border-t border-slate-100 shrink-0">
-              <div class="flex items-center gap-1.5">
-                <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
-                  <i class="fa-solid fa-user-tie"></i>
-                </span>
-                <span>대표자:</span>
-                <strong id="detailRepName" class="text-slate-800 text-sm">-</strong>
+              <div class="grid grid-cols-3 gap-3 text-center text-xs tabular-nums flex-1">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">전세보증금</div>
+                  <div id="investDep" class="font-extrabold text-indigo-600 text-sm lg:text-base">-</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">권리금</div>
+                  <div id="investPrem" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
+                  <div class="text-[11px] text-slate-400 mb-1">월세</div>
+                  <div id="investRent" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 flex items-center justify-center text-[10px]">
-                  <i class="fa-solid fa-user-check"></i>
-                </span>
-                <span>실운영:</span>
-                <strong id="detailOpName" class="text-slate-800 text-sm">-</strong>
-                <span id="detailOpAge" class="text-slate-400 tabular-nums">(-)</span>
-                <span id="ownerDiffBadge" class="hidden text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/70">위탁·가족운영</span>
+
+              <!-- 인테리어 분담 게이지 -->
+              <div class="pt-2 shrink-0">
+                <div class="flex justify-between items-center text-xs mb-2">
+                  <span class="text-slate-600 font-bold">인테리어 분담 비율</span>
+                  <span id="interiorRatioText" class="text-xs font-extrabold text-indigo-600 tabular-nums">매장 -% : 본사 -%</span>
+                </div>
+                <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex p-0.5 border border-slate-200/60">
+                  <div id="barStoreRatio" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 50%"></div>
+                  <div id="barHqRatio" class="bg-emerald-400 h-full rounded-full transition-all duration-300 ml-0.5" style="width: 50%"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3 text-xs tabular-nums">
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-500 flex items-center gap-1.5 font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span>매장 부담
+                      </span>
+                      <span id="interiorStoreVal" class="font-extrabold text-slate-900 text-sm">-</span>
+                    </div>
+                    <div id="interiorStoreExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
+                  </div>
+                  <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div class="flex items-center justify-between">
+                      <span class="text-slate-500 flex items-center gap-1.5 font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>본사 부담
+                      </span>
+                      <span id="interiorHqVal" class="font-extrabold text-slate-900 text-sm">-</span>
+                    </div>
+                    <div id="interiorHqExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- 상세 카드 2: 투자비 및 인테리어 분담 -->
-          <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-4 h-full">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 gap-2">
-              <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
-                <i class="fa-solid fa-coins text-emerald-500"></i>
-                <span>투자비 및 인테리어 분담</span>
-              </div>
-              <span class="text-[10px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
-                총 투자 = 보증 + 권리
-              </span>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 text-center text-xs tabular-nums flex-1">
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">전세보증금</div>
-                <div id="investDep" class="font-extrabold text-indigo-600 text-sm lg:text-base">-</div>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">권리금</div>
-                <div id="investPrem" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
-                <div class="text-[11px] text-slate-400 mb-1">월세</div>
-                <div id="investRent" class="font-extrabold text-slate-800 text-sm lg:text-base">-</div>
-              </div>
-            </div>
-
-            <!-- 인테리어 분담 게이지 -->
-            <div class="pt-2 shrink-0">
-              <div class="flex justify-between items-center text-xs mb-2">
-                <span class="text-slate-600 font-bold">인테리어 분담 비율</span>
-                <span id="interiorRatioText" class="text-xs font-extrabold text-indigo-600 tabular-nums">매장 -% : 본사 -%</span>
-              </div>
-              <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden flex p-0.5 border border-slate-200/60">
-                <div id="barStoreRatio" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 50%"></div>
-                <div id="barHqRatio" class="bg-emerald-400 h-full rounded-full transition-all duration-300 ml-0.5" style="width: 50%"></div>
-              </div>
-              <div class="grid grid-cols-2 gap-3 mt-3 text-xs tabular-nums">
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-500 flex items-center gap-1.5 font-medium">
-                      <span class="w-2.5 h-2.5 rounded-full bg-indigo-600 inline-block"></span>매장 부담
-                    </span>
-                    <span id="interiorStoreVal" class="font-extrabold text-slate-900 text-sm">-</span>
-                  </div>
-                  <div id="interiorStoreExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
-                </div>
-                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                  <div class="flex items-center justify-between">
-                    <span class="text-slate-500 flex items-center gap-1.5 font-medium">
-                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>본사 부담
-                    </span>
-                    <span id="interiorHqVal" class="font-extrabold text-slate-900 text-sm">-</span>
-                  </div>
-                  <div id="interiorHqExact" class="text-[10px] text-slate-400 text-right mt-1 hidden">원값 -</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 상세 카드 3: 매장 마진율 구조 (xl 이상에서는 넓게 차지하도록 col-span-2) -->
-          <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-3 xl:col-span-2">
-            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+          <!-- 하단 카드 3: 매장 마진율 구조 -->
+          <!-- ★ flex-1을 적용하여 좌측 카드 높이에 맞춰 남은 빈공간을 꽉 채우도록 설정 -->
+          <div class="bg-white rounded-2xl p-5 border border-[#E6E4DD] shadow-sm flex flex-col space-y-3 flex-1">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-100 shrink-0">
               <div>
                 <div class="flex items-center gap-2 font-bold text-slate-800 text-sm">
                   <i class="fa-solid fa-percent text-amber-500"></i>
@@ -338,39 +346,40 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-5 gap-2 lg:gap-3 text-center tabular-nums pt-2">
+            <!-- 안쪽 그리드도 flex-1로 늘어나면서 세로 중앙 정렬 유지 -->
+            <div class="grid grid-cols-5 gap-2 lg:gap-3 text-center tabular-nums pt-2 flex-1">
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                 <div class="text-[11px] font-semibold text-slate-400 mb-1.5">정상</div>
                 <div id="mNormal" class="text-sm font-extrabold text-slate-800 mb-2.5">-</div>
-                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden shrink-0 mt-auto">
                   <div id="barMNormal" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                 <div class="text-[11px] font-semibold text-slate-400 mb-1.5">30%</div>
                 <div id="m30" class="text-sm font-extrabold text-slate-800 mb-2.5">-</div>
-                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden shrink-0 mt-auto">
                   <div id="barM30" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                 <div class="text-[11px] font-semibold text-slate-400 mb-1.5">40%</div>
                 <div id="m40" class="text-sm font-extrabold text-slate-800 mb-2.5">-</div>
-                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden shrink-0 mt-auto">
                   <div id="barM40" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                 <div class="text-[11px] font-semibold text-slate-400 mb-1.5">50%</div>
                 <div id="m50" class="text-sm font-extrabold text-slate-800 mb-2.5">-</div>
-                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden shrink-0 mt-auto">
                   <div id="barM50" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
               <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 flex flex-col justify-center">
                 <div class="text-[11px] font-semibold text-slate-400 mb-1.5">균일</div>
                 <div id="mFlat" class="text-sm font-extrabold text-slate-800 mb-2.5">-</div>
-                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden">
+                <div class="w-full h-2 bg-slate-200/80 rounded-full overflow-hidden shrink-0 mt-auto">
                   <div id="barMFlat" class="h-full bg-amber-400 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
               </div>
@@ -449,8 +458,8 @@
 
   <script>
     // =========================================================================
-    // 스크립트는 기존 코드를 100% 동일하게 유지하되, JS에서 동적으로 할당되는
-    // 테마 클래스명(Hero Card)만 PC 좌우 레이아웃에 맞춰 수정했습니다.
+    // 스크립트 기능은 기존과 동일하며, JS 내부 테마 갱신 로직의 클래스명만
+    // 좌우 높이 맞춤(stretch / flex-col)을 유지하도록 업데이트 되었습니다.
     // =========================================================================
     const DEFAULT_SHEET_URL = "https://docs.google.com/spreadsheets/d/16vaYTfcQK1sMWvL-Rf6sWwtkYYwEvc9jfbfQX7ccSvY/edit";
     const STORAGE_KEY_URL = "wm_invest_sheet_url";
@@ -953,8 +962,8 @@
       const totalUnit = document.getElementById("summaryTotalInvestUnit");
       const interiorUnit = document.getElementById("summaryInteriorUnit");
 
-      // PC버전 좌측 세로형 구조 클래스 유지
-      const baseHeroCardCls = "w-full lg:w-[320px] xl:w-[360px] shrink-0 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden transition-all duration-300 lg:sticky lg:top-6";
+      // PC버전 좌측 세로형 구조 클래스를 그대로 유지
+      const baseHeroCardCls = "w-full lg:w-[320px] xl:w-[360px] shrink-0 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden transition-all duration-300 flex flex-col";
       const baseGlowCls = "absolute -right-20 -bottom-20 w-64 h-64 opacity-20 rounded-full blur-3xl pointer-events-none";
 
       if (branchKey === "경기") {
