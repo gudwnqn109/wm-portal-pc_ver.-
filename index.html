@@ -304,7 +304,7 @@
         <div class="px-5 pt-1.5 pb-3 flex items-center justify-between shrink-0">
           <div class="flex items-center gap-2">
             <h3 class="text-[17px] font-extrabold text-[#18181B] tracking-tight">전체 메뉴</h3>
-            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full">6개</span>
+            <span id="drawerMenuCountBadge" class="text-[11px] font-extrabold text-amber-800 bg-amber-500/15 px-2 py-0.5 rounded-full">3개</span>
           </div>
           <button onclick="closeAllMenusDrawer()" class="w-8 h-8 rounded-full bg-white border border-[#E6E4DD] text-zinc-500 hover:text-[#18181B] flex items-center justify-center transition active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
@@ -339,25 +339,20 @@
     const GOOGLE_CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
     const ALLOWED_EMAILS = ["gudwnqn109@gmail.com"];
 
+    // 1. 여기서 사용하지 않는 메뉴 3개 제거 완료!
     const MENU_ITEMS = [
       { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', category: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', accent: 'amber' },
       { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', category: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', accent: 'blue' },
-      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' },
-      { id: 'sellthru', title: 'FW 판매율', subtitle: '시즌·브랜드·복종별 수량/금액 판매율', url: './sellthru.html', category: '시장·상품', badge: 'SEASON', icon: 'fa-solid fa-shirt', accent: 'emerald' },
-      { id: 'investment', title: '매장 투자비 현황', subtitle: '보증금·권리금·인테리어·마진 구조', url: './investment.html', category: '매장·운영', badge: 'STORE', icon: 'fa-solid fa-building-columns', accent: 'teal' },
-      { id: 'voc', title: '현장의 소리', subtitle: '매장 VOC·건의사항 실시간 접수 현황', url: './voc.html', category: '매장·운영', badge: 'VOC', icon: 'fa-solid fa-bullhorn', accent: 'rose' }
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', category: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', accent: 'indigo' }
     ];
 
     const ACCENT_STYLES = {
       amber: { iconBg: 'bg-amber-500/15', iconText: 'text-amber-700', badge: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
       blue: { iconBg: 'bg-blue-500/12', iconText: 'text-blue-700', badge: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
-      indigo: { iconBg: 'bg-indigo-500/12', iconText: 'text-indigo-700', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' },
-      emerald: { iconBg: 'bg-emerald-500/12', iconText: 'text-emerald-700', badge: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20' },
-      teal: { iconBg: 'bg-teal-500/12', iconText: 'text-teal-700', badge: 'bg-teal-500/10 text-teal-700 border-teal-500/20' },
-      rose: { iconBg: 'bg-rose-500/12', iconText: 'text-rose-700', badge: 'bg-rose-500/10 text-rose-700 border-rose-500/20' }
+      indigo: { iconBg: 'bg-indigo-500/12', iconText: 'text-indigo-700', badge: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
     };
 
-    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v2';
+    const PIN_STORAGE_KEY = 'wm_portal_pinned_menus_v3'; // 스토리지 충돌 방지용 키 변경
     let pinnedMenuIds = ['daily'];
     let selectedCategory = '전체';
     let currentView = 'home';
@@ -840,39 +835,6 @@
           </div>
         `;
       }
-      if (menuId === 'sellthru') {
-        return `
-          <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
-            <div><span class="bg-amber-500 text-slate-950 font-black text-[10px] px-1.5 py-0.5 rounded">WM본부</span><h4 class="text-sm font-extrabold mt-1">FW 매장별 판매율 리포트</h4></div>
-            <span class="text-[11px] font-black bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-lg">종합 우수 (A)</span>
-          </div>
-          <div class="grid grid-cols-2 gap-2.5 text-xs tabular-nums">
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200"><div class="flex justify-between"><span class="font-bold text-slate-700">인디안</span><span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-1.5 rounded">A등급</span></div><div class="text-lg font-black text-slate-900 mt-1">24.8%</div><div class="text-[10.5px] text-emerald-600 font-bold mt-1">전국평균 대비 +2.4%p</div></div>
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200"><div class="flex justify-between"><span class="font-bold text-slate-700">브루노바피</span><span class="text-[10px] bg-amber-100 text-amber-800 font-extrabold px-1.5 rounded">A등급</span></div><div class="text-lg font-black text-slate-900 mt-1">21.5%</div><div class="text-[10.5px] text-emerald-600 font-bold mt-1">전국평균 대비 +1.8%p</div></div>
-          </div>
-        `;
-      }
-      if (menuId === 'investment') {
-        return `
-          <div class="rounded-2xl bg-gradient-to-br from-indigo-950 via-teal-950 to-slate-900 text-white p-4 shadow-md">
-            <div class="flex justify-between text-[10px]"><span class="bg-white/15 px-2 py-0.5 rounded font-bold">서울지점 · 대리점</span><span class="text-teal-200">단위: 백만원</span></div>
-            <h4 class="text-lg font-extrabold mt-2">명일점 투자비 · 마진 구조</h4>
-            <div class="grid grid-cols-2 gap-2.5 mt-3 tabular-nums">
-              <div class="bg-white/10 p-3 rounded-xl"><div class="text-[10.5px] text-teal-200">총 투자비 (보증+권리)</div><div class="text-xl font-black mt-0.5">332백만</div></div>
-              <div class="bg-white/10 p-3 rounded-xl"><div class="text-[10.5px] text-teal-200">인테리어 총액</div><div class="text-xl font-black mt-0.5">78백만</div></div>
-            </div>
-          </div>
-        `;
-      }
-      return `
-        <div class="bg-slate-900 text-white p-3.5 rounded-2xl flex justify-between items-center">
-          <div><span class="text-[10px] text-indigo-300 font-bold">중부영업팀 통합 앱</span><h4 class="text-sm font-extrabold">현장의 소리 (VOC)</h4></div>
-          <span class="text-[10.5px] bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-bold">● 클라우드연동</span>
-        </div>
-        <div class="space-y-2.5 text-xs">
-          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-1.5"><div class="flex justify-between items-center"><span class="font-bold text-slate-900">분당서현점</span><span class="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded font-bold">VM/디스플레이</span></div><p class="text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">주말 윈도우 마네킹 착장 변경 후 구매율 상승 확인.</p></div>
-        </div>
-      `;
     }
 
     function openAllMenusDrawer() {
