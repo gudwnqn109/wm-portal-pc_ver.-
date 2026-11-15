@@ -47,7 +47,7 @@
         <button onclick="setBranch('강원')" id="bTab_강원" class="px-3 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">강원</button>
       </div>
 
-      <!-- 우측: 매장 검색 + 일일매출장 매장 드롭다운 + 일일 기준일 -->
+      <!-- 우측: 매장 검색 + 일일매출장 매장 드롭다운 -->
       <div class="flex items-center gap-2 shrink-0">
         <div class="relative w-48">
           <i class="fa-solid fa-magnifying-glass text-[11px] text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
@@ -63,35 +63,29 @@
           <select id="storeSelect" onchange="selectStore(this.value)" class="bg-transparent text-amber-300 font-extrabold text-xs px-2 focus:outline-none cursor-pointer max-w-[160px] truncate"></select>
           <button onclick="stepStore(1)" class="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-white" title="다음 매장"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
         </div>
-
-        <div class="inline-flex items-center bg-slate-100 border border-slate-200 rounded-xl px-2.5 py-1 text-xs font-bold text-slate-700">
-          <span class="text-[11px] text-slate-400 mr-1.5">일일기준</span>
-          <select id="daySelect" onchange="changeDay(this.value)" class="bg-transparent font-extrabold text-slate-900 focus:outline-none cursor-pointer"></select>
-        </div>
       </div>
     </div>
   </header>
 
-  <!-- 메인 대시보드 컨테이너 (상단 섹션 + 하단 섹션 수직 배치, 전체 폭 100% 보장) -->
+  <!-- 메인 대시보드 컨테이너 -->
   <main class="w-full max-w-[1800px] mx-auto px-4 lg:px-6 py-3.5 flex flex-col gap-4">
 
     <!-- ========================================================================= -->
-    <!-- [TOP SECTION] 좌측 6컬럼 (일일 2x2 + 주간 1x2 = 2x3) / 우측 6컬럼 (5대 브랜드 무스크롤) -->
+    <!-- [TOP SECTION] -->
     <!-- ========================================================================= -->
     <section class="w-full grid grid-cols-1 xl:grid-cols-12 gap-4 items-stretch">
 
-      <!-- 좌측 상단 (6컬럼): 일일 매출장 4개 지표 (2x2) + 주간 매출/고객 지표 2개 (1x2) -->
+      <!-- 좌측 상단 (6컬럼) -->
       <div class="xl:col-span-6 w-full min-w-0 flex flex-col justify-between gap-3">
         
-        <!-- 1~2행: 일일 매출장 4개 카드 (2x2 Grid) -->
+        <!-- 1~2행: 일일 매출장 4개 카드 -->
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
           
-          <!-- 일일 카드 1: 당일 매출 -->
           <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 shadow-sm border border-slate-800 flex flex-col justify-between relative overflow-hidden">
             <div class="flex items-center justify-between gap-1.5">
               <div class="flex items-center gap-1.5 min-w-0">
                 <span id="dBranchBadge" class="text-[10.5px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">서울지점</span>
-                <span id="dDayLabel" class="text-xs font-bold text-slate-200 truncate">당일 매출 (12일)</span>
+                <span id="dDayLabel" class="text-xs font-bold text-slate-200 truncate">당일 매출 (-)</span>
               </div>
               <span id="dDayRateBadge" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-white/15 text-amber-300 shrink-0">0.0% 달성</span>
             </div>
@@ -106,10 +100,9 @@
             </div>
           </div>
 
-          <!-- 일일 카드 2: 당월 누계 -->
           <div class="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between gap-1">
-              <span id="dMonthLabel" class="text-xs font-extrabold text-slate-700">11월 누계</span>
+              <span id="dMonthLabel" class="text-xs font-extrabold text-slate-700">-월 누계</span>
               <div class="flex items-center gap-1">
                 <span id="dMonthRateBadge" class="text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200">0.0% 달성</span>
                 <span id="dMonthGrBadge" class="text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border bg-slate-50 text-slate-600 border-slate-200">0.0% 신장</span>
@@ -128,7 +121,6 @@
             </div>
           </div>
 
-          <!-- 일일 카드 3: 26년 연누계 -->
           <div class="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between gap-1">
               <span class="text-xs font-extrabold text-slate-700">26년 연누계</span>
@@ -149,7 +141,6 @@
             </div>
           </div>
 
-          <!-- 일일 카드 4: 주말·평일 비중 & 첫구매 -->
           <div class="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between gap-1">
               <span class="text-xs font-extrabold text-slate-700">주말·평일 비중</span>
@@ -173,10 +164,9 @@
 
         </div>
 
-        <!-- 3행: 주간 리포트 요약 카드 2개 (번호 제거, 좌측 하단에 배치) -->
+        <!-- 3행: 주간 리포트 요약 카드 2개 -->
         <div class="w-full grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
           
-          <!-- 주간 매출 및 회원 고객 비중 -->
           <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-start gap-2">
             <div class="flex items-center justify-between">
               <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
@@ -221,7 +211,6 @@
             </div>
           </div>
 
-          <!-- 고객 지표 및 첫구매 신규고객 -->
           <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-start gap-2">
             <div class="flex items-center justify-between">
               <h3 class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
@@ -277,7 +266,7 @@
         </div>
       </div>
 
-      <!-- 우측 상단 (6컬럼): 5대 브랜드별 매출 구성 및 전년 대비 신장 (세로 스크롤 없이 5대 브랜드 전체 표시) -->
+      <!-- 우측 상단 (6컬럼): 5대 브랜드별 매출 구성 및 전년 대비 신장 -->
       <div class="xl:col-span-6 w-full min-w-0 bg-white rounded-2xl border border-slate-200/90 p-4 shadow-2xs flex flex-col justify-between">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5 shrink-0">
           <div>
@@ -295,6 +284,7 @@
               <div class="flex items-center justify-between text-xs">
                 <span class="text-amber-300 font-extrabold flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>당월 누계 브랜드 매출
+                  <span id="brandMonthPeriod" class="text-[10px] font-medium text-amber-100/70 ml-1"></span>
                 </span>
                 <span id="wBmRank" class="text-[10.5px] font-extrabold text-amber-400 bg-slate-800 px-2 py-0.5 rounded">서울 내 -위</span>
               </div>
@@ -313,6 +303,7 @@
               <div class="flex items-center justify-between text-xs">
                 <span class="text-indigo-300 font-extrabold flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-indigo-400"></span>년 누계 브랜드 매출
+                  <span id="brandYearPeriod" class="text-[10px] font-medium text-indigo-200/70 ml-1"></span>
                 </span>
                 <span id="wByRank" class="text-[10.5px] font-extrabold text-indigo-200 bg-white/10 px-2 py-0.5 rounded">서울 내 -위</span>
               </div>
@@ -330,15 +321,13 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- [BOTTOM SECTION] 동업계 타브랜드 상권 현황 (전체 폭 12컬럼: 좌 4컬럼 + 우 8컬럼) -->
+    <!-- [BOTTOM SECTION] -->
     <!-- ========================================================================= -->
     <section class="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
       
-      <!-- 좌측 하단 (4컬럼): 기준 브랜드 상권 요약 -->
       <div class="lg:col-span-4 w-full min-w-0 flex flex-col">
         <div class="bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 rounded-2xl p-5 text-white shadow-lg border border-indigo-800/40 flex flex-col justify-between relative overflow-hidden flex-1">
           <div class="absolute -right-8 -bottom-8 w-40 h-40 bg-indigo-500 opacity-15 rounded-full blur-2xl pointer-events-none"></div>
-
           <div>
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 min-w-0">
@@ -347,14 +336,11 @@
               </div>
               <span id="cClose25Badge" class="text-xs font-bold text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 shrink-0">25년 마감 -</span>
             </div>
-
             <div class="mt-3 flex items-center gap-2 flex-wrap">
               <h2 id="cStoreName" class="text-xl lg:text-2xl font-extrabold tracking-tight text-white">길동점</h2>
               <span id="cStoreRank" class="text-xs font-bold text-indigo-100 bg-indigo-700/80 px-2 py-1 rounded-md">상권 -위</span>
               <span id="cStoreShareBadge" class="text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-1 rounded-md">점유율 -%</span>
             </div>
-
-            <!-- 상권 내 비중 바 -->
             <div class="mt-4 pt-3.5 border-t border-white/10">
               <div class="flex items-center justify-between text-xs mb-1.5">
                 <span class="flex items-center gap-1.5 font-semibold text-white/90">
@@ -367,8 +353,6 @@
                 <div id="cShareBar" class="h-full bg-emerald-400 rounded-full transition-all duration-500" style="width:0%"></div>
               </div>
             </div>
-
-            <!-- 2개 핵심 메트릭 박스 -->
             <div class="grid grid-cols-2 gap-3 mt-4">
               <div class="bg-white/10 p-3 rounded-xl border border-white/10">
                 <p id="cMetric1Lbl" class="text-xs text-indigo-200 font-medium truncate">26년 누계 (웰메이드)</p>
@@ -388,8 +372,6 @@
               </div>
             </div>
           </div>
-
-          <!-- 하단 월별 추이 차트 -->
           <div class="mt-4 pt-3.5 border-t border-white/10">
             <div class="flex items-center justify-between text-xs mb-2">
               <span class="font-semibold text-white/85 flex items-center gap-1.5">
@@ -406,10 +388,7 @@
         </div>
       </div>
 
-      <!-- 우측 하단 (8컬럼): 동일 상권 브랜드별 실적 현황 -->
       <div class="lg:col-span-8 w-full min-w-0 bg-white rounded-2xl border border-slate-200/90 p-5 shadow-2xs flex flex-col justify-between gap-4">
-        
-        <!-- 상단 헤더 & 컨트롤 바 -->
         <div class="space-y-3 border-b border-slate-100 pb-3.5 shrink-0">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -426,12 +405,8 @@
               <i class="fa-solid fa-chevron-down text-[10px] text-indigo-600 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
           </div>
-
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <!-- 기간 퀵 칩 -->
             <div id="cPeriodChips" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar"></div>
-
-            <!-- 정렬 & 뷰 토글 -->
             <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-xl border border-slate-200/70 shrink-0">
               <div class="flex items-center bg-slate-200/60 p-0.5 rounded-lg text-xs">
                 <button id="cSortSales" onclick="setCompSort('sales')" class="px-3 py-1 rounded-md font-bold bg-white text-slate-900 shadow-2xs transition">매출순</button>
@@ -448,10 +423,7 @@
             </div>
           </div>
         </div>
-
-        <!-- 동일 상권 브랜드 카드 그리드 (2열 전체 폭) -->
         <div id="cBrandContainer" class="w-full flex-1"></div>
-
       </div>
 
     </section>
@@ -459,9 +431,6 @@
   </main>
 
   <script>
-    // =========================================================================
-    // 1. 구글 시트 ID 및 전역 상태 (일일 매출장 소속 매장만 마스터 등록)
-    // =========================================================================
     const SHEET_DAILY_ID = '1F0l1o6Vr7oCRULK0RZNTGEwZpdZ6Zpf45PkdH4N82y4';
     const SHEET_WEEKLY_ID = '1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w';
     const SHEET_COMP_ID = '1ml4qhwd0axGXdozyd1m7thOiZEuzi1_cnFyvPaMfQAc';
@@ -476,7 +445,6 @@
     let compView = 'card';
     let maxCompMonth = 10;
 
-    // 일일 매출장에 존재하는 매장만 순서대로 보관하는 마스터 리스트
     let DAILY_MASTER_ORDER = [];
     const STORE_MAP = {};
 
@@ -521,16 +489,13 @@
     function getPrevWeekRangeString() {
       const base = new Date(currentYear, currentMonth - 1, currentDay);
       const day = base.getDay();
-      const diffToMon = day === 0 ? -6 : 1 - day; // 이번 주 월요일 차이값
-      
+      const diffToMon = day === 0 ? -6 : 1 - day;
       const prevMon = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 7);
       const prevSun = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 1);
-      
       const format = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
       return `(${format(prevMon)} ~ ${format(prevSun)})`;
     }
 
-    // 매장명 정규화 매칭 함수 (일일 매출장에 있는 매장만 찾기)
     function findDailyMasterStore(rawName) {
       if (!rawName) return null;
       const clean = String(rawName).trim();
@@ -557,105 +522,23 @@
       };
     }
 
-    // =========================================================================
-    // 2. 초기 일일매출장 시드 데이터 (시트 로드 전 즉시 표시)
-    // =========================================================================
+    // 초기 시드 데이터 경량화 (1개 매장만 남김)
     function initSeedStores() {
-      const seeds = [
-        {
-          name: '길동점', branch: '서울', region: '강동구', pop: '49.9만', sv: '신현호', openDate: '2022.02',
-          daily: { dayAct: 1850, dayTgt: 2200, mAct: 24800, mCumTgt: 28500, mFullTgt: 68000, mLy: 28600, yAct: 382278, yTgt: 410000, yLy: 313342, wkndSum: 9800, wkdySum: 15000, custAct: 11, custTgt: 30, dailySales: {}, dailyTargets: {} },
-          weekly: {
-            sales26: 11122.9, sales25: 9747.3, salesGr: 0.141, custSales26: 11122.9, custShare: 1.0,
-            custCnt26: 60, custCnt25: 47, custGr: 0.277, unitPrice: 185.4, billPrice: 168.7,
-            firstGoal: 30, firstWeek: 10, firstWeekGr: 0.667, firstMonth: 11, firstMonthGr: 0.10, firstProg: 0.367, firstYear: 494, firstYearGr: 0.885,
-            brandMonth: { rank: 9, total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057,
-              details: { indian:{sales:8181,gr:-0.145}, bruno:{sales:-111,gr:-1.07}, daily:{sales:3329,gr:-0.029}, label:{sales:720,gr:0}, duani:{sales:737.4,gr:1.56} } },
-            brandYear: { rank: 8, total: 382278.0, gr: 0.220, indian: 0.460, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077,
-              details: { indian:{sales:175844,gr:0.15}, bruno:{sales:36764,gr:-0.054}, daily:{sales:117336,gr:0.193}, label:{sales:20785,gr:1.705}, duani:{sales:29548,gr:0.886} } }
-          },
-          comp: {
-            close25: { '파크랜드': 1680000, 'OL': 170000, '웰메이드': 370000, 'JDX': 650000 },
-            s26: {
-              accum: { '파크랜드': 1316559, 'OL': 617605, '웰메이드': 369383, 'JDX': 360742 },
-              m1:{'웰메이드':28500,'파크랜드':115000,'OL':52000,'JDX':31000}, m2:{'웰메이드':26400,'파크랜드':110000,'OL':48000,'JDX':29000},
-              m3:{'웰메이드':35200,'파크랜드':132000,'OL':61000,'JDX':38000}, m4:{'웰메이드':44100,'파크랜드':145000,'OL':68000,'JDX':41000},
-              m5:{'웰메이드':62800,'파크랜드':168000,'OL':79000,'JDX':49000}, m6:{'웰메이드':33500,'파크랜드':124000,'OL':58000,'JDX':34000},
-              m7:{'웰메이드':31200,'파크랜드':118000,'OL':54000,'JDX':32000}, m8:{'웰메이드':24800,'파크랜드':105000,'OL':49000,'JDX':28000},
-              m9:{'웰메이드':28900,'파크랜드':128000,'OL':64000,'JDX':36000}, m10:{'웰메이드':53983,'파크랜드':171559,'OL':84605,'JDX':42742}
-            },
-            s25: {
-              accum: { '파크랜드': 1333884, 'OL': 58433, '웰메이드': 298523, 'JDX': 542616 },
-              m1:{'웰메이드':22100,'파크랜드':118000,'OL':5800,'JDX':48000}, m2:{'웰메이드':30200,'파크랜드':114000,'OL':5400,'JDX':46000},
-              m3:{'웰메이드':29800,'파크랜드':135000,'OL':6100,'JDX':55000}, m4:{'웰메이드':31500,'파크랜드':142000,'OL':6200,'JDX':58000},
-              m5:{'웰메이드':35400,'파크랜드':165000,'OL':6800,'JDX':64000}, m6:{'웰메이드':38100,'파크랜드':128000,'OL':5500,'JDX':52000},
-              m7:{'웰메이드':29400,'파크랜드':121000,'OL':5200,'JDX':49000}, m8:{'웰메이드':27200,'파크랜드':109000,'OL':4900,'JDX':45000},
-              m9:{'웰메이드':28100,'파크랜드':131000,'OL':5900,'JDX':56000}, m10:{'웰메이드':26723,'파크랜드':170884,'OL':6633,'JDX':69616}
-            }
-          }
+      const s = {
+        name: '길동점', branch: '서울', region: '강동구', pop: '49.9만', sv: '신현호', openDate: '2022.02',
+        daily: { dayAct: 1850, dayTgt: 2200, mAct: 24800, mCumTgt: 28500, mFullTgt: 68000, mLy: 28600, yAct: 382278, yTgt: 410000, yLy: 313342, wkndSum: 9800, wkdySum: 15000, custAct: 11, custTgt: 30, dailySales: {}, dailyTargets: {} },
+        weekly: {
+          sales26: 11122.9, sales25: 9747.3, salesGr: 0.141, custSales26: 11122.9, custShare: 1.0, custCnt26: 60, custCnt25: 47, custGr: 0.277, unitPrice: 185.4, billPrice: 168.7,
+          firstGoal: 30, firstWeek: 10, firstWeekGr: 0.667, firstMonth: 11, firstMonthGr: 0.10, firstProg: 0.367, firstYear: 494, firstYearGr: 0.885,
+          brandMonth: { rank: 9, total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057, details: { indian:{sales:8181,gr:-0.145}, bruno:{sales:-111,gr:-1.07}, daily:{sales:3329,gr:-0.029}, label:{sales:720,gr:0}, duani:{sales:737.4,gr:1.56} } },
+          brandYear: { rank: 8, total: 382278.0, gr: 0.220, indian: 0.460, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077, details: { indian:{sales:175844,gr:0.15}, bruno:{sales:36764,gr:-0.054}, daily:{sales:117336,gr:0.193}, label:{sales:20785,gr:1.705}, duani:{sales:29548,gr:0.886} } }
         },
-        {
-          name: '금호직영점', branch: '서울', region: '성동구', pop: '28.5만', sv: '문경영', openDate: '2004.08',
-          daily: { dayAct: 2150, dayTgt: 2400, mAct: 14677, mCumTgt: 16500, mFullTgt: 45000, mLy: 16510, yAct: 506474, yTgt: 520000, yLy: 507489, wkndSum: 5800, wkdySum: 8877, custAct: 3, custTgt: 30, dailySales: {}, dailyTargets: {} },
-          weekly: {
-            sales26: 13025.0, sales25: 14457.0, salesGr: -0.099, custSales26: 13025.0, custShare: 1.0,
-            custCnt26: 45, custCnt25: 77, custGr: -0.416, unitPrice: 289.4, billPrice: 255.0,
-            firstGoal: 30, firstWeek: 3, firstWeekGr: -0.40, firstMonth: 3, firstMonthGr: -0.50, firstProg: 0.10, firstYear: 193, firstYearGr: 0.027,
-            brandMonth: { rank: 6, total: 14676.7, gr: -0.111, indian: 0.317, bruno: 0.025, daily: 0.515, label: 0.115, duani: 0.028,
-              details: { indian:{sales:4651,gr:-0.211}, bruno:{sales:373,gr:-0.708}, daily:{sales:7556,gr:0.099}, label:{sales:1685,gr:0.539}, duani:{sales:411,gr:0.035} } },
-            brandYear: { rank: 3, total: 506474.0, gr: -0.002, indian: 0.275, bruno: 0.088, daily: 0.503, label: 0.079, duani: 0.055,
-              details: { indian:{sales:139211,gr:-0.053}, bruno:{sales:44547,gr:-0.062}, daily:{sales:254586,gr:0.063}, label:{sales:40214,gr:-0.158}, duani:{sales:27916,gr:-0.011} } }
-          },
-          comp: {
-            close25: { '웰메이드': 510000, '크로커다일': 480000, '샤트렌': 310000 },
-            s26: { accum: { '웰메이드': 506474, '크로커다일': 442100, '샤트렌': 289000 } },
-            s25: { accum: { '웰메이드': 507489, '크로커다일': 465000, '샤트렌': 301000 } }
-          }
-        },
-        {
-          name: '여주점', branch: '강원', region: '여주', pop: '11.4만', sv: '박형주', openDate: '1992.03',
-          daily: { dayAct: 597, dayTgt: 1200, mAct: 16000, mCumTgt: 18470, mFullTgt: 45200, mLy: 17260, yAct: 385000, yTgt: 440000, yLy: 417118, wkndSum: 5152, wkdySum: 10848, custAct: 7, custTgt: 30, dailySales: {}, dailyTargets: {} },
-          weekly: {
-            sales26: 9649.0, sales25: 11530.0, salesGr: -0.163, custSales26: 9600.0, custShare: 0.995,
-            custCnt26: 32, custCnt25: 48, custGr: -0.333, unitPrice: 300.0, billPrice: 267.0,
-            firstGoal: 30, firstWeek: 6, firstWeekGr: 0.50, firstMonth: 7, firstMonthGr: 0.40, firstProg: 0.233, firstYear: 231, firstYearGr: -0.212,
-            brandMonth: { rank: 14, total: 10298.0, gr: -0.146, indian: 0.531, bruno: 0.142, daily: 0.225, label: 0.054, duani: 0.048,
-              details: { indian:{sales:5472,gr:-0.172}, bruno:{sales:1462,gr:-0.112}, daily:{sales:2317,gr:-0.134}, label:{sales:556,gr:-0.085}, duani:{sales:491,gr:-0.095} } },
-            brandYear: { rank: 7, total: 379691.0, gr: -0.091, indian: 0.487, bruno: 0.151, daily: 0.254, label: 0.056, duani: 0.052,
-              details: { indian:{sales:185072,gr:-0.101}, bruno:{sales:57333,gr:-0.078}, daily:{sales:96441,gr:-0.088}, label:{sales:21263,gr:-0.064}, duani:{sales:19582,gr:-0.072} } }
-          },
-          comp: {
-            close25: { '웰메이드': 420000, '파크랜드': 390000, '크로커다일': 310000, 'PAT': 240000 },
-            s26: { accum: { '웰메이드': 379691, '파크랜드': 352000, '크로커다일': 278000, 'PAT': 215000 } },
-            s25: { accum: { '웰메이드': 417118, '파크랜드': 368000, '크로커다일': 292000, 'PAT': 228000 } }
-          }
-        },
-        {
-          name: '명일점', branch: '서울', region: '강동구', pop: '49.9만', sv: '신현호', openDate: '2014.09',
-          daily: { dayAct: 2420, dayTgt: 2300, mAct: 31200, mCumTgt: 29800, mFullTgt: 72000, mLy: 28500, yAct: 396400, yTgt: 390000, yLy: 366358, wkndSum: 13100, wkdySum: 18100, custAct: 15, custTgt: 30, dailySales: {}, dailyTargets: {} },
-          weekly: {
-            sales26: 13840.0, sales25: 12450.0, salesGr: 0.112, custSales26: 13420.0, custShare: 0.97,
-            custCnt26: 68, custCnt25: 61, custGr: 0.115, unitPrice: 197.4, billPrice: 179.6,
-            firstGoal: 30, firstWeek: 9, firstWeekGr: 0.286, firstMonth: 15, firstMonthGr: 0.154, firstProg: 0.50, firstYear: 382, firstYearGr: 0.124,
-            brandMonth: { rank: 5, total: 15202.0, gr: 0.094, indian: 0.512, bruno: 0.138, daily: 0.235, label: 0.054, duani: 0.046,
-              details: { indian:{sales:7783.4,gr:0.105}, bruno:{sales:2097.9,gr:0.062}, daily:{sales:3572.5,gr:0.088}, label:{sales:820.9,gr:0.124}, duani:{sales:691.3,gr:0.041} } },
-            brandYear: { rank: 7, total: 396400.0, gr: 0.082, indian: 0.492, bruno: 0.145, daily: 0.258, label: 0.055, duani: 0.050,
-              details: { indian:{sales:195028.8,gr:0.091}, bruno:{sales:57478,gr:0.054}, daily:{sales:102271.2,gr:0.084}, label:{sales:21802,gr:0.102}, duani:{sales:19820,gr:0.038} } }
-          },
-          comp: {
-            close25: { '웰메이드': 420000, '올리비아로렌': 380000, '크로커다일': 310000, '파크랜드': 260000 },
-            s26: { accum: { '웰메이드': 396400, '올리비아로렌': 342000, '크로커다일': 289000, '파크랜드': 241000 } },
-            s25: { accum: { '웰메이드': 366358, '올리비아로렌': 355000, '크로커다일': 295000, '파크랜드': 252000 } }
-          }
-        }
-      ];
-      DAILY_MASTER_ORDER = seeds.map(s => s.name);
-      seeds.forEach(s => { STORE_MAP[s.name] = s; });
+        comp: { close25: {}, s26: { accum: {} }, s25: { accum: {} } }
+      };
+      DAILY_MASTER_ORDER = [s.name];
+      STORE_MAP[s.name] = s;
     }
 
-    // =========================================================================
-    // 3. 3대 구글 시트 실시간 JSONP 연동 (일일 매출장 매장만 마스터로 등록)
-    // =========================================================================
     const toNum = c => {
       if (!c) return 0;
       const v = c.v !== undefined && c.v !== null ? c.v : c.f;
@@ -699,7 +582,6 @@
       }, 2200);
     }
 
-    // [핵심] 오직 일일 매출장(일자별_통합매출)의 매장들만 마스터 목록으로 구성
     window.onDailySales = function(res) {
       if (!res || !res.table || !res.table.rows) return;
       const rows = res.table.rows;
@@ -741,7 +623,6 @@
       });
 
       if (newOrder.length > 0) {
-        // 일일 매출장에 없는 매장 제거
         DAILY_MASTER_ORDER = newOrder;
         Object.keys(STORE_MAP).forEach(k => {
           if (!DAILY_MASTER_ORDER.includes(k)) delete STORE_MAP[k];
@@ -751,10 +632,8 @@
       let latest = 12;
       for (let d = 1; d <= 31; d++) { if ((dayTotals[d] || 0) >= 1000) latest = d; }
       currentDay = latest;
-      buildDayOptions();
       recalcDailyForAll();
 
-      // 먼저 도착한 주간/동업계 시트가 있으면 재매핑
       if (pendingWeeklyResponse) parseWeeklyData(pendingWeeklyResponse);
       if (pendingCompResponse) parseCompData(pendingCompResponse);
 
@@ -828,7 +707,6 @@
           }
           return;
         }
-        // 일일 매출장에 있는 매장에만 주간 실적 연결 (새 매장 추가 안 함)
         const st = findDailyMasterStore(sName);
         if (!st) return;
 
@@ -877,7 +755,6 @@
         const yr = String(getV(5)).trim();
         if (!store || !brand || store === '매장명' || brand === '브랜드') return;
 
-        // 일일 매출장에 등록된 매장에만 동업계 데이터 연결
         const st = findDailyMasterStore(store);
         if (!st) return;
 
@@ -907,26 +784,6 @@
         }
       });
       maxCompMonth = maxM;
-    }
-
-    // =========================================================================
-    // 4. UI 컨트롤러 & 렌더링
-    // =========================================================================
-    function buildDayOptions() {
-      const sel = document.getElementById('daySelect');
-      const days = ['일','월','화','수','목','금','토'];
-      let html = '';
-      for (let d = 1; d <= 30; d++) {
-        const dow = days[new Date(currentYear, currentMonth - 1, d).getDay()];
-        html += `<option value="${d}" ${d === currentDay ? 'selected' : ''}>${currentMonth}월 ${d}일(${dow})</option>`;
-      }
-      sel.innerHTML = html;
-    }
-
-    function changeDay(d) {
-      currentDay = parseInt(d, 10);
-      recalcDailyForAll();
-      renderDashboard();
     }
 
     function getFilteredStoreNames() {
@@ -1040,7 +897,6 @@
       renderCompetitorSection(st);
     }
 
-    // [1] 좌측 상단: 일일 매출장 4개 카드 렌더링
     function renderDailySection(st) {
       const d = st.daily;
       const dayRate = d.dayTgt > 0 ? (d.dayAct / d.dayTgt) * 100 : 0;
@@ -1102,7 +958,6 @@
       document.getElementById('dCustRate').innerText = `${cRate.toFixed(1)}% 달성`;
     }
 
-    // [2] 주간 리포트 & 우측 상단 5대 브랜드 무스크롤 렌더링
     function renderWeeklySection(st) {
       const w = st.weekly;
       const rangeStr = getPrevWeekRangeString();
@@ -1131,6 +986,21 @@
       document.getElementById('wFirstBar').style.width = `${Math.min(100, Math.max(0, w.firstProg * 100))}%`;
       document.getElementById('wFirstWeek').innerHTML = `${fmt(w.firstWeek)}명 ${fmtParen(w.firstWeekGr)}`;
       document.getElementById('wFirstYear').innerHTML = `${fmt(w.firstYear)}명 ${fmtParen(w.firstYearGr)}`;
+
+      // ----------------------------------------------------
+      // 브랜드별 매출 기간 표시 계산 (현재 기준일자의 전주 일요일)
+      // ----------------------------------------------------
+      const base = new Date(currentYear, currentMonth - 1, currentDay);
+      const day = base.getDay();
+      const diffToMon = day === 0 ? -6 : 1 - day; 
+      const prevSun = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 1);
+      
+      const pSunStr = `${String(prevSun.getMonth() + 1).padStart(2, '0')}.${String(prevSun.getDate()).padStart(2, '0')}`;
+      const cMonStr = String(currentMonth).padStart(2, '0');
+
+      document.getElementById('brandMonthPeriod').innerText = `(${cMonStr}.01 ~ ${pSunStr})`;
+      document.getElementById('brandYearPeriod').innerText = `(01.01 ~ ${pSunStr})`;
+      // ----------------------------------------------------
 
       const bDefs = [
         { key: 'indian', name: '인디안', dot: 'bg-slate-800', bar: 'bg-slate-800', stack: 'bg-slate-300' },
@@ -1193,7 +1063,6 @@
       renderBrandCol(w.brandYear,  'wByTotal', 'wByRank', 'wByBadge', 'wByStack', 'wByList', 'brandYear');
     }
 
-    // [3] 하단: 동업계 타브랜드 상권 현황 렌더링 (12컬럼 전체 폭)
     function renderCompetitorSection(st) {
       const c = st.comp;
       const p26 = (c.s26 && c.s26[compPeriod]) || (c.s26 && c.s26.accum) || {};
@@ -1254,7 +1123,6 @@
       document.getElementById('cMetric2Gr').innerText = fAccGr !== null ? `${fAccGr >= 0 ? '▲ +' : '▼ '}${fAccGr}%` : '-';
       document.getElementById('cMetric2Prev').innerText = avg25 > 0 ? `(전년 ${fmt(avg25)})` : '';
 
-      // 월별 추이 막대 차트
       const chartEl = document.getElementById('cMonthlyChart');
       chartEl.style.gridTemplateColumns = `repeat(${maxCompMonth}, minmax(0, 1fr))`;
       let maxBar = 1;
@@ -1281,7 +1149,6 @@
         `;
       }).join('');
 
-      // 우측 동일 상권 브랜드 카드/요약표
       const display = [...list];
       if (compSort === 'growth') {
         display.sort((a, b) => (b.growth ?? -999999) - (a.growth ?? -999999));
@@ -1366,7 +1233,6 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initSeedStores();
-      buildDayOptions();
       renderCompPeriodChips();
       refreshStoreSelector();
       renderDashboard();
