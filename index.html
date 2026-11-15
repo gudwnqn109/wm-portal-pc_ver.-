@@ -38,7 +38,8 @@
     </div>
 
     <!-- [2. PC 사이드바] -->
-    <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20 transition-all duration-300">
+    <!-- transition-all을 통해 margin 변경 시 부드럽게 슬라이드 애니메이션 적용 -->
+    <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20 transition-all duration-300 ease-in-out">
       <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
         <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
@@ -64,8 +65,8 @@
           <div class="flex items-center gap-2.5 min-w-0">
             <div class="w-8 h-8 rounded-full bg-zinc-800 text-amber-400 flex items-center justify-center text-xs font-black shrink-0"><i class="fa-solid fa-user-check"></i></div>
             <div class="min-w-0">
-              <div id="sidebarUserName" class="text-xs font-bold text-zinc-200 truncate">관리자</div>
-              <div id="sidebarUserEmail" class="text-[10.5px] text-zinc-400 truncate">-</div>
+              <!-- 깨짐 현상이 발생하는 이름(userName) 요소는 완전히 삭제하고, 이메일만 강조하여 표시합니다. -->
+              <div id="sidebarUserEmail" class="text-[11px] text-zinc-300 font-medium truncate">-</div>
             </div>
           </div>
           <button onclick="handleLogout()" class="w-8 h-8 rounded-lg bg-zinc-800 hover:text-rose-400 text-zinc-400 flex items-center justify-center transition shrink-0"><i class="fa-solid fa-right-from-bracket text-xs"></i></button>
@@ -74,13 +75,15 @@
     </aside>
 
     <!-- [3. 우측 메인 영역] -->
-    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2]">
+    <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2] relative">
+      
+      <!-- [3-1. 플로팅 사이드바 토글 버튼 (가운데 정렬)] -->
+      <button onclick="toggleDesktopSidebar()" id="desktopSidebarToggleBtn" class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-30 w-5 h-14 bg-white border border-l-0 border-[#E6E4DD] shadow-[2px_0_5px_rgba(0,0,0,0.05)] rounded-r-lg items-center justify-center text-zinc-400 hover:text-amber-500 hover:w-6 transition-all cursor-pointer">
+        <i class="fa-solid fa-chevron-left text-[10px]" id="sidebarToggleIcon"></i>
+      </button>
+
       <header class="bg-[#F7F6F2]/95 backdrop-blur-md px-4 lg:px-6 py-3 border-b border-[#E6E4DD] flex items-center justify-between gap-3 shrink-0 z-20">
         <div class="flex items-center gap-2.5 min-w-0">
-          
-          <!-- PC 사이드바 토글 버튼 추가됨 -->
-          <button onclick="$('desktopSidebar').classList.toggle('lg:flex'); $('desktopSidebar').classList.toggle('hidden');" class="hidden lg:flex w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] items-center justify-center transition shrink-0 hover:bg-zinc-50"><i class="fa-solid fa-bars text-xs"></i></button>
-          
           <button onclick="goHome()" class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md shrink-0 transition">WM중부</button>
           <button id="mobileHomeBtn" onclick="goHome()" class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition shrink-0"><i class="fa-solid fa-house text-xs"></i></button>
           <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold tracking-tight truncate">WM중부 통합 영업 포털</h1>
@@ -172,6 +175,7 @@
     let pins = ['dashboard', 'daily', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
     let smId = 'dashboard', lmId = 'dashboard', rmId = 'daily';
     let user = null, isPrev = false;
+    let isSidebarOpen = true; // 사이드바 토글 상태 변수 추가
 
     // Helpers
     const getM = id => MENU.find(m => m.id === id) || MENU[0];
@@ -185,6 +189,25 @@
       pins = isPin(id) ? pins.filter(x => x !== id) : [...pins, id];
       localStorage.setItem(PIN_KEY, JSON.stringify(pins));
       syncUI();
+    }
+
+    // [추가됨] PC 사이드바 토글 애니메이션 기능
+    function toggleDesktopSidebar() {
+      isSidebarOpen = !isSidebarOpen;
+      const sidebar = $('desktopSidebar');
+      const icon = $('sidebarToggleIcon');
+      
+      if(isSidebarOpen) {
+        // 사이드바 펼침
+        sidebar.classList.remove('-ml-[250px]');
+        icon.classList.remove('fa-chevron-right');
+        icon.classList.add('fa-chevron-left');
+      } else {
+        // 사이드바 닫음 (마진을 이용해 메인 영역 확장)
+        sidebar.classList.add('-ml-[250px]');
+        icon.classList.remove('fa-chevron-left');
+        icon.classList.add('fa-chevron-right');
+      }
     }
 
     function syncUI() {
@@ -325,10 +348,7 @@
 
     function handleAuth(res) {
       try {
-        // [수정됨] 한글 이름 깨짐 현상을 해결하기 위한 디코딩 추가 로직
-        const base64 = res.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-        const payload = JSON.parse(jsonPayload);
+        const payload = JSON.parse(atob(res.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
         
         if(ALLOWED.includes(payload.email)) {
           user = { email: payload.email, name: payload.name };
@@ -340,9 +360,11 @@
 
     function initPortal() {
       $('authOverlay').classList.add('hidden');
-      $('sidebarUserName').innerText = user?.name || '관리자';
+      
+      // 이름 삽입 코드 완전 삭제, 이메일만 표시되도록 수정
       $('sidebarUserEmail').innerText = user?.email || '';
       $('drawerEmail').innerText = user?.email || '';
+      
       const h = window.location.hash.replace('#','');
       h && MENU.some(m=>m.id===h) ? openM(h) : goHome();
     }
