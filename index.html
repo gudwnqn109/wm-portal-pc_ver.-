@@ -38,7 +38,7 @@
     </div>
 
     <!-- [2. PC 사이드바] -->
-    <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20">
+    <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20 transition-all duration-300">
       <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
         <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
@@ -77,6 +77,10 @@
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2]">
       <header class="bg-[#F7F6F2]/95 backdrop-blur-md px-4 lg:px-6 py-3 border-b border-[#E6E4DD] flex items-center justify-between gap-3 shrink-0 z-20">
         <div class="flex items-center gap-2.5 min-w-0">
+          
+          <!-- PC 사이드바 토글 버튼 추가됨 -->
+          <button onclick="$('desktopSidebar').classList.toggle('lg:flex'); $('desktopSidebar').classList.toggle('hidden');" class="hidden lg:flex w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] items-center justify-center transition shrink-0 hover:bg-zinc-50"><i class="fa-solid fa-bars text-xs"></i></button>
+          
           <button onclick="goHome()" class="lg:hidden bg-[#18181B] text-amber-400 font-black text-[10.5px] px-2.5 py-1 rounded-md shrink-0 transition">WM중부</button>
           <button id="mobileHomeBtn" onclick="goHome()" class="lg:hidden w-8 h-8 rounded-lg bg-white text-zinc-700 border border-[#E6E4DD] flex items-center justify-center transition shrink-0"><i class="fa-solid fa-house text-xs"></i></button>
           <h1 id="headerTitle" class="text-[15px] lg:text-[17px] font-extrabold tracking-tight truncate">WM중부 통합 영업 포털</h1>
@@ -191,8 +195,8 @@
 
     // UI Renders
     function updateHeader() {
-      $('btnModeSingle').className = split===1 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white flex gap-1.5' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex gap-1.5';
-      $('btnModeSplit').className = split===2 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-amber-400 flex gap-1.5' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex gap-1.5';
+      $('btnModeSingle').className = split===1 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-white flex items-center gap-1.5 transition' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex items-center gap-1.5 transition';
+      $('btnModeSplit').className = split===2 ? 'px-3 py-1.5 rounded-lg text-xs font-extrabold bg-[#18181B] text-amber-400 flex items-center gap-1.5 transition' : 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-600 flex items-center gap-1.5 transition';
       
       const homeBtn = $('sidebarHomeBtn');
       if (view === 'home') {
@@ -321,7 +325,11 @@
 
     function handleAuth(res) {
       try {
-        const payload = JSON.parse(atob(res.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        // [수정됨] 한글 이름 깨짐 현상을 해결하기 위한 디코딩 추가 로직
+        const base64 = res.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        const payload = JSON.parse(jsonPayload);
+        
         if(ALLOWED.includes(payload.email)) {
           user = { email: payload.email, name: payload.name };
           localStorage.setItem('wm_user', JSON.stringify(user));
