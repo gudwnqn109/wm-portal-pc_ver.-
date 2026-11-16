@@ -138,11 +138,11 @@
     // [구글 시트 연동 설정]
     // =========================================================================
     // 사용 중인 'WM중부영업팀 복합점 매출 현황' 구글 시트 주소를 아래에 붙여넣으세요.
-    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1nlcLw1mj0D94mhYcfHXsR3lew8AoMnvSngdRYLh3vhg/edit?gid=0#gid=0";
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w/edit?usp=drive_web&ouid=114027821451249945566";
     const SHEET_NAME = "복합점 매출";
 
     // =========================================================================
-    // 기본 스냅샷 데이터 (26.11.15 기준 최신화)
+    // 기본 스냅샷 데이터 (26.11.15 기준 최신화 / 25년 마감 없는 매장 신장률 '-' 처리)
     // =========================================================================
     const INITIAL_COMPLEX_DATA = [
       // -------------------- 1. WM+OL+상설 복합점 (7개 매장) --------------------
@@ -227,7 +227,7 @@
           { type: "WM(상설)", y25: "-", w_sales: "12,119", w_avg: "1,731", w_gr: "-", m_sales: "18,892", m_avg: "2,099", m_gr: "-", y26_sales: "18,892", y26_avg: "2,099", y26_gr: "-" },
           { type: "OL(상설)", y25: "-", w_sales: "2,686",  w_avg: "1,343", w_gr: "-", m_sales: "4,818",  m_avg: "535",   m_gr: "-", y26_sales: "4,818",  y26_avg: "535",   y26_gr: "-" }
         ],
-        total: { type: "합계", y25: "-", w_sales: "27,190", w_avg: "13,595", w_gr: "-", m_sales: "39,721", m_avg: "4,413", m_gr: "-", y26_sales: "39,721", y26_avg: "4,413", y26_gr: "0%" }
+        total: { type: "합계", y25: "-", w_sales: "27,190", w_avg: "13,595", w_gr: "-", m_sales: "39,721", m_avg: "4,413", m_gr: "-", y26_sales: "39,721", y26_avg: "4,413", y26_gr: "-" }
       },
 
       // -------------------- 2. WM+OL 복합점 (5개 매장) --------------------
@@ -381,6 +381,21 @@
       return Math.round(n).toLocaleString('ko-KR');
     }
 
+    // 25년 마감 매출 유무 확인 헬퍼 (매출이 없거나 0 이하이면 false)
+    function hasValidY25(y25Val) {
+      if (y25Val === null || y25Val === undefined) return false;
+      const s = String(y25Val).trim();
+      if (s === '' || s === '-') return false;
+      return toNum(s) > 0;
+    }
+
+    // 신장률 표시 포맷 헬퍼: 25년 마감 매출이 없으면 무조건 '-' 반환
+    function formatGrowthValue(rowObj, grVal) {
+      if (!rowObj || !hasValidY25(rowObj.y25)) return '-';
+      const s = String(grVal ?? '').trim();
+      return s === '' ? '-' : s;
+    }
+
     // 합계 행 누락 대비 안전 계산 헬퍼
     function buildFallbackTotal(rows) {
       const sumKey = (k) => {
@@ -458,7 +473,6 @@
         sheetParam = `&sheet=${encodeURIComponent(SHEET_NAME.trim())}`;
       }
 
-      // headers=3 파라미터를 지정하여 1~3행의 타이틀 및 기간 헤더(주간/월간/누계)가 누락되지 않도록 처리
       const script = document.createElement('script');
       script.id = 'gviz_jsonp_script';
       script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGoogleSheetJSONP&headers=3${sheetParam}&t=${Date.now()}`;
@@ -480,7 +494,6 @@
       return String(raw || '').trim();
     }
 
-    // 타이틀 날짜(예: 26.11.15)를 기반으로 주간/월간/누계 헤더를 보조 계산하는 함수
     function applyDerivedDateHeaders(titleText) {
       const m = String(titleText || '').match(/(\d{2})\.(\d{2})\.(\d{2})/);
       if (!m) return;
@@ -517,7 +530,7 @@
 
         let foundWeeklyHeader = false;
 
-        // 1. 시트 상단 타이틀 및 주간/월간/누계 기간 헤더 정확히 추출
+        // 1. 시트 상단 타이틀 및 주간/월간/누계 기간 헤더 추출
         const checkHeaderMeta = (str) => {
           if (!str) return;
           const clean = String(str).replace(/\s+/g, ' ').trim();
@@ -555,7 +568,7 @@
           });
         }
 
-        // 2. 복종 구분 열('WM(정상)' 등이 위치한 열 인덱스, 기본 C열=2) 감지
+        // 2. 복종 구분 열('WM(정상)' 등이 위치한 열 인덱스) 감지
         const validBrandTypes = ['WM(정상)', 'OL(정상)', 'WM(상설)', 'OL(상설)'];
         let typeColIdx = 2;
         for (let r = 0; r < rows.length; r++) {
@@ -621,7 +634,6 @@
             currentGroup = normalizeGroupName(rawGroup);
           }
 
-          // [핵심 수정] B열+C열 병합으로 인해 '합계'가 B열(rawStore)에 들어오는 경우와 C열(rawType)에 들어오는 경우 모두 처리
           const isTotalRow = (
             rawType === '합계' ||
             rawType === '소계' ||
@@ -629,7 +641,6 @@
             rawStoreClean === '소계'
           );
 
-          // 새로운 매장 시작 판별
           if (
             !isTotalRow &&
             rawStore &&
@@ -670,21 +681,34 @@
             }
           }
 
+          const rawY25 = fmtSale(cells, typeColIdx + 1);
+          // 25년 마감 매출이 없거나 0 이하인 경우('-', '0' 등) 판별
+          const hasY25Sales = hasValidY25(rawY25);
+          const normalizedY25 = hasY25Sales ? rawY25 : '-';
+
           const rowMetrics = {
             type: isTotalRow ? '합계' : rawType,
-            y25: fmtSale(cells, typeColIdx + 1),
+            y25: normalizedY25,
             w_sales: fmtSale(cells, typeColIdx + 2),
             w_avg: fmtSale(cells, typeColIdx + 3),
-            w_gr: fmtGr(cells, typeColIdx + 4),
+            w_gr: hasY25Sales ? fmtGr(cells, typeColIdx + 4) : '-',
             m_sales: fmtSale(cells, typeColIdx + 5),
             m_avg: fmtSale(cells, typeColIdx + 6),
-            m_gr: fmtGr(cells, typeColIdx + 7),
+            m_gr: hasY25Sales ? fmtGr(cells, typeColIdx + 7) : '-',
             y26_sales: fmtSale(cells, typeColIdx + 8),
             y26_avg: fmtSale(cells, typeColIdx + 9),
-            y26_gr: fmtGr(cells, typeColIdx + 10)
+            y26_gr: hasY25Sales ? fmtGr(cells, typeColIdx + 10) : '-'
           };
 
           if (isTotalRow && currentStoreObj && currentStoreObj.rows.length > 0) {
+            // 세부 복종 행 전체에 25년 마감 매출이 없다면 합계 행의 신장률도 무조건 '-' 처리
+            const storeHasAnyY25 = currentStoreObj.rows.some(r => hasValidY25(r.y25)) && hasY25Sales;
+            if (!storeHasAnyY25) {
+              rowMetrics.y25 = '-';
+              rowMetrics.w_gr = '-';
+              rowMetrics.m_gr = '-';
+              rowMetrics.y26_gr = '-';
+            }
             currentStoreObj.total = rowMetrics;
             parsedStores.push(currentStoreObj);
             currentStoreObj = null;
@@ -693,7 +717,6 @@
           }
         }
 
-        // 마지막 매장이 합계 행 없이 끝난 경우에도 누락되지 않도록 안전 처리
         if (currentStoreObj && currentStoreObj.rows.length > 0) {
           if (!currentStoreObj.total) {
             currentStoreObj.total = buildFallbackTotal(currentStoreObj.rows);
@@ -849,32 +872,40 @@
       let htmlRows = [];
 
       function generateDetailDataCells(r) {
+        const wGr = formatGrowthValue(r, r.w_gr);
+        const mGr = formatGrowthValue(r, r.m_gr);
+        const y26Gr = formatGrowthValue(r, r.y26_gr);
+
         return `
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-semibold text-zinc-700 whitespace-nowrap">${r.y25}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-semibold text-zinc-900 whitespace-nowrap bg-amber-50/15">${r.w_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-medium text-zinc-500 whitespace-nowrap bg-amber-50/15">${r.w_avg}</td>
-          <td class="border-r border-[#E6E4DD] px-2.5 py-2 text-right whitespace-nowrap bg-amber-50/15 ${getGrowthClass(r.w_gr)}">${r.w_gr}</td>
+          <td class="border-r border-[#E6E4DD] px-2.5 py-2 text-right whitespace-nowrap bg-amber-50/15 ${getGrowthClass(wGr)}">${wGr}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-semibold text-zinc-900 whitespace-nowrap">${r.m_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-medium text-zinc-500 whitespace-nowrap">${r.m_avg}</td>
-          <td class="border-r border-[#E6E4DD] px-2.5 py-2 text-right whitespace-nowrap ${getGrowthClass(r.m_gr)}">${r.m_gr}</td>
+          <td class="border-r border-[#E6E4DD] px-2.5 py-2 text-right whitespace-nowrap ${getGrowthClass(mGr)}">${mGr}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-semibold text-zinc-900 whitespace-nowrap bg-sky-50/15">${r.y26_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2 text-right font-medium text-zinc-500 whitespace-nowrap bg-sky-50/15">${r.y26_avg}</td>
-          <td class="px-2.5 py-2 text-right whitespace-nowrap bg-sky-50/15 ${getGrowthClass(r.y26_gr)}">${r.y26_gr}</td>
+          <td class="px-2.5 py-2 text-right whitespace-nowrap bg-sky-50/15 ${getGrowthClass(y26Gr)}">${y26Gr}</td>
         `;
       }
 
       function generateSummaryDataCells(t) {
+        const wGr = formatGrowthValue(t, t.w_gr);
+        const mGr = formatGrowthValue(t, t.m_gr);
+        const y26Gr = formatGrowthValue(t, t.y26_gr);
+
         return `
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-extrabold text-amber-950 whitespace-nowrap bg-amber-50/40">${t.y25}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-extrabold text-amber-950 whitespace-nowrap bg-amber-100/50">${t.w_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-bold text-amber-900 whitespace-nowrap bg-amber-100/50">${t.w_avg}</td>
-          <td class="border-r border-[#E6E4DD] px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-100/50 ${getGrowthClass(t.w_gr, true)}">${t.w_gr}</td>
+          <td class="border-r border-[#E6E4DD] px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-100/50 ${getGrowthClass(wGr, true)}">${wGr}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-extrabold text-amber-950 whitespace-nowrap bg-amber-50/40">${t.m_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-bold text-amber-900 whitespace-nowrap bg-amber-50/40">${t.m_avg}</td>
-          <td class="border-r border-[#E6E4DD] px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-50/40 ${getGrowthClass(t.m_gr, true)}">${t.m_gr}</td>
+          <td class="border-r border-[#E6E4DD] px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-50/40 ${getGrowthClass(mGr, true)}">${mGr}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-extrabold text-amber-950 whitespace-nowrap bg-amber-100/50">${t.y26_sales}</td>
           <td class="border-r border-[#E6E4DD] px-3 py-2.5 text-right font-bold text-amber-900 whitespace-nowrap bg-amber-100/50">${t.y26_avg}</td>
-          <td class="px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-100/50 ${getGrowthClass(t.y26_gr, true)}">${t.y26_gr}</td>
+          <td class="px-2.5 py-2.5 text-right whitespace-nowrap bg-amber-100/50 ${getGrowthClass(y26Gr, true)}">${y26Gr}</td>
         `;
       }
 
