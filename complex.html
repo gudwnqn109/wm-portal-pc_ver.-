@@ -27,7 +27,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Custom thin scrollbar for the table container */
     .table-container::-webkit-scrollbar {
       width: 7px;
       height: 7px;
@@ -55,16 +54,20 @@
 </head>
 <body class="h-screen flex flex-col p-4 lg:p-5 overflow-hidden select-none">
 
-  <!-- 1. 상단 타이틀 -->
+  <!-- 1. 상단 타이틀 & 실시간 연동 버튼 -->
   <header class="flex flex-wrap items-center justify-between gap-3 mb-3 shrink-0 animate-view">
     <div class="flex flex-wrap items-center gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="px-2 py-0.5 rounded-md bg-[#18181B] text-amber-400 text-[10.5px] font-black tracking-wider">COMPLEX 18</span>
-          <h1 id="sheetMainTitle" class="text-[17px] lg:text-[19px] font-extrabold tracking-tight text-[#18181B]">
-            ■ 중부영업팀 복합매장 실적현황
-          </h1>
-        </div>
+      <div class="flex items-center gap-2.5">
+        <span class="px-2 py-0.5 rounded-md bg-[#18181B] text-amber-400 text-[10.5px] font-black tracking-wider">COMPLEX 18</span>
+        <h1 id="sheetMainTitle" class="text-[17px] lg:text-[19px] font-extrabold tracking-tight text-[#18181B]">
+          ■ 중부영업팀 복합매장 실적현황 (26.11.08)
+        </h1>
+        <button type="button" onclick="loadGoogleSheetData(true)" id="currentSheetLabel"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#E6E4DD] hover:bg-[#F0EEE9] text-[11px] font-bold text-zinc-700 transition whitespace-nowrap shadow-2xs" title="구글 시트 실시간 동기화">
+          <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          <span id="syncText">실시간 시트 연동</span>
+          <i id="refreshIcon" class="fa-solid fa-rotate text-[10px]"></i>
+        </button>
       </div>
     </div>
   </header>
@@ -85,7 +88,7 @@
 
       <div class="relative w-44">
         <i class="fa-solid fa-magnifying-glass text-zinc-400 text-[11px] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-        <input id="storeSearchInput" type="text" oninput="handleSearchInput(this.value)" placeholder="매장명 검색..." class="w-full bg-[#F7F6F2] border border-[#E6E4DD] focus:border-[#18181B] focus:bg-white rounded-xl pl-8 pr-7 py-1.5 text-xs font-semibold text-[#18181B] placeholder-zinc-400 focus:outline-none transition" />
+        <input id="storeSearchInput" type="text" oninput="handleSearchInput(this.value)" placeholder="매장명 검색 (18개)..." class="w-full bg-[#F7F6F2] border border-[#E6E4DD] focus:border-[#18181B] focus:bg-white rounded-xl pl-8 pr-7 py-1.5 text-xs font-semibold text-[#18181B] placeholder-zinc-400 focus:outline-none transition" />
         <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 text-xs">
           <i class="fa-solid fa-circle-xmark"></i>
         </button>
@@ -103,9 +106,9 @@
             <th rowspan="2" class="sticky top-0 z-30 bg-[#18181B] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center w-[200px]">매장명</th>
             <th rowspan="2" class="sticky top-0 z-30 bg-[#18181B] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center w-[90px]">구분</th>
             <th rowspan="2" class="sticky top-0 z-30 bg-[#18181B] border-b border-r border-zinc-700 px-3.5 font-extrabold tracking-tight text-right text-amber-300 w-[115px]">25년 마감</th>
-            <th colspan="3" class="sticky top-0 z-30 bg-[#222226] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center text-amber-400">주간 (11.2~11.8)</th>
-            <th colspan="3" class="sticky top-0 z-30 bg-[#18181B] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center text-emerald-300">월간 (11.1~11.8)</th>
-            <th colspan="3" class="sticky top-0 z-30 bg-[#222226] border-b border-zinc-700 px-3 font-extrabold tracking-tight text-center text-sky-300">26년 누계(1.1~11.8)</th>
+            <th id="thWeeklyTitle" colspan="3" class="sticky top-0 z-30 bg-[#222226] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center text-amber-400">주간 (11.2~11.8)</th>
+            <th id="thMonthlyTitle" colspan="3" class="sticky top-0 z-30 bg-[#18181B] border-b border-r border-zinc-700 px-3 font-extrabold tracking-tight text-center text-emerald-300">월간 (11.1~11.8)</th>
+            <th id="thYearlyTitle" colspan="3" class="sticky top-0 z-30 bg-[#222226] border-b border-zinc-700 px-3 font-extrabold tracking-tight text-center text-sky-300">26년 누계(1.1~11.8)</th>
           </tr>
           <tr class="h-8">
             <th class="sticky top-9 z-20 bg-[#27272A] border-b border-r border-zinc-700 px-3 font-bold text-[11px] text-right text-zinc-200 w-[95px]">매출</th>
@@ -124,74 +127,507 @@
     </div>
   </main>
 
+  <!-- 토스트 알림 -->
+  <div id="toastBox" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#18181B]/95 text-white px-4 py-2.5 rounded-full text-xs font-bold shadow-xl flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none -translate-y-2 whitespace-nowrap">
+    <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+    <span id="toastMessage">실적 데이터를 불러오는 중...</span>
+  </div>
+
   <script>
     // =========================================================================
-    // 1. Google Apps Script 연동 변수 세팅
+    // [구글 시트 연동 설정] weekly.html과 동일한 JSONP(gviz/tq) 방식
     // =========================================================================
-    // 구글 시트에서 배포한 Apps Script 웹 앱의 URL을 아래에 입력하세요.
-    const GAS_WEB_APP_URL = 'https://docs.google.com/spreadsheets/d/1nlcLw1mj0D94mhYcfHXsR3lew8AoMnvSngdRYLh3vhg/edit?gid=0#gid=0';
+    // 1. 복합점 매출 현황 구글 시트 주소를 아래에 붙여넣으세요. (URL에 #gid=숫자 가 포함되어 있으면 해당 시트 탭을 자동으로 읽어옵니다)
+    const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w/edit?usp=drive_web&ouid=114027821451249945566";
+    
+    // 2. 만약 시트 탭 이름으로 직접 지정하고 싶다면 아래에 탭 이름(예: "복합점")을 적고, URL의 gid 또는 첫 번째 탭을 그대로 쓰려면 빈 문자열("")로 두세요.
+    const SHEET_NAME = "";
 
-    let storeDataset = [];
+    // =========================================================================
+    // 초기 스냅샷 데이터 (네트워크 지연이나 오프라인 시에도 화면이 깨지지 않도록 유지)
+    // =========================================================================
+    const INITIAL_COMPLEX_DATA = [
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "강릉죽헌직영점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "561,214", w_sales: "9,470",  w_avg: "1,353", w_gr: "-36%", m_sales: "13,627", m_avg: "1,703", m_gr: "-26%", y26_sales: "426,568", y26_avg: "1,367", y26_gr: "-8%" },
+          { type: "OL(정상)", y25: "477,786", w_sales: "13,316", w_avg: "1,902", w_gr: "-18%", m_sales: "15,759", m_avg: "1,970", m_gr: "-35%", y26_sales: "385,181", y26_avg: "1,235", y26_gr: "-4%" },
+          { type: "WM(상설)", y25: "646,440", w_sales: "40,666", w_avg: "5,809", w_gr: "-9%",  m_sales: "54,270", m_avg: "6,784", m_gr: "4%",   y26_sales: "527,864", y26_avg: "1,692", y26_gr: "-3%" },
+          { type: "OL(상설)", y25: "188,186", w_sales: "19,907", w_avg: "2,844", w_gr: "67%",  m_sales: "21,183", m_avg: "2,648", m_gr: "46%",  y26_sales: "225,360", y26_avg: "722",   y26_gr: "48%" }
+        ],
+        total: { type: "합계", y25: "1,873,626", w_sales: "83,359", w_avg: "11,908", w_gr: "-5%", m_sales: "104,838", m_avg: "13,105", m_gr: "-4%", y26_sales: "1,564,973", y26_avg: "5,016", y26_gr: "0%" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "용인보라직영점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "449,526", w_sales: "9,616",  w_avg: "1,374", w_gr: "-8%",  m_sales: "12,851", m_avg: "1,606", m_gr: "1%",   y26_sales: "457,053", y26_avg: "1,465", y26_gr: "25%" },
+          { type: "OL(정상)", y25: "287,677", w_sales: "7,805",  w_avg: "1,115", w_gr: "22%",  m_sales: "8,784",  m_avg: "1,098", m_gr: "18%",  y26_sales: "319,861", y26_avg: "1,025", y26_gr: "36%" },
+          { type: "WM(상설)", y25: "510,979", w_sales: "13,889", w_avg: "1,984", w_gr: "-2%",  m_sales: "17,358", m_avg: "2,170", m_gr: "21%",  y26_sales: "409,468", y26_avg: "1,312", y26_gr: "8%" },
+          { type: "OL(상설)", y25: "197,862", w_sales: "3,333",  w_avg: "476",   w_gr: "-41%", m_sales: "4,790",  m_avg: "599",   m_gr: "-18%", y26_sales: "171,530", y26_avg: "550",   y26_gr: "12%" }
+        ],
+        total: { type: "합계", y25: "1,446,043", w_sales: "34,643", w_avg: "4,949", w_gr: "-6%", m_sales: "43,782", m_avg: "5,473", m_gr: "8%", y26_sales: "1,357,912", y26_avg: "4,352", y26_gr: "20%" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "문막광터직영점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "467,455", w_sales: "9,832", w_avg: "1,405", w_gr: "-42%", m_sales: "13,127", m_avg: "1,641", m_gr: "-30%", y26_sales: "348,884", y26_avg: "1,118", y26_gr: "-1%" },
+          { type: "OL(정상)", y25: "194,518", w_sales: "3,952", w_avg: "565",   w_gr: "21%",  m_sales: "4,256",  m_avg: "532",   m_gr: "-38%", y26_sales: "128,801", y26_avg: "413",   y26_gr: "-18%" },
+          { type: "WM(상설)", y25: "281,115", w_sales: "8,671", w_avg: "1,239", w_gr: "116%", m_sales: "13,406", m_avg: "1,676", m_gr: "174%", y26_sales: "274,911", y26_avg: "881",   y26_gr: "26%" },
+          { type: "OL(상설)", y25: "72,404",  w_sales: "2,450", w_avg: "350",   w_gr: "99%",  m_sales: "3,373",  m_avg: "422",   m_gr: "140%", y26_sales: "82,580",  y26_avg: "265",   y26_gr: "60%" }
+        ],
+        total: { type: "합계", y25: "1,015,492", w_sales: "24,904", w_avg: "3,558", w_gr: "-2%", m_sales: "34,161", m_avg: "4,270", m_gr: "7%", y26_sales: "835,177", y26_avg: "2,677", y26_gr: "7%" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "서수원직영점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "340,375",   w_sales: "10,121", w_avg: "1,446", w_gr: "145%", m_sales: "10,580", m_avg: "1,323", m_gr: "102%", y26_sales: "398,063", y26_avg: "1,276", y26_gr: "37%" },
+          { type: "OL(정상)", y25: "212,740",   w_sales: "6,953",  w_avg: "993",   w_gr: "192%", m_sales: "7,152",  m_avg: "894",   m_gr: "101%", y26_sales: "206,508", y26_avg: "662",   y26_gr: "10%" },
+          { type: "WM(상설)", y25: "1,119,323", w_sales: "23,935", w_avg: "3,419", w_gr: "-23%", m_sales: "28,561", m_avg: "3,570", m_gr: "-24%", y26_sales: "813,229", y26_avg: "2,607", y26_gr: "-10%" },
+          { type: "OL(상설)", y25: "370,478",   w_sales: "8,026",  w_avg: "1,147", w_gr: "-24%", m_sales: "9,783",  m_avg: "1,223", m_gr: "-29%", y26_sales: "268,144", y26_avg: "859",   y26_gr: "-8%" }
+        ],
+        total: { type: "합계", y25: "2,042,916", w_sales: "49,035", w_avg: "7,005", w_gr: "2%", m_sales: "56,076", m_avg: "7,010", m_gr: "-7%", y26_sales: "1,685,944", y26_avg: "5,404", y26_gr: "1%" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "동탄직영점",
+        note: "(26.05.09 오픈)",
+        rows: [
+          { type: "WM(정상)", y25: "-", w_sales: "4,952", w_avg: "707",   w_gr: "-", m_sales: "6,793",  m_avg: "849",   m_gr: "-", y26_sales: "191,569", y26_avg: "1,047", y26_gr: "-" },
+          { type: "OL(정상)", y25: "-", w_sales: "4,179", w_avg: "597",   w_gr: "-", m_sales: "4,829",  m_avg: "604",   m_gr: "-", y26_sales: "112,498", y26_avg: "615",   y26_gr: "-" },
+          { type: "WM(상설)", y25: "-", w_sales: "8,760", w_avg: "1,251", w_gr: "-", m_sales: "11,406", m_avg: "1,426", m_gr: "-", y26_sales: "157,512", y26_avg: "861",   y26_gr: "-" },
+          { type: "OL(상설)", y25: "-", w_sales: "2,044", w_avg: "292",   w_gr: "-", m_sales: "2,573",  m_avg: "322",   m_gr: "-", y26_sales: "47,713",  y26_avg: "261",   y26_gr: "-" }
+        ],
+        total: { type: "합계", y25: "-", w_sales: "19,935", w_avg: "2,848", w_gr: "-", m_sales: "25,601", m_avg: "3,200", m_gr: "-", y26_sales: "509,291", y26_avg: "2,783", y26_gr: "-" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "일산덕이직영점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "222,021", w_sales: "32,217", w_avg: "4,602", w_gr: "532%", m_sales: "32,217", m_avg: "4,027", m_gr: "466%", y26_sales: "199,744", y26_avg: "640", y26_gr: "11%" },
+          { type: "OL(정상)", y25: "104,081", w_sales: "1,648",  w_avg: "235",   w_gr: "-29%", m_sales: "1,705",  m_avg: "213",   m_gr: "-32%", y26_sales: "94,961",  y26_avg: "304", y26_gr: "5%" },
+          { type: "WM(상설)", y25: "120,724", w_sales: "2,426",  w_avg: "347",   w_gr: "-20%", m_sales: "2,426",  m_avg: "303",   m_gr: "-43%", y26_sales: "101,275", y26_avg: "325", y26_gr: "3%" },
+          { type: "OL(상설)", y25: "72,672",  w_sales: "2,659",  w_avg: "380",   w_gr: "-15%", m_sales: "2,659",  m_avg: "332",   m_gr: "-18%", y26_sales: "51,523",  y26_avg: "165", y26_gr: "-14%" }
+        ],
+        total: { type: "합계", y25: "519,497", w_sales: "38,950", w_avg: "5,564", w_gr: "187%", m_sales: "39,007", m_avg: "4,876", m_gr: "148%", y26_sales: "447,504", y26_avg: "1,434", y26_gr: "4%" }
+      },
+      {
+        group: "WM+OL+상설\n복합점",
+        store: "곤지암점",
+        note: "(26.11.07 오픈)",
+        rows: [
+          { type: "WM(정상)", y25: "-", w_sales: "3,627", w_avg: "1,813", w_gr: "-", m_sales: "3,627", m_avg: "1,813", m_gr: "-", y26_sales: "3,627", y26_avg: "1,813", y26_gr: "-" },
+          { type: "WM(상설)", y25: "-", w_sales: "6,772", w_avg: "3,386", w_gr: "-", m_sales: "6,772", m_avg: "3,386", m_gr: "-", y26_sales: "6,772", y26_avg: "3,386", y26_gr: "-" },
+          { type: "OL(상설)", y25: "-", w_sales: "2,132", w_avg: "1,066", w_gr: "-", m_sales: "2,132", m_avg: "1,066", m_gr: "-", y26_sales: "2,132", y26_avg: "1,066", y26_gr: "-" }
+        ],
+        total: { type: "합계", y25: "-", w_sales: "12,531", w_avg: "6,266", w_gr: "-", m_sales: "12,531", m_avg: "6,266", m_gr: "-", y26_sales: "12,531", y26_avg: "6,266", y26_gr: "-" }
+      },
+      {
+        group: "WM+OL\n복합점",
+        store: "용인점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "545,294", w_sales: "13,683", w_avg: "1,955", w_gr: "-30%", m_sales: "13,683", m_avg: "1,710", m_gr: "-43%", y26_sales: "456,618", y26_avg: "1,464", y26_gr: "-2%" },
+          { type: "OL(정상)", y25: "566,991", w_sales: "16,746", w_avg: "2,392", w_gr: "-8%",  m_sales: "16,746", m_avg: "2,093", m_gr: "-28%", y26_sales: "509,921", y26_avg: "1,634", y26_gr: "10%" }
+        ],
+        total: { type: "합계", y25: "1,112,284", w_sales: "30,429", w_avg: "4,347", w_gr: "-20%", m_sales: "30,429", m_avg: "3,804", m_gr: "-35%", y26_sales: "966,539", y26_avg: "3,098", y26_gr: "4%" }
+      },
+      {
+        group: "WM+OL\n복합점",
+        store: "이천부발점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "383,774", w_sales: "4,699", w_avg: "671", w_gr: "-30%", m_sales: "5,716", m_avg: "714", m_gr: "-43%", y26_sales: "274,002", y26_avg: "878", y26_gr: "-13%" },
+          { type: "OL(정상)", y25: "99,399",  w_sales: "1,454", w_avg: "208", w_gr: "171%", m_sales: "1,454", m_avg: "182", m_gr: "13%",  y26_sales: "91,868",  y26_avg: "294", y26_gr: "9%" }
+        ],
+        total: { type: "합계", y25: "483,173", w_sales: "6,153", w_avg: "879", w_gr: "-15%", m_sales: "7,169", m_avg: "896", m_gr: "-37%", y26_sales: "367,284", y26_avg: "1,177", y26_gr: "-9%" }
+      },
+      {
+        group: "WM+OL\n복합점",
+        store: "철원점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "521,145", w_sales: "2,338", w_avg: "334", w_gr: "-91%", m_sales: "3,193", m_avg: "399", m_gr: "-88%", y26_sales: "341,053", y26_avg: "1,093", y26_gr: "-22%" },
+          { type: "OL(정상)", y25: "153,307", w_sales: "1,602", w_avg: "229", w_gr: "-12%", m_sales: "1,734", m_avg: "217", m_gr: "-15%", y26_sales: "126,180", y26_avg: "404",   y26_gr: "1%" }
+        ],
+        total: { type: "합계", y25: "674,452", w_sales: "3,940", w_avg: "563", w_gr: "-85%", m_sales: "4,927", m_avg: "616", m_gr: "-82%", y26_sales: "467,234", y26_avg: "1,498", y26_gr: "-17%" }
+      },
+      {
+        group: "WM+OL\n복합점",
+        store: "간석점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "488,883", w_sales: "7,545", w_avg: "1,078", w_gr: "-38%", m_sales: "10,063", m_avg: "1,258", m_gr: "-33%", y26_sales: "338,156", y26_avg: "1,084", y26_gr: "-17%" },
+          { type: "OL(정상)", y25: "147,601", w_sales: "3,579", w_avg: "511",   w_gr: "-11%", m_sales: "4,396",  m_avg: "549",   m_gr: "-7%",  y26_sales: "112,002", y26_avg: "359",   y26_gr: "-11%" }
+        ],
+        total: { type: "합계", y25: "636,484", w_sales: "11,124", w_avg: "1,589", w_gr: "-31%", m_sales: "14,458", m_avg: "1,807", m_gr: "-26%", y26_sales: "450,158", y26_avg: "1,443", y26_gr: "-16%" }
+      },
+      {
+        group: "WM+OL\n복합점",
+        store: "안산선부점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "67,558",  w_sales: "5,415",  w_avg: "774",   w_gr: "-28%", m_sales: "7,705",  m_avg: "963",   m_gr: "3%",  y26_sales: "209,572", y26_avg: "672", y26_gr: "696%" },
+          { type: "OL(정상)", y25: "425,519", w_sales: "16,093", w_avg: "2,299", w_gr: "64%",  m_sales: "17,941", m_avg: "2,243", m_gr: "82%", y26_sales: "293,384", y26_avg: "940", y26_gr: "-13%" }
+        ],
+        total: { type: "합계", y25: "493,076", w_sales: "21,507", w_avg: "3,072", w_gr: "24%", m_sales: "25,646", m_avg: "3,206", m_gr: "48%", y26_sales: "502,956", y26_avg: "1,612", y26_gr: "38%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "방학직영점",
+        note: "(OL 02.28 철수)",
+        rows: [
+          { type: "WM(정상)", y25: "229,201", w_sales: "6,567",  w_avg: "938",   w_gr: "5%",  m_sales: "7,362",  m_avg: "920",   m_gr: "10%",   y26_sales: "237,701", y26_avg: "762", y26_gr: "25%" },
+          { type: "OL(정상)", y25: "170,070", w_sales: "-",      w_avg: "-",     w_gr: "0%",  m_sales: "-",      m_avg: "-",     m_gr: "-100%", y26_sales: "48,828",  y26_avg: "156", y26_gr: "-65%" },
+          { type: "WM(상설)", y25: "270,977", w_sales: "11,214", w_avg: "1,602", w_gr: "43%", m_sales: "12,781", m_avg: "1,598", m_gr: "41%",   y26_sales: "265,884", y26_avg: "852", y26_gr: "18%" }
+        ],
+        total: { type: "합계", y25: "670,248", w_sales: "17,780", w_avg: "2,540", w_gr: "3%", m_sales: "20,142", m_avg: "2,518", m_gr: "2%", y26_sales: "552,413", y26_avg: "1,771", y26_gr: "-1%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "화성남양점",
+        note: "(08.21 대리점 전환)",
+        rows: [
+          { type: "WM(정상)", y25: "185,405", w_sales: "3,823", w_avg: "546", w_gr: "-16%", m_sales: "5,357", m_avg: "670", m_gr: "5%",   y26_sales: "166,095", y26_avg: "532", y26_gr: "7%" },
+          { type: "WM(상설)", y25: "128,306", w_sales: "4,235", w_avg: "605", w_gr: "176%", m_sales: "5,119", m_avg: "640", m_gr: "106%", y26_sales: "106,905", y26_avg: "343", y26_gr: "0%" }
+        ],
+        total: { type: "합계", y25: "313,711", w_sales: "8,058", w_avg: "1,151", w_gr: "33%", m_sales: "10,475", m_avg: "1,309", m_gr: "38%", y26_sales: "273,001", y26_avg: "875", y26_gr: "4%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "수원남문점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "384,861", w_sales: "38,155", w_avg: "5,451", w_gr: "190%", m_sales: "39,687", m_avg: "4,961", m_gr: "140%", y26_sales: "466,252", y26_avg: "1,494", y26_gr: "51%" },
+          { type: "WM(상설)", y25: "214,010", w_sales: "10,575", w_avg: "1,511", w_gr: "59%",  m_sales: "12,913", m_avg: "1,614", m_gr: "52%",  y26_sales: "308,604", y26_avg: "989",   y26_gr: "81%" }
+        ],
+        total: { type: "합계", y25: "598,870", w_sales: "48,730", w_avg: "6,961", w_gr: "146%", m_sales: "52,600", m_avg: "6,575", m_gr: "110%", y26_sales: "774,856", y26_avg: "2,484", y26_gr: "62%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "전곡점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "244,529", w_sales: "7,606", w_avg: "1,087", w_gr: "45%", m_sales: "8,510", m_avg: "1,064", m_gr: "40%", y26_sales: "252,824", y26_avg: "810", y26_gr: "28%" },
+          { type: "WM(상설)", y25: "95,818",  w_sales: "2,491", w_avg: "356",   w_gr: "15%", m_sales: "3,395", m_avg: "424",   m_gr: "27%", y26_sales: "79,917",  y26_avg: "256", y26_gr: "0%" }
+        ],
+        total: { type: "합계", y25: "340,346", w_sales: "10,097", w_avg: "1,442", w_gr: "36%", m_sales: "11,905", m_avg: "1,488", m_gr: "36%", y26_sales: "332,741", y26_avg: "1,066", y26_gr: "20%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "안양중앙점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "374,602", w_sales: "9,670", w_avg: "1,381", w_gr: "26%", m_sales: "10,626", m_avg: "1,328", m_gr: "22%", y26_sales: "318,858", y26_avg: "1,022", y26_gr: "2%" },
+          { type: "WM(상설)", y25: "286,360", w_sales: "9,553", w_avg: "1,365", w_gr: "-7%", m_sales: "12,194", m_avg: "1,524", m_gr: "4%",  y26_sales: "224,468", y26_avg: "719",   y26_gr: "-3%" }
+        ],
+        total: { type: "합계", y25: "660,962", w_sales: "19,223", w_avg: "2,746", w_gr: "7%", m_sales: "22,820", m_avg: "2,853", m_gr: "12%", y26_sales: "543,327", y26_avg: "1,741", y26_gr: "0%" }
+      },
+      {
+        group: "WM+상설\n복합점",
+        store: "의정부제일점",
+        note: "",
+        rows: [
+          { type: "WM(정상)", y25: "374,663", w_sales: "8,406", w_avg: "1,201", w_gr: "-6%",  m_sales: "9,668", m_avg: "1,209", m_gr: "1%", y26_sales: "266,159", y26_avg: "853", y26_gr: "-17%" },
+          { type: "WM(상설)", y25: "246,155", w_sales: "7,225", w_avg: "1,032", w_gr: "-17%", m_sales: "9,904", m_avg: "1,238", m_gr: "1%", y26_sales: "224,595", y26_avg: "720", y26_gr: "14%" }
+        ],
+        total: { type: "합계", y25: "620,818", w_sales: "15,631", w_avg: "2,233", w_gr: "-11%", m_sales: "19,572", m_avg: "2,446", m_gr: "1%", y26_sales: "490,754", y26_avg: "1,573", y26_gr: "-5%" }
+      }
+    ];
+
+    let storeDataset = JSON.parse(JSON.stringify(INITIAL_COMPLEX_DATA));
     let selectedGroup = 'ALL';
     let searchQuery = '';
     let expandedStores = new Set();
     let allExpanded = false;
+    let jsonpFallbackTimer = null;
+    let isManualSync = false;
+    let toastTimer = null;
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastBox');
+      if (!toast) return;
+      document.getElementById('toastMessage').innerText = msg;
+      toast.classList.remove('opacity-0', '-translate-y-2', 'pointer-events-none');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-2', 'pointer-events-none');
+      }, 2400);
+    }
 
     // =========================================================================
-    // 2. 데이터 비동기 Fetch 함수
+    // [구글 스프레드시트 실시간 연동] JSONP (gviz/tq)
     // =========================================================================
-    async function fetchSheetData() {
-      const tbody = document.getElementById('complexTableBody');
-      
-      // 로딩 스피너 UI 표시
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="13" class="py-24 text-center">
-            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-amber-500 mb-3 block"></i>
-            <p class="text-[13.5px] font-bold text-zinc-600">구글 시트에서 최신 실적을 동기화하고 있습니다...</p>
-          </td>
-        </tr>
-      `;
+    function extractSheetId(input) {
+      if (!input) return null;
+      const match = input.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (match && match[1]) return match[1];
+      if (input.length > 25 && !input.includes('/') && !input.includes('.')) return input.trim();
+      return null;
+    }
+
+    function extractGid(input) {
+      if (!input) return null;
+      const match = input.match(/[?#&]gid=([0-9]+)/);
+      return (match && match[1]) ? match[1] : null;
+    }
+
+    function setSyncSpinning(spinning) {
+      const icon = document.getElementById('refreshIcon');
+      if (icon) icon.classList.toggle('fa-spin', spinning);
+    }
+
+    function loadGoogleSheetData(manual = false) {
+      isManualSync = manual;
+      const sheetId = extractSheetId(GOOGLE_SHEET_URL);
+      if (!sheetId) {
+        if (manual) showToast("구글 스프레드시트 주소를 확인해주세요.");
+        return;
+      }
+
+      setSyncSpinning(true);
+      const syncDot = document.getElementById('syncDot');
+      const syncText = document.getElementById('syncText');
+      if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+      if (syncText) syncText.innerText = '동기화중';
+
+      const oldScript = document.getElementById('gviz_jsonp_script');
+      if (oldScript) oldScript.remove();
+
+      if (jsonpFallbackTimer) clearTimeout(jsonpFallbackTimer);
+      jsonpFallbackTimer = setTimeout(() => {
+        setSyncSpinning(false);
+        if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+        if (syncText) syncText.innerText = '시트 스냅샷 모드';
+        if (isManualSync) showToast(`시트 스냅샷 데이터 기준으로 표시 중입니다 (${storeDataset.length}개 매장)`);
+      }, 3500);
+
+      const gid = extractGid(GOOGLE_SHEET_URL);
+      let sheetParam = '';
+      if (SHEET_NAME && SHEET_NAME.trim() !== '') {
+        sheetParam = `&sheet=${encodeURIComponent(SHEET_NAME.trim())}`;
+      } else if (gid) {
+        sheetParam = `&gid=${gid}`;
+      }
+
+      const script = document.createElement('script');
+      script.id = 'gviz_jsonp_script';
+      script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:handleGoogleSheetJSONP${sheetParam}&t=${Date.now()}`;
+      script.onerror = function() {
+        if (jsonpFallbackTimer) clearTimeout(jsonpFallbackTimer);
+        setSyncSpinning(false);
+        if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+        if (syncText) syncText.innerText = '시트 스냅샷 모드';
+        if (isManualSync) showToast(`시트 권한을 확인해주세요. 스냅샷 기준으로 표시합니다.`);
+      };
+      document.body.appendChild(script);
+    }
+
+    function normalizeGroupName(raw) {
+      const s = String(raw || '').replace(/\s+/g, '');
+      if (s.includes('WM+OL+상설')) return "WM+OL+상설\n복합점";
+      if (s.includes('WM+OL')) return "WM+OL\n복합점";
+      if (s.includes('WM+상설')) return "WM+상설\n복합점";
+      return String(raw || '').trim();
+    }
+
+    window.handleGoogleSheetJSONP = function(response) {
+      if (jsonpFallbackTimer) clearTimeout(jsonpFallbackTimer);
+      setSyncSpinning(false);
+
+      const syncDot = document.getElementById('syncDot');
+      const syncText = document.getElementById('syncText');
 
       try {
-        const response = await fetch(GAS_WEB_APP_URL);
-        if (!response.ok) throw new Error('네트워크 응답이 실패했습니다.');
-        
-        const data = await response.json();
-        storeDataset = data; // 불러온 데이터를 전역 변수에 할당
-        
-        renderGroupFilterTabs();
-        renderTable();
-      } catch (error) {
-        console.error('Data Fetch Error:', error);
-        // 에러 UI 표시
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="13" class="py-24 text-center">
-              <i class="fa-solid fa-triangle-exclamation text-3xl text-rose-500 mb-3 block"></i>
-              <p class="text-[14px] font-bold text-rose-600 mb-1">데이터 동기화에 실패했습니다.</p>
-              <p class="text-xs font-medium text-zinc-500">Apps Script 웹 앱 URL이 정확한지, 배포 권한이 '모든 사용자'로 되어 있는지 확인해주세요.</p>
-            </td>
-          </tr>
-        `;
+        if (!response || !response.table || !response.table.rows) {
+          if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+          if (syncText) syncText.innerText = '시트 스냅샷 모드';
+          return;
+        }
+
+        const cols = response.table.cols || [];
+        const rows = response.table.rows || [];
+
+        // 1. 시트 내 상단 타이틀 및 기간 헤더(주간/월간/누계) 자동 감지 후 업데이트
+        const checkHeaderMeta = (str) => {
+          if (!str) return;
+          const clean = String(str).trim();
+          if (clean.includes('복합매장 실적현황') || clean.includes('복합점 실적현황')) {
+            document.getElementById('sheetMainTitle').innerText = clean.startsWith('■') ? clean : `■ ${clean}`;
+          }
+          if (/주간\s*\(/.test(clean)) document.getElementById('thWeeklyTitle').innerText = clean;
+          if (/월간\s*\(/.test(clean)) document.getElementById('thMonthlyTitle').innerText = clean;
+          if (/누계\s*\(/.test(clean)) document.getElementById('thYearlyTitle').innerText = clean;
+        };
+
+        cols.forEach(c => checkHeaderMeta(c.label));
+        for (let r = 0; r < Math.min(rows.length, 6); r++) {
+          const cells = rows[r].c || [];
+          cells.forEach(cell => {
+            if (cell) checkHeaderMeta(cell.f || cell.v);
+          });
+        }
+
+        // 2. 복종 구분 열('WM(정상)' 등이 위치한 열 인덱스) 자동 감지
+        const validBrandTypes = ['WM(정상)', 'OL(정상)', 'WM(상설)', 'OL(상설)'];
+        let typeColIdx = 2; // 기본값 C열(index 2)
+        for (let r = 0; r < rows.length; r++) {
+          const cells = rows[r].c || [];
+          for (let c = 0; c < cells.length; c++) {
+            const val = cells[c] ? String(cells[c].f ?? cells[c].v ?? '').replace(/\s+/g, '') : '';
+            if (validBrandTypes.includes(val)) {
+              typeColIdx = c;
+              break;
+            }
+          }
+          if (typeColIdx !== 2) break;
+        }
+
+        const groupColIdx = Math.max(0, typeColIdx - 2);
+        const storeColIdx = Math.max(0, typeColIdx - 1);
+
+        const getCell = (cells, idx) => (cells && cells[idx]) ? cells[idx] : null;
+        const getStr = (cells, idx) => {
+          const c = getCell(cells, idx);
+          if (!c) return '';
+          if (c.f !== undefined && c.f !== null && String(c.f).trim() !== '') return String(c.f).trim();
+          if (c.v !== undefined && c.v !== null) return String(c.v).trim();
+          return '';
+        };
+        const fmtSale = (cells, idx) => {
+          const c = getCell(cells, idx);
+          if (!c || (c.v === null && !c.f)) return '-';
+          if (c.f && String(c.f).trim() === '-') return '-';
+          if (typeof c.v === 'number') return Math.round(c.v).toLocaleString('ko-KR');
+          const s = String(c.f ?? c.v ?? '').trim();
+          return s === '' ? '-' : s;
+        };
+        const fmtGr = (cells, idx) => {
+          const c = getCell(cells, idx);
+          if (!c || (c.v === null && !c.f)) return '-';
+          if (c.f !== undefined && c.f !== null) {
+            const fStr = String(c.f).trim();
+            if (fStr === '-' || fStr.includes('%')) return fStr;
+          }
+          if (typeof c.v === 'number') return Math.round(c.v * 100) + '%';
+          const s = String(c.v ?? '').trim();
+          return s === '' ? '-' : s;
+        };
+
+        // 기존 스냅샷의 매장별 note 매핑 보존용
+        const defaultNotes = {};
+        INITIAL_COMPLEX_DATA.forEach(item => {
+          if (item.note) defaultNotes[item.store] = item.note;
+        });
+
+        const parsedStores = [];
+        let currentGroup = "WM+OL+상설\n복합점";
+        let currentStoreObj = null;
+
+        for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].c || [];
+          const rawGroup = getStr(cells, groupColIdx);
+          const rawStore = getStr(cells, storeColIdx);
+          const rawType = getStr(cells, typeColIdx).replace(/\s+/g, '');
+
+          if (rawGroup && (rawGroup.includes('WM') || rawGroup.includes('복합'))) {
+            currentGroup = normalizeGroupName(rawGroup);
+          }
+
+          // 매장명 셀에 오픈일/철수일 메모가 줄바꿈이나 괄호로 들어있는 경우 분리
+          if (rawStore && rawStore !== '매장명' && !rawStore.includes('합계') && !rawStore.includes('총계')) {
+            if (rawStore.startsWith('(') && currentStoreObj) {
+              currentStoreObj.note = rawStore;
+            } else {
+              let sName = rawStore;
+              let sNote = '';
+              const parenIdx = rawStore.indexOf('(');
+              if (parenIdx > 0) {
+                sName = rawStore.slice(0, parenIdx).trim();
+                sNote = rawStore.slice(parenIdx).trim();
+              } else {
+                sName = rawStore.replace(/\s+/g, ' ').trim();
+                sNote = defaultNotes[sName] || '';
+              }
+
+              if (!currentStoreObj || currentStoreObj.store !== sName) {
+                if (currentStoreObj && currentStoreObj.rows.length > 0) {
+                  parsedStores.push(currentStoreObj);
+                }
+                currentStoreObj = {
+                  group: currentGroup,
+                  store: sName,
+                  note: sNote,
+                  rows: [],
+                  total: null
+                };
+              }
+            }
+          }
+
+          const rowMetrics = {
+            type: rawType,
+            y25: fmtSale(cells, typeColIdx + 1),
+            w_sales: fmtSale(cells, typeColIdx + 2),
+            w_avg: fmtSale(cells, typeColIdx + 3),
+            w_gr: fmtGr(cells, typeColIdx + 4),
+            m_sales: fmtSale(cells, typeColIdx + 5),
+            m_avg: fmtSale(cells, typeColIdx + 6),
+            m_gr: fmtGr(cells, typeColIdx + 7),
+            y26_sales: fmtSale(cells, typeColIdx + 8),
+            y26_avg: fmtSale(cells, typeColIdx + 9),
+            y26_gr: fmtGr(cells, typeColIdx + 10)
+          };
+
+          if (validBrandTypes.includes(rawType)) {
+            if (currentStoreObj) {
+              currentStoreObj.rows.push(rowMetrics);
+            }
+          } else if ((rawType === '합계' || rawType === '소계') && currentStoreObj && currentStoreObj.rows.length > 0) {
+            rowMetrics.type = '합계';
+            currentStoreObj.total = rowMetrics;
+            parsedStores.push(currentStoreObj);
+            currentStoreObj = null;
+          }
+        }
+
+        if (parsedStores.length > 0) {
+          storeDataset = parsedStores;
+          renderGroupFilterTabs();
+          renderTable();
+
+          if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+          if (syncText) syncText.innerText = '실시간 시트 연동';
+          if (isManualSync) {
+            showToast(`구글 시트 실시간 동기화 완료 (${parsedStores.length}개 매장)`);
+          }
+        } else {
+          if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+          if (syncText) syncText.innerText = '시트 스냅샷 모드';
+          if (isManualSync) {
+            showToast(`복합점 시트 탭 이름(SHEET_NAME) 또는 주소를 확인해주세요.`);
+          }
+        }
+      } catch (err) {
+        console.error("시트 데이터 파싱 오류:", err);
+        if (syncDot) syncDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+        if (syncText) syncText.innerText = '시트 스냅샷 모드';
       }
-    }
+    };
 
     // =========================================================================
-    // 3. 기존 렌더링 및 헬퍼 로직 (수정 없이 그대로 유지)
+    // 기존 UI 및 테이블 렌더링 로직
     // =========================================================================
-    function toNum(val) {
-      if (val === null || val === undefined) return 0;
-      const cleaned = String(val).replace(/,/g, '').trim();
-      if (cleaned === '' || cleaned === '-') return 0;
-      const n = parseFloat(cleaned);
-      return isNaN(n) ? 0 : n;
-    }
-
-    function fmtNum(n) {
-      return Math.round(n).toLocaleString('ko-KR');
-    }
-
     function getGrowthClass(grStr, isTotalRow = false, isDarkFooter = false) {
       const s = String(grStr || '').trim();
       if (s === '-' || s === '' || s === '0%' || s === '0.0%') {
@@ -361,7 +797,7 @@
             `<td rowspan="${groupRowSpan}" class="border-r border-b border-[#E6E4DD] px-2 py-2 text-center font-bold text-[11.5px] text-zinc-500 bg-zinc-50 whitespace-pre-line leading-relaxed shadow-[inset_-1px_0_0_rgba(0,0,0,0.02)]">
               ${groupName}
             </td>` : '';
-          groupCellRendered = true; 
+          groupCellRendered = true;
 
           if (!isExpanded) {
             let tr = `<tr class="bg-white hover:bg-zinc-50 transition-colors border-b border-[#E6E4DD]">`;
@@ -382,6 +818,7 @@
             htmlRows.push(tr);
           } else {
             const rowSpanCount = storeObj.rows.length + 1;
+            
             storeObj.rows.forEach((r, idx) => {
               let tr = `<tr class="bg-white hover:bg-zinc-50 transition-colors ${idx === 0 ? 'border-t border-[#E6E4DD]' : ''}">`;
               if (idx === 0) {
@@ -397,6 +834,7 @@
                   </td>
                 `;
               }
+              
               tr += `
                 <td class="border-r border-[#E6E4DD] px-2 py-2 text-center select-none ${idx === 0 ? '' : 'border-t border-[#F0EEE9]'}">
                   ${getBrandBadge(r.type)}
@@ -444,11 +882,11 @@
       handleSearchInput('');
     }
 
-    // =========================================================================
-    // 4. 초기 렌더링을 fetchSheetData()로 대체
-    // =========================================================================
+    // 초기 실행: 스냅샷 즉시 렌더링 후 구글 시트 실시간 동기화 호출
     window.addEventListener('DOMContentLoaded', () => {
-      fetchSheetData();
+      renderGroupFilterTabs();
+      renderTable();
+      loadGoogleSheetData(false);
     });
   </script>
 </body>
