@@ -38,7 +38,6 @@
     </div>
 
     <!-- [2. PC 사이드바] -->
-    <!-- transition-all을 통해 margin 변경 시 부드럽게 슬라이드 애니메이션 적용 -->
     <aside id="desktopSidebar" class="hidden lg:flex w-[250px] bg-[#18181B] text-white flex-col shrink-0 border-r border-zinc-800 select-none z-20 transition-all duration-300 ease-in-out">
       <div class="px-5 pt-5 pb-4 border-b border-zinc-800/90">
         <div onclick="goHome()" class="flex items-center gap-2.5 cursor-pointer group">
@@ -65,7 +64,6 @@
           <div class="flex items-center gap-2.5 min-w-0">
             <div class="w-8 h-8 rounded-full bg-zinc-800 text-amber-400 flex items-center justify-center text-xs font-black shrink-0"><i class="fa-solid fa-user-check"></i></div>
             <div class="min-w-0">
-              <!-- 깨짐 현상이 발생하는 이름(userName) 요소는 완전히 삭제하고, 이메일만 강조하여 표시합니다. -->
               <div id="sidebarUserEmail" class="text-[11px] text-zinc-300 font-medium truncate">-</div>
             </div>
           </div>
@@ -77,7 +75,7 @@
     <!-- [3. 우측 메인 영역] -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F7F6F2] relative">
       
-      <!-- [3-1. 플로팅 사이드바 토글 버튼 (가운데 정렬)] -->
+      <!-- [3-1. 플로팅 사이드바 토글 버튼] -->
       <button onclick="toggleDesktopSidebar()" id="desktopSidebarToggleBtn" class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-30 w-5 h-14 bg-white border border-l-0 border-[#E6E4DD] shadow-[2px_0_5px_rgba(0,0,0,0.05)] rounded-r-lg items-center justify-center text-zinc-400 hover:text-amber-500 hover:w-6 transition-all cursor-pointer">
         <i class="fa-solid fa-chevron-left text-[10px]" id="sidebarToggleIcon"></i>
       </button>
@@ -155,6 +153,8 @@
     const CLIENT_ID = "663649865269-lbt4v2hn6li66v4ncjhu3pnnq5pt7vn2.apps.googleusercontent.com";
     const ALLOWED = ["gudwnqn109@gmail.com"];
     const PIN_KEY = 'wm_portal_pinned_menus_v4';
+    
+    // [수정됨] MENU 배열에 '통합 재고 조회(stock)' 추가
     const MENU = [
       { id: 'dashboard', title: '통합 대시보드', subtitle: '매장별 실시간 매출 및 상권 분석', url: './dashboard.html', cat: '매출·실적', badge: 'MAIN', icon: 'fa-solid fa-gauge-high', acc: 'amber' },
       { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', cat: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', acc: 'amber' },
@@ -162,8 +162,10 @@
       { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', cat: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', acc: 'amber' },
       { id: 'complex', title: '복합점 실적현황', subtitle: '복합 매장 브랜드별 상세 실적', url: './complex.html', cat: '매출·실적', badge: 'COMPLEX', icon: 'fa-solid fa-layer-group', acc: 'blue' },
       { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', cat: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', acc: 'indigo' },
-      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' }
+      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' },
+      { id: 'stock', title: '통합 재고 조회', subtitle: '배분집계 및 스타일·창고 실시간 재고', url: './stock.html', cat: '매장·관리', badge: 'STOCK', icon: 'fa-solid fa-box-open', acc: 'indigo' }
     ];
+    
     const ACC = {
       amber: { bg: 'bg-amber-500/15', txt: 'text-amber-700', bdg: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
       blue:  { bg: 'bg-blue-500/12', txt: 'text-blue-700', bdg: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
@@ -172,10 +174,12 @@
 
     // State
     const $ = id => document.getElementById(id);
-    let pins = ['dashboard', 'daily', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
+    
+    // [수정됨] pins 기본값에 'stock' 추가하여 홈 화면 및 퀵 메뉴바 상단 우선 노출
+    let pins = ['dashboard', 'daily', 'sellthru_fw', 'stock'], selCat = '전체', view = 'home', split = 1;
     let smId = 'dashboard', lmId = 'dashboard', rmId = 'daily';
     let user = null, isPrev = false;
-    let isSidebarOpen = true; // 사이드바 토글 상태 변수 추가
+    let isSidebarOpen = true;
 
     // Helpers
     const getM = id => MENU.find(m => m.id === id) || MENU[0];
@@ -191,19 +195,16 @@
       syncUI();
     }
 
-    // [추가됨] PC 사이드바 토글 애니메이션 기능
     function toggleDesktopSidebar() {
       isSidebarOpen = !isSidebarOpen;
       const sidebar = $('desktopSidebar');
       const icon = $('sidebarToggleIcon');
       
       if(isSidebarOpen) {
-        // 사이드바 펼침
         sidebar.classList.remove('-ml-[250px]');
         icon.classList.remove('fa-chevron-right');
         icon.classList.add('fa-chevron-left');
       } else {
-        // 사이드바 닫음 (마진을 이용해 메인 영역 확장)
         sidebar.classList.add('-ml-[250px]');
         icon.classList.remove('fa-chevron-left');
         icon.classList.add('fa-chevron-right');
@@ -361,7 +362,6 @@
     function initPortal() {
       $('authOverlay').classList.add('hidden');
       
-      // 이름 삽입 코드 완전 삭제, 이메일만 표시되도록 수정
       $('sidebarUserEmail').innerText = user?.email || '';
       $('drawerEmail').innerText = user?.email || '';
       
