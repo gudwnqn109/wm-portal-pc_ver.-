@@ -70,9 +70,7 @@
   <!-- 메인 대시보드 컨테이너 -->
   <main class="w-full max-w-[1800px] mx-auto px-4 lg:px-6 py-3.5 flex flex-col gap-4">
 
-    <!-- ========================================================================= -->
     <!-- [TOP SECTION] -->
-    <!-- ========================================================================= -->
     <section class="w-full grid grid-cols-1 xl:grid-cols-12 gap-4 items-stretch">
 
       <!-- 좌측 상단 (6컬럼) -->
@@ -123,7 +121,7 @@
 
           <div class="rounded-2xl bg-white p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between">
             <div class="flex items-center justify-between gap-1">
-              <span class="text-xs font-extrabold text-slate-700">26년 연누계</span>
+              <span id="dYearLabel" class="text-xs font-extrabold text-slate-700">연누계</span>
               <div class="flex items-center gap-1">
                 <span id="dYearRateBadge" class="text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200">0.0% 달성</span>
                 <span id="dYearGrBadge" class="text-[10.5px] font-extrabold px-1.5 py-0.5 rounded border bg-rose-50 text-rose-700 border-rose-200">+0.0% 신장</span>
@@ -182,7 +180,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-[11px] mb-1">
-                    <span class="font-extrabold text-slate-800">26년 주간 실적</span>
+                    <span id="wSalesCurLbl" class="font-extrabold text-slate-800">주간 실적</span>
                     <span id="wSales26" class="font-black text-slate-900">-</span>
                   </div>
                   <div class="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden">
@@ -191,7 +189,7 @@
                 </div>
                 <div>
                   <div class="flex justify-between text-[11px] mb-1">
-                    <span class="font-semibold text-slate-500">25년 전년 동기</span>
+                    <span id="wSalesPrevLbl" class="font-semibold text-slate-500">전년 동기</span>
                     <span id="wSales25" class="font-bold text-slate-600">-</span>
                   </div>
                   <div class="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden">
@@ -320,9 +318,7 @@
 
     </section>
 
-    <!-- ========================================================================= -->
     <!-- [BOTTOM SECTION] -->
-    <!-- ========================================================================= -->
     <section class="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
       
       <div class="lg:col-span-4 w-full min-w-0 flex flex-col">
@@ -334,7 +330,7 @@
                 <span id="cBranchBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-white/15 text-white shrink-0">서울지점</span>
                 <span id="cRegionInfo" class="text-xs text-indigo-200 font-medium truncate">강동구 · 인구 49.9만 · 웰메이드 기준</span>
               </div>
-              <span id="cClose25Badge" class="text-xs font-bold text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 shrink-0">25년 마감 -</span>
+              <span id="cClose25Badge" class="text-xs font-bold text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 shrink-0">전년 마감 -</span>
             </div>
             <div class="mt-3 flex items-center gap-2 flex-wrap">
               <h2 id="cStoreName" class="text-xl lg:text-2xl font-extrabold tracking-tight text-white">길동점</h2>
@@ -355,7 +351,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3 mt-4">
               <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                <p id="cMetric1Lbl" class="text-xs text-indigo-200 font-medium truncate">26년 누계 (웰메이드)</p>
+                <p id="cMetric1Lbl" class="text-xs text-indigo-200 font-medium truncate">누계 (웰메이드)</p>
                 <p id="cMetric1Val" class="text-xl font-extrabold text-white mt-1">-</p>
                 <div class="mt-1 flex items-center flex-wrap gap-1 text-[11px]">
                   <span id="cMetric1Gr" class="font-bold text-emerald-400">-</span>
@@ -363,7 +359,7 @@
                 </div>
               </div>
               <div class="bg-white/10 p-3 rounded-xl border border-white/10">
-                <p id="cMetric2Lbl" class="text-xs text-indigo-200 font-medium truncate">월평균 매출 (1~10월)</p>
+                <p id="cMetric2Lbl" class="text-xs text-indigo-200 font-medium truncate">월평균 매출</p>
                 <p id="cMetric2Val" class="text-xl font-extrabold text-white mt-1">-</p>
                 <div class="mt-1 flex items-center flex-wrap gap-1 text-[11px]">
                   <span id="cMetric2Gr" class="font-bold text-emerald-400">-</span>
@@ -379,8 +375,8 @@
                 <span id="cChartTitle">웰메이드 월별 추이 (막대 클릭 시 월별 조회)</span>
               </span>
               <div class="flex items-center gap-2.5 text-[11px] text-white/70">
-                <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-white/35 inline-block"></i>25년</span>
-                <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-emerald-400 inline-block"></i>26년</span>
+                <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-white/35 inline-block"></i><span id="cLegendPrev">전년</span></span>
+                <span class="flex items-center gap-1"><i class="w-2 h-2 rounded-xs bg-emerald-400 inline-block"></i><span id="cLegendCur">당해</span></span>
               </div>
             </div>
             <div id="cMonthlyChart" class="grid grid-cols-10 gap-1 items-end h-20 pt-2"></div>
@@ -396,11 +392,11 @@
                 <h3 class="text-base font-extrabold text-slate-900">동일 상권 브랜드별 실적 현황</h3>
                 <span id="cBrandCount" class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full">0개</span>
               </div>
-              <p class="text-xs text-slate-400 mt-0.5">25년 누계 대비 신장률 비교 (단위:천원)</p>
+              <p id="cSubtitle" class="text-xs text-slate-400 mt-0.5">전년 대비 신장률 비교 (단위:천원)</p>
             </div>
             <div class="relative">
               <select id="cPeriodSelect" onchange="setCompPeriod(this.value)" class="appearance-none text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 pl-3.5 pr-8 py-2 rounded-xl focus:outline-none cursor-pointer">
-                <option value="accum">26년 누계 (1~10월)</option>
+                <option value="accum">누계</option>
               </select>
               <i class="fa-solid fa-chevron-down text-[10px] text-indigo-600 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
             </div>
@@ -435,15 +431,21 @@
     const SHEET_WEEKLY_ID = '1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w';
     const SHEET_COMP_ID = '1ml4qhwd0axGXdozyd1m7thOiZEuzi1_cnFyvPaMfQAc';
 
+    // 현재 시각 기준 초기화 (시트 로드 시 시트 헤더 기준으로 자동 갱신)
+    const _nowInit = new Date();
+    let currentYear = _nowInit.getFullYear();
+    let currentMonth = _nowInit.getMonth() + 1;
+    let currentDay = _nowInit.getDate();
+
+    // 동업계 시트 기준 연도 (2자리, 시트 파싱 시 자동 갱신)
+    let compShortYear = Number(String(currentYear).slice(-2));
+
     let currentBranch = 'ALL';
     let currentStoreName = '길동점';
-    let currentDay = 12;
-    let currentMonth = 11;
-    let currentYear = 2026;
     let compPeriod = 'accum';
     let compSort = 'sales';
     let compView = 'card';
-    let maxCompMonth = 10;
+    let maxCompMonth = Math.max(1, currentMonth - 1);
 
     let DAILY_MASTER_ORDER = [];
     const STORE_MAP = {};
@@ -467,6 +469,53 @@
       }
     };
 
+    const getDaysInMonth = (year = currentYear, month = currentMonth) => new Date(year, month, 0).getDate();
+    const getShortYear = (year = currentYear) => String(year).slice(-2);
+
+    // 시트 헤더(cols 및 상단 5행)에서 기준 연·월 자동 감지
+    function detectYearAndMonthFromTable(table) {
+      if (!table) return;
+      const texts = [];
+      if (Array.isArray(table.cols)) {
+        table.cols.forEach(col => { if (col && col.label) texts.push(String(col.label)); });
+      }
+      if (Array.isArray(table.rows)) {
+        for (let r = 0; r < Math.min(table.rows.length, 5); r++) {
+          const cells = table.rows[r].c || [];
+          cells.forEach(cell => {
+            if (cell) {
+              const val = cell.v !== undefined && cell.v !== null ? String(cell.v) : (cell.f ? String(cell.f) : '');
+              if (val) texts.push(val);
+            }
+          });
+        }
+      }
+
+      for (const text of texts) {
+        const monthMatch = text.match(/(\d{1,2})\s*월\s*(?:누계|계획|목표|달성|실적|진척)/);
+        if (monthMatch) {
+          const m = parseInt(monthMatch[1], 10);
+          if (m >= 1 && m <= 12) {
+            currentMonth = m;
+            break;
+          }
+        }
+      }
+
+      for (const text of texts) {
+        if (text.includes('전년')) continue;
+        const yearMatch = text.match(/(\d{2,4})\s*년\s*(?:연?누계|연?목표)/);
+        if (yearMatch) {
+          let y = parseInt(yearMatch[1], 10);
+          if (y < 100) y += 2000;
+          if (y >= 2020 && y <= 2099) {
+            currentYear = y;
+            break;
+          }
+        }
+      }
+    }
+
     const fmt = n => (n === null || n === undefined || isNaN(n)) ? '-' : Math.round(Number(n)).toLocaleString('ko-KR');
     const fmtMil = n => (Number(n || 0) / 1000).toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const fmtMilInt = n => Math.round(Number(n || 0) / 1000).toLocaleString('ko-KR');
@@ -486,12 +535,17 @@
       return `<span class="text-[10.5px] font-bold text-slate-400">(0%)</span>`;
     };
 
-    function getPrevWeekRangeString() {
+    function getPrevWeekDates() {
       const base = new Date(currentYear, currentMonth - 1, currentDay);
       const day = base.getDay();
       const diffToMon = day === 0 ? -6 : 1 - day;
       const prevMon = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 7);
       const prevSun = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 1);
+      return { prevMon, prevSun };
+    }
+
+    function getPrevWeekRangeString() {
+      const { prevMon, prevSun } = getPrevWeekDates();
       const format = (d) => `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
       return `(${format(prevMon)} ~ ${format(prevSun)})`;
     }
@@ -522,7 +576,7 @@
       };
     }
 
-    // 초기 시드 데이터 경량화 (1개 매장만 남김)
+    // 초기 시드 데이터 경량화 (로딩 전 스켈레톤 역할)
     function initSeedStores() {
       const s = {
         name: '길동점', branch: '서울', region: '강동구', pop: '49.9만', sv: '신현호', openDate: '2022.02',
@@ -578,14 +632,33 @@
       setTimeout(() => {
         if (icon) icon.classList.remove('fa-spin');
         if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
-        if (lbl) lbl.innerText = `일일매출장 기준 (${DAILY_MASTER_ORDER.length}개점)`;
+        if (lbl) lbl.innerText = `일일매출장 기준 (${currentYear}.${String(currentMonth).padStart(2,'0')}.${String(currentDay).padStart(2,'0')} · ${DAILY_MASTER_ORDER.length}개점)`;
       }, 2200);
     }
 
     window.onDailySales = function(res) {
       if (!res || !res.table || !res.table.rows) return;
+
+      // 시트 헤더에서 기준 연·월 자동 감지
+      detectYearAndMonthFromTable(res.table);
+
       const rows = res.table.rows;
+      const cols = res.table.cols || [];
       let day1Col = 4;
+
+      // '1일' 컬럼 인덱스 동적 감지
+      cols.forEach((col, c) => {
+        if (col && col.label && String(col.label).trim() === '1일') day1Col = c;
+      });
+      for (let r = 0; r < Math.min(rows.length, 3); r++) {
+        const cells = rows[r].c || [];
+        for (let c = 0; c < cells.length; c++) {
+          const val = cells[c] ? String(cells[c].v || cells[c].f || '') : '';
+          if (val.trim() === '1일') day1Col = c;
+        }
+      }
+
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
       const dayTotals = {};
       const newOrder = [];
 
@@ -609,9 +682,11 @@
         const st = STORE_MAP[sName];
         st.daily.dailySales = {};
         for (let d = 1; d <= 31; d++) {
-          const val = toNum(c[day1Col + d - 1]);
+          const val = d <= daysInMonth ? toNum(c[day1Col + d - 1]) : 0;
           st.daily.dailySales[d] = val;
-          dayTotals[d] = (dayTotals[d] || 0) + val;
+          if (d <= daysInMonth) {
+            dayTotals[d] = (dayTotals[d] || 0) + val;
+          }
         }
         const base = day1Col + 31;
         st.daily.sheetMAct = toNum(c[base]);
@@ -629,34 +704,59 @@
         });
       }
 
-      let latest = 12;
-      for (let d = 1; d <= 31; d++) { if ((dayTotals[d] || 0) >= 1000) latest = d; }
-      currentDay = latest;
+      // 실적 입력된 마지막 영업일 자동 감지
+      let latest = 1;
+      for (let d = 1; d <= daysInMonth; d++) {
+        if ((dayTotals[d] || 0) >= 1000) latest = d;
+      }
+      currentDay = Math.min(latest, daysInMonth);
       recalcDailyForAll();
 
       if (pendingWeeklyResponse) parseWeeklyData(pendingWeeklyResponse);
       if (pendingCompResponse) parseCompData(pendingCompResponse);
 
       refreshStoreSelector();
+      renderCompPeriodChips();
       renderDashboard();
     };
 
     window.onDailyTargets = function(res) {
       if (!res || !res.table || !res.table.rows) return;
-      res.table.rows.forEach(r => {
+      const rows = res.table.rows;
+      const cols = res.table.cols || [];
+      let custTargetColIdx = 4;
+      let day1ColIdx = 5;
+
+      // 목표 시트 컬럼 위치 동적 감지
+      cols.forEach((col, c) => {
+        const val = col && col.label ? String(col.label) : '';
+        if (val.includes('신규고객') || val.includes('고객 목표') || val.includes('고객목표') || val.includes('첫구매')) custTargetColIdx = c;
+        if (val.trim() === '1일') day1ColIdx = c;
+      });
+      for (let r = 0; r < Math.min(rows.length, 3); r++) {
+        const cells = rows[r].c || [];
+        for (let c = 0; c < cells.length; c++) {
+          const val = cells[c] ? String(cells[c].v || cells[c].f || '') : '';
+          if (val.includes('신규고객') || val.includes('고객 목표') || val.includes('고객목표') || val.includes('첫구매')) custTargetColIdx = c;
+          if (val.trim() === '1일') day1ColIdx = c;
+        }
+      }
+
+      rows.forEach(r => {
         const c = r.c || [];
         const sName = c[2] && c[2].v ? String(c[2].v).trim() : '';
         const st = findDailyMasterStore(sName);
         if (!st) return;
-        st.daily.custTgt = Math.round(toNum(c[4])) || 30;
+        st.daily.custTgt = Math.round(toNum(c[custTargetColIdx])) || 30;
         st.daily.dailyTargets = {};
-        for (let d = 1; d <= 31; d++) st.daily.dailyTargets[d] = toNum(c[5 + d - 1]);
+        for (let d = 1; d <= 31; d++) st.daily.dailyTargets[d] = toNum(c[day1ColIdx + d - 1]);
       });
       recalcDailyForAll();
       renderDashboard();
     };
 
     function recalcDailyForAll() {
+      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
       DAILY_MASTER_ORDER.forEach(name => {
         const st = STORE_MAP[name];
         if (!st) return;
@@ -665,13 +765,13 @@
         let cumS = 0, cumT = 0, wknd = 0, wkdy = 0;
         for (let d = 1; d <= currentDay; d++) {
           const sv = dObj.dailySales[d] || 0;
-          const tv = (dObj.dailyTargets && dObj.dailyTargets[d]) ? dObj.dailyTargets[d] : (dObj.mFullTgt / 30);
+          const tv = (dObj.dailyTargets && dObj.dailyTargets[d]) ? dObj.dailyTargets[d] : (dObj.mFullTgt / daysInMonth);
           cumS += sv; cumT += tv;
           const dow = new Date(currentYear, currentMonth - 1, d).getDay();
           if (dow === 0 || dow === 5 || dow === 6) wknd += sv; else wkdy += sv;
         }
         dObj.dayAct = dObj.dailySales[currentDay] || 0;
-        dObj.dayTgt = (dObj.dailyTargets && dObj.dailyTargets[currentDay]) ? dObj.dailyTargets[currentDay] : Math.round(dObj.mFullTgt / 30);
+        dObj.dayTgt = (dObj.dailyTargets && dObj.dailyTargets[currentDay]) ? dObj.dailyTargets[currentDay] : Math.round(dObj.mFullTgt / daysInMonth);
         dObj.mAct = cumS > 0 ? cumS : (dObj.sheetMAct || 0);
         dObj.mCumTgt = cumT;
         dObj.wkndSum = wknd;
@@ -744,6 +844,21 @@
 
     function parseCompData(res) {
       if (!res || !res.table || !res.table.rows) return;
+
+      // 동업계 시트에 기록된 최신 연도 자동 감지 (예: 26년 / 27년)
+      let detectedMaxYr = 0;
+      res.table.rows.forEach(r => {
+        const c = r.c || [];
+        const rawYr = (c[5] && c[5].v !== null && c[5].v !== undefined) ? String(c[5].v).trim() : '';
+        const m = rawYr.match(/(\d{2,4})/);
+        if (m) {
+          const yNum = Number(m[1].slice(-2));
+          if (yNum >= 20 && yNum <= 99 && yNum > detectedMaxYr) detectedMaxYr = yNum;
+        }
+      });
+      if (detectedMaxYr > 0) compShortYear = detectedMaxYr;
+      const curYrStr = String(compShortYear);
+
       let maxM = 1;
       res.table.rows.forEach(r => {
         const c = r.c || [];
@@ -761,8 +876,8 @@
         if (region) st.region = region;
         if (pop) st.pop = pop;
 
-        const is26 = yr.includes('26');
-        const target = is26 ? st.comp.s26 : st.comp.s25;
+        const isCurYr = yr.includes(curYrStr);
+        const target = isCurYr ? st.comp.s26 : st.comp.s25;
         let sumM = 0;
         for (let m = 1; m <= 12; m++) {
           const v = getV(5 + m);
@@ -771,7 +886,7 @@
             target[`m${m}`] = target[`m${m}`] || {};
             target[`m${m}`][brand] = num;
             sumM += num;
-            if (is26 && m > maxM) maxM = m;
+            if (isCurYr && m > maxM) maxM = m;
           }
         }
         const acc = getV(18);
@@ -779,7 +894,7 @@
         const closeV = getV(19);
         if (closeV !== '' && !isNaN(closeV) && parseFloat(closeV) > 0) {
           st.comp.close25[brand] = parseFloat(closeV);
-        } else if (!is26 && target.accum[brand] > 0 && !st.comp.close25[brand]) {
+        } else if (!isCurYr && target.accum[brand] > 0 && !st.comp.close25[brand]) {
           st.comp.close25[brand] = target.accum[brand];
         }
       });
@@ -811,7 +926,7 @@
       if (!list.includes(currentStoreName)) currentStoreName = list[0];
       sel.innerHTML = list.map(n => {
         const st = STORE_MAP[n];
-        return `<option value="${n}" ${n === currentStoreName ? 'selected' : ''}>[${st.branch}] ${n}</option>`;
+        return `<option value="${n.replace(/"/g, '&quot;')}" ${n === currentStoreName ? 'selected' : ''}>[${st.branch}] ${n}</option>`;
       }).join('');
     }
 
@@ -860,7 +975,7 @@
       const el = document.getElementById('cPeriodChips');
       const sel = document.getElementById('cPeriodSelect');
       let chipsHtml = `<button onclick="setCompPeriod('accum')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${compPeriod === 'accum' ? 'bg-indigo-600 text-white shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">누계</button>`;
-      let optsHtml = `<option value="accum">26년 누계 (1~${maxCompMonth}월)</option>`;
+      let optsHtml = `<option value="accum">${compShortYear}년 누계 (1~${maxCompMonth}월)</option>`;
       for (let m = 1; m <= maxCompMonth; m++) {
         const k = `m${m}`;
         chipsHtml += `<button onclick="setCompPeriod('${k}')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition whitespace-nowrap ${compPeriod === k ? 'bg-indigo-600 text-white font-bold shadow-2xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${m}월</button>`;
@@ -899,11 +1014,12 @@
 
     function renderDailySection(st) {
       const d = st.daily;
+      const shortYear = getShortYear(currentYear);
       const dayRate = d.dayTgt > 0 ? (d.dayAct / d.dayTgt) * 100 : 0;
       const dayDiff = (d.dayAct - d.dayTgt) / 1000;
 
       document.getElementById('dBranchBadge').innerText = `${st.branch}지점`;
-      document.getElementById('dDayLabel').innerText = `당일 매출 (${currentDay}일)`;
+      document.getElementById('dDayLabel').innerText = `당일 매출 (${currentMonth}/${currentDay}일)`;
       document.getElementById('dDayRateBadge').innerText = `${dayRate.toFixed(1)}% 달성`;
       document.getElementById('dDayActual').innerText = fmtMil(d.dayAct);
       document.getElementById('dDayActualRaw').innerText = `(${fmt(d.dayAct)}천원)`;
@@ -932,6 +1048,7 @@
       const yGr = yLy > 0 ? ((d.yAct - yLy) / yLy) * 100 : (st.weekly.brandYear.gr * 100);
       const yDiff = Math.round((d.yAct - d.yTgt) / 1000);
 
+      document.getElementById('dYearLabel').innerText = `${shortYear}년 연누계`;
       document.getElementById('dYearRateBadge').innerText = `${yRate.toFixed(1)}% 달성`;
       document.getElementById('dYearGrBadge').innerText = `${yGr >= 0 ? '+' : ''}${yGr.toFixed(1)}% 신장`;
       document.getElementById('dYearActual').innerText = fmtMilInt(d.yAct);
@@ -960,9 +1077,14 @@
 
     function renderWeeklySection(st) {
       const w = st.weekly;
+      const shortYear = getShortYear(currentYear);
+      const prevShortYear = getShortYear(currentYear - 1);
       const rangeStr = getPrevWeekRangeString();
+
       document.getElementById('wCardTitle1').innerText = `주간 매출 및 회원 고객 비중 ${rangeStr}`;
       document.getElementById('wCardTitle2').innerText = `주간 고객 지표 및 첫구매 신규고객 ${rangeStr}`;
+      document.getElementById('wSalesCurLbl').innerText = `${shortYear}년 주간 실적`;
+      document.getElementById('wSalesPrevLbl').innerText = `${prevShortYear}년 전년 동기`;
 
       document.getElementById('wSalesBadge').innerHTML = getBadge(w.salesGr);
       document.getElementById('wSales26').innerText = `${fmt(w.sales26)} 천원`;
@@ -987,20 +1109,14 @@
       document.getElementById('wFirstWeek').innerHTML = `${fmt(w.firstWeek)}명 ${fmtParen(w.firstWeekGr)}`;
       document.getElementById('wFirstYear').innerHTML = `${fmt(w.firstYear)}명 ${fmtParen(w.firstYearGr)}`;
 
-      // ----------------------------------------------------
-      // 브랜드별 매출 기간 표시 계산 (현재 기준일자의 전주 일요일)
-      // ----------------------------------------------------
-      const base = new Date(currentYear, currentMonth - 1, currentDay);
-      const day = base.getDay();
-      const diffToMon = day === 0 ? -6 : 1 - day; 
-      const prevSun = new Date(currentYear, currentMonth - 1, base.getDate() + diffToMon - 1);
-      
-      const pSunStr = `${String(prevSun.getMonth() + 1).padStart(2, '0')}.${String(prevSun.getDate()).padStart(2, '0')}`;
-      const cMonStr = String(currentMonth).padStart(2, '0');
+      // 브랜드별 매출 기간 계산: 전주 일요일의 실제 월을 기준으로 시작일·종료일 일치
+      const { prevSun } = getPrevWeekDates();
+      const pSunMon = String(prevSun.getMonth() + 1).padStart(2, '0');
+      const pSunDay = String(prevSun.getDate()).padStart(2, '0');
+      const pSunStr = `${pSunMon}.${pSunDay}`;
 
-      document.getElementById('brandMonthPeriod').innerText = `(${cMonStr}.01 ~ ${pSunStr})`;
+      document.getElementById('brandMonthPeriod').innerText = `(${pSunMon}.01 ~ ${pSunStr})`;
       document.getElementById('brandYearPeriod').innerText = `(01.01 ~ ${pSunStr})`;
-      // ----------------------------------------------------
 
       const bDefs = [
         { key: 'indian', name: '인디안', dot: 'bg-slate-800', bar: 'bg-slate-800', stack: 'bg-slate-300' },
@@ -1065,10 +1181,17 @@
 
     function renderCompetitorSection(st) {
       const c = st.comp;
-      const p26 = (c.s26 && c.s26[compPeriod]) || (c.s26 && c.s26.accum) || {};
-      const p25 = (c.s25 && c.s25[compPeriod]) || (c.s25 && c.s25.accum) || {};
+      const curYr = compShortYear;
+      const prevYr = compShortYear - 1;
+
+      const p26 = (c.s26 && c.s26[compPeriod]) || (compPeriod === 'accum' ? (c.s26 && c.s26.accum) : {}) || {};
+      const p25 = (c.s25 && c.s25[compPeriod]) || (compPeriod === 'accum' ? (c.s25 && c.s25.accum) : {}) || {};
       const acc26 = (c.s26 && c.s26.accum) || {};
       const acc25 = (c.s25 && c.s25.accum) || {};
+
+      document.getElementById('cLegendPrev').innerText = `${prevYr}년`;
+      document.getElementById('cLegendCur').innerText = `${curYr}년`;
+      document.getElementById('cSubtitle').innerText = `${prevYr}년 동기 대비 신장률 비교 (단위:천원)`;
 
       const list = Object.entries(p26)
         .filter(([_, v]) => v > 0)
@@ -1095,7 +1218,7 @@
       }
       if (!focus) focus = list[0] || { brand: '웰메이드', val26: 0, val25: 0, close25: 0, rank: 0, share: 0 };
 
-      const fmtEok = v => (!v || v <= 0) ? '25년 마감 -' : `25년 마감 ${(v < 1000 ? v : v / 100000).toFixed(1)}억`;
+      const fmtEok = v => (!v || v <= 0) ? `${prevYr}년 마감 -` : `${prevYr}년 마감 ${(v < 1000 ? v : v / 100000).toFixed(1)}억`;
 
       document.getElementById('cBranchBadge').innerText = `${st.branch}지점`;
       document.getElementById('cRegionInfo').innerText = `${st.region !== '-' ? st.region : st.branch}${st.pop ? ' · 인구 ' + st.pop : ''} · ${focus.brand} 기준`;
@@ -1106,30 +1229,56 @@
       document.getElementById('cSharePct').innerText = `${focus.share.toFixed(1)}%`;
       document.getElementById('cTotalDist').innerText = fmt(totalDist);
       document.getElementById('cShareBar').style.width = `${Math.min(100, focus.share)}%`;
+      document.getElementById('cChartTitle').innerText = `${focus.brand} 월별 추이 (막대 클릭 시 월별 조회)`;
 
-      const fAcc26 = acc26[focus.brand] || focus.val26 || 0;
-      const fAcc25 = acc25[focus.brand] || focus.val25 || 0;
-      const fAccGr = fAcc25 > 0 ? (((fAcc26 - fAcc25) / fAcc25) * 100).toFixed(1) : null;
+      const fAcc26 = acc26[focus.brand] || 0;
+      const fAcc25 = acc25[focus.brand] || 0;
+      const fAccGr = fAcc25 > 0 ? ((fAcc26 - fAcc25) / fAcc25) * 100 : null;
 
-      document.getElementById('cMetric1Lbl').innerText = `26년 누계 (${focus.brand})`;
+      const setMetricGrowth = (grElId, prevElId, grNum, prevVal) => {
+        const grEl = document.getElementById(grElId);
+        const prevEl = document.getElementById(prevElId);
+        if (grNum !== null && !isNaN(grNum)) {
+          const sign = grNum > 0 ? '▲ +' : (grNum < 0 ? '▼ ' : '');
+          grEl.innerText = `${sign}${grNum.toFixed(1)}%`;
+          grEl.className = grNum >= 0 ? 'font-bold text-emerald-400' : 'font-bold text-rose-400';
+          prevEl.innerText = `(전년 ${fmt(prevVal)})`;
+        } else {
+          grEl.innerText = '-';
+          grEl.className = 'font-bold text-white/60';
+          prevEl.innerText = prevVal > 0 ? `(전년 ${fmt(prevVal)})` : '(전년 없음)';
+        }
+      };
+
+      document.getElementById('cMetric1Lbl').innerText = `${curYr}년 누계 (${focus.brand})`;
       document.getElementById('cMetric1Val').innerText = fmt(fAcc26);
-      document.getElementById('cMetric1Gr').innerText = fAccGr !== null ? `${fAccGr >= 0 ? '▲ +' : '▼ '}${fAccGr}%` : '-';
-      document.getElementById('cMetric1Prev').innerText = fAcc25 > 0 ? `(전년 ${fmt(fAcc25)})` : '';
+      setMetricGrowth('cMetric1Gr', 'cMetric1Prev', fAccGr, fAcc25);
 
-      const avg26 = Math.round(fAcc26 / Math.max(1, maxCompMonth));
-      const avg25 = Math.round(fAcc25 / Math.max(1, maxCompMonth));
-      document.getElementById('cMetric2Lbl').innerText = `월평균 매출 (1~${maxCompMonth}월)`;
-      document.getElementById('cMetric2Val').innerText = fmt(avg26);
-      document.getElementById('cMetric2Gr').innerText = fAccGr !== null ? `${fAccGr >= 0 ? '▲ +' : '▼ '}${fAccGr}%` : '-';
-      document.getElementById('cMetric2Prev').innerText = avg25 > 0 ? `(전년 ${fmt(avg25)})` : '';
+      // 월별 선택 시 우측 카드를 해당 월 실적으로 전환, 누계 시 월평균 표시
+      if (compPeriod === 'accum') {
+        const avg26 = Math.round(fAcc26 / Math.max(1, maxCompMonth));
+        const avg25 = Math.round(fAcc25 / Math.max(1, maxCompMonth));
+        document.getElementById('cMetric2Lbl').innerText = `월평균 매출 (1~${maxCompMonth}월)`;
+        document.getElementById('cMetric2Val').innerText = fmt(avg26);
+        setMetricGrowth('cMetric2Gr', 'cMetric2Prev', fAccGr, avg25);
+      } else {
+        const selM = parseInt(compPeriod.replace('m', ''), 10);
+        const mVal26 = (c.s26[compPeriod] && c.s26[compPeriod][focus.brand]) || 0;
+        const mVal25 = (c.s25[compPeriod] && c.s25[compPeriod][focus.brand]) || 0;
+        const mGr = mVal25 > 0 ? ((mVal26 - mVal25) / mVal25) * 100 : null;
+        document.getElementById('cMetric2Lbl').innerText = `${curYr}년 ${selM}월 실적`;
+        document.getElementById('cMetric2Val').innerText = fmt(mVal26);
+        setMetricGrowth('cMetric2Gr', 'cMetric2Prev', mGr, mVal25);
+      }
 
+      // 월별 막대 차트 (미집계 월은 0 처리하여 왜곡 방지)
       const chartEl = document.getElementById('cMonthlyChart');
       chartEl.style.gridTemplateColumns = `repeat(${maxCompMonth}, minmax(0, 1fr))`;
       let maxBar = 1;
       const mArr = [];
       for (let m = 1; m <= maxCompMonth; m++) {
-        const v26 = (c.s26[`m${m}`] && c.s26[`m${m}`][focus.brand]) || Math.round(fAcc26 / maxCompMonth);
-        const v25 = (c.s25[`m${m}`] && c.s25[`m${m}`][focus.brand]) || Math.round(fAcc25 / maxCompMonth);
+        const v26 = (c.s26[`m${m}`] && c.s26[`m${m}`][focus.brand]) || 0;
+        const v25 = (c.s25[`m${m}`] && c.s25[`m${m}`][focus.brand]) || 0;
         if (v26 > maxBar) maxBar = v26;
         if (v25 > maxBar) maxBar = v25;
         mArr.push({ m, v26, v25 });
@@ -1139,7 +1288,7 @@
         const h25 = v25 > 0 ? Math.max(6, Math.round((v25 / maxBar) * 52)) : 2;
         const h26 = v26 > 0 ? Math.max(6, Math.round((v26 / maxBar) * 52)) : 2;
         return `
-          <button onclick="setCompPeriod('${isSel ? 'accum' : pKey}')" class="flex flex-col items-center justify-end h-full rounded-lg px-0.5 py-1 transition ${isSel ? 'bg-white/15 ring-1 ring-emerald-400' : 'hover:bg-white/10'}">
+          <button onclick="setCompPeriod('${isSel ? 'accum' : pKey}')" title="${m}월 · ${curYr}년 ${fmt(v26)} / ${prevYr}년 ${fmt(v25)}" class="flex flex-col items-center justify-end h-full rounded-lg px-0.5 py-1 transition ${isSel ? 'bg-white/15 ring-1 ring-emerald-400' : 'hover:bg-white/10'}">
             <div class="flex items-end justify-center gap-0.5 h-14 w-full">
               <span class="w-1.5 lg:w-2 rounded-t-xs bg-white/35" style="height:${h25}px"></span>
               <span class="w-1.5 lg:w-2 rounded-t-xs ${isSel ? 'bg-amber-300' : 'bg-emerald-400'}" style="height:${h26}px"></span>
@@ -1169,8 +1318,8 @@
                 <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
                   <th class="py-2.5 px-4 w-14 text-center">순위</th>
                   <th class="py-2.5 px-4">브랜드</th>
-                  <th class="py-2.5 px-4 text-right">26년 실적</th>
-                  <th class="py-2.5 px-4 text-right">25년 실적</th>
+                  <th class="py-2.5 px-4 text-right">${curYr}년 실적</th>
+                  <th class="py-2.5 px-4 text-right">${prevYr}년 실적</th>
                   <th class="py-2.5 px-4 text-right">점유율</th>
                   <th class="py-2.5 px-4 text-right">신장률</th>
                 </tr>
@@ -1223,7 +1372,7 @@
               <div class="h-full ${barCls} rounded-full transition-all duration-500" style="width:${barW}%"></div>
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span>25년 매출: <strong class="text-slate-700 font-bold">${item.val25 > 0 ? fmt(item.val25) : '-'}</strong></span>
+              <span>${prevYr}년 매출: <strong class="text-slate-700 font-bold">${item.val25 > 0 ? fmt(item.val25) : '-'}</strong></span>
               <span>월평균 <strong class="text-slate-700 font-semibold">${fmt(mAvg)}</strong></span>
             </div>
           </div>
