@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko" class="light">
 <head>
-  <!-- [직접 접속 차단 보안 코드 - 실제 배포 시 주석 해제]
+  <meta name="robots" content="noindex, nofollow">
+  <!-- [직접 접속 차단 보안 코드] -->
   <script>
     if (window.self === window.top) {
       window.location.replace('./index.html');
     }
   </script>
-  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>WM중부 일일 매출장</title>
@@ -821,163 +821,22 @@
       }
 
       isUsingFallback = true;
-      currentYear = 2026;
-      currentMonth = 11;
-      currentDay = 12;
-      latestDetectedDay = 12;
-
-      const branchGroups = [
-        {
-          branch: '서울',
-          codeStart: 1001,
-          managers: [
-            { sv: '신현호', names: ['강남역직영점', '잠실롯데점', '목동현대점', '역삼테헤란점', '서초교대점', '송파문정점', '강동천호점'] },
-            { sv: '문경영', names: ['노원역점', '미아사거리점', '수유역점', '성신여대점', '창동역점', '상계중계점', '도봉방학점'] },
-            { sv: '우경태', names: ['영등포타임점', '신도림디큐브점', '구로디지털점', '여의도IFC점', '당산역점', '가산마리오점'] },
-            { sv: '박형주', names: ['홍대입구직영점', '은평연신내점', '신촌현대점', '합정메세나점', '마포공덕점', '불광역점'] }
-          ]
-        },
-        {
-          branch: '경기',
-          codeStart: 2001,
-          managers: [
-            { sv: '신순호', names: ['용인보라직영점', '분당서현점', '수원인계점', '성남모란점', '판교알파돔점', '수지죽전점', '동탄센트럴점', '영통역점', '광교아브뉴점', '평택역점', '안성스타필드점', '오산운암점'] },
-            { sv: '이두원', names: ['일산라페스타점', '부천중동점', '안양범계점', '파주운정점', '김포구래점', '화정역점', '산본중심점', '광명철산점', '시흥배곧점', '안산중앙점', '의왕포일점'] },
-            { sv: '신현호', names: ['하남미사직영점', '구리돌다리점', '남양주다산점', '별내역점', '의정부중앙점', '양주옥정점', '포천송우점', '이천터미널점', '여주아울렛점', '광주경안점'] }
-          ]
-        },
-        {
-          branch: '강원',
-          codeStart: 3001,
-          managers: [
-            { sv: '김동하', names: ['춘천명동직영점', '원주단계점', '강릉중앙점', '춘천퇴계점', '원주혁신점', '강릉교동점', '홍천읍내점', '횡성중앙점', '영월역점', '평창진부점', '정선고한점', '철원동송점', '화천중앙점', '양구읍내점', '인제원통점'] },
-            { sv: '우경태', names: ['속초조양점', '양양읍내점', '고성거진점', '속초중앙점', '주문진항점', '강릉포남점', '춘천후평점', '원주무실점', '원주태장점', '춘천석사점', '강릉옥천점', '홍천남면점', '횡성둔내점'] },
-            { sv: '박형주', names: ['동해천곡점', '삼척남양점', '태백황지점', '동해북평점', '삼척도계점', '태백장성점', '동해묵호점', '삼척근덕점', '정선사북점', '영월상동점', '평창대화점', '강릉연곡점', '속초교동점'] }
-          ]
-        }
-      ];
-
-      const sampleSpecs = [];
-      branchGroups.forEach((bg, bIdx) => {
-        let localCounter = 0;
-        bg.managers.forEach((mg, mIdx) => {
-          mg.names.forEach((storeName, sIdx) => {
-            const seed = bIdx * 37 + mIdx * 13 + sIdx * 7;
-            const isDirect = storeName.includes('직영');
-            const baseScale = bg.branch === '서울' ? 1280 : (bg.branch === '경기' ? 1050 : 680);
-            const dayBase = Math.round(baseScale * (isDirect ? 1.32 : (0.76 + (seed % 45) / 100)));
-            const achieveRatio = 0.72 + ((seed * 11) % 42) / 100;
-            const targetBase = Math.round(dayBase / achieveRatio);
-            const growth = Math.round((((seed * 17) % 240) - 135)) / 10;
-            const yearGrowth = Math.round((((seed * 19) % 180) - 85)) / 10;
-            const custT = 22 + (seed % 28);
-            const custM = Math.max(8, Math.round(custT * (0.45 + ((seed * 13) % 75) / 100)));
-            const openY = 2017 + (seed % 7);
-            const openM = String(1 + (seed % 12)).padStart(2, '0');
-            const openD = String(1 + (seed % 27)).padStart(2, '0');
-
-            sampleSpecs.push({
-              branch: bg.branch,
-              code: `H${bg.codeStart + localCounter}`,
-              name: storeName,
-              sv: mg.sv,
-              openDate: `${openY}.${openM}.${openD}`,
-              dayBase,
-              targetBase,
-              growth,
-              yearGrowth,
-              custM,
-              custT
-            });
-            localCounter++;
-          });
-        });
-      });
-
-      const daysInMonth = getDaysInMonth(currentYear, currentMonth);
-      const dowMultipliers = [1.22, 0.80, 0.84, 0.86, 0.90, 1.16, 1.34];
-
-      currentStoreDB = sampleSpecs.map((spec, idx) => {
-        const dailySales = {};
-        const dailyTargets = {};
-        let monthActual = 0;
-
-        for (let d = 1; d <= daysInMonth; d++) {
-          const dow = new Date(currentYear, currentMonth - 1, d).getDay();
-          const mult = dowMultipliers[dow];
-          const tVal = Math.round(spec.targetBase * mult);
-          dailyTargets[d] = tVal;
-
-          if (d <= currentDay) {
-            const jitter = 0.93 + (((idx * 7 + d * 13) % 15) / 100);
-            const sVal = Math.round(spec.dayBase * mult * jitter);
-            dailySales[d] = sVal;
-            monthActual += sVal;
-          } else {
-            dailySales[d] = 0;
-          }
-        }
-
-        const monthTarget = Object.values(dailyTargets).reduce((a, b) => a + b, 0);
-        const monthRatePlan = monthTarget > 0 ? Math.round((monthActual / monthTarget) * 1000) / 10 : 0;
-        const lastYearVal = Math.round(monthActual / (1 + spec.growth / 100));
-        const actual26Cum = Math.round(monthActual * 21.6);
-        const target26 = Math.round(monthTarget * 9.5);
-        const rate26Cum = target26 > 0 ? Math.round((actual26Cum / target26) * 1000) / 10 : 0;
-        const lastYearYear = Math.round(actual26Cum / (1 + spec.yearGrowth / 100));
-
-        return {
-          id: idx + 1,
-          branch: spec.branch,
-          code: spec.code,
-          name: spec.name,
-          sv: spec.sv,
-          openDate: spec.openDate,
-          dailySales,
-          dailyTargets,
-          custTargetMonth: spec.custT,
-          sheetMonthActual: monthActual,
-          monthActual,
-          monthTarget,
-          monthRatePlan,
-          monthCumTarget: 0,
-          monthCumRate: 0,
-          lastYearVal,
-          growthRate: spec.growth,
-          actual26Cum,
-          target26,
-          rate26Cum,
-          lastYearYear,
-          yearGrowthRate: spec.yearGrowth,
-          weekendMonthSum: 0,
-          weekdayMonthSum: 0,
-          weekendTargetSum: 0,
-          weekdayTargetSum: 0,
-          weekendShare: 0,
-          weekdayShare: 0,
-          newCustMonth: spec.custM,
-          newCustYear: spec.custM * 10 + 12,
-          totalCust: 620 + idx * 19,
-          custAchieveRate: spec.custT > 0 ? Math.round((spec.custM / spec.custT) * 1000) / 10 : 0
-        };
-      });
-
+      currentStoreDB = [];
       rawSummaryMap = { branches: {}, managers: {} };
-      recalculateDynamicStoreMetrics();
 
       const icon = document.getElementById('refreshIcon');
       const statusDot = document.getElementById('sheetStatusDot');
       const statusLabel = document.getElementById('currentSheetLabel');
 
       if (icon) icon.classList.remove('animate-spin');
-      if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
-      if (statusLabel) statusLabel.innerText = '데이터 연동됨';
+      if (statusDot) statusDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-500';
+      if (statusLabel) statusLabel.innerText = '연동 대기';
 
       buildDayDropdown();
       updateBranchView();
 
       if (showNotice) {
-        showToast('미리보기 환경 제한으로 내장 실적 데이터를 표시합니다.');
+        showToast('구글 시트 데이터를 불러오지 못했습니다. 새로고침해 주세요.');
       }
     }
 
