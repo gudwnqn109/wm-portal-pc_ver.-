@@ -213,21 +213,22 @@
     }
 
     // =========================================================================
-    // [1] 동적 헤더 스키마 파서 (시트 열 변경/추가 시 자동 대응)
+    // [1] 동적 헤더 스키마 파서 (3~8행 헤더만 정확히 분리, 9~23행 요약행 제외)
     // =========================================================================
     function matchSeasonText(txt) {
       const s = String(txt || '').replace(/\s+/g, '').toUpperCase();
       if (!s) return null;
-      if (s.includes('FW사계절') || s.includes('사계절')) return 'FW사계절';
+      if (s.includes('사계절') || (s.includes('FW') && !s.includes('가을') && !s.includes('겨울') && !s.includes('판매율'))) return 'FW사계절';
       if (s.includes('가을')) return '가을';
       if (s.includes('겨울')) return '겨울';
       return null;
     }
 
-    function matchBrandText(txt) {
+    function matchBrandText(txt, allowTotal = true) {
       const clean = String(txt || '').replace(/\s+/g, '').toUpperCase();
       if (!clean) return null;
       for (const b of BRAND_ALIAS_MAP) {
+        if (!allowTotal && b.code === '합계') continue;
         if (b.keys.some(k => clean === k || clean.includes(`(${k})`) || (k.length >= 2 && clean.includes(k)))) {
           return { code: b.code, name: b.name };
         }
@@ -249,53 +250,69 @@
     function matchItemMetricText(txt) {
       const s = String(txt || '').replace(/\s+/g, '');
       if (!s) return null;
-      if (s === '출고' || s.includes('출고수량') || s === '공급수량') return 'out';
-      if (s === '판매' || s.includes('판매수량')) return 'sale';
-      if (s === '판매율' || s.includes('수량판매율')) return 'rate';
+      if (s === '출고' || s === '출고수량' || s === '출고량' || s === '공급' || s === '공급수량' || s === '입고' || s === '입고수량') return 'out';
+      if (s === '판매' || s === '판매수량' || s === '판매량') return 'sale';
+      if (s === '판매율' || s === '수량판매율') return 'rate';
       return null;
     }
 
-    function detectBaseColumnsAndDataStart(rows) {
+    function detectHeaderAndBaseCols(rows) {
       let branchCol = 0, codeCol = 1, nameCol = 2;
-      let dataStartRow = -1;
+      let headerStartRow = -1;
 
-      const scanLimit = Math.min(rows.length, 20);
+      const scanLimit = Math.min(rows.length, 15);
       for (let r = 0; r < scanLimit; r++) {
         const row = rows[r] || [];
-        for (let c = 0; c < Math.min(row.length, 10); c++) {
+        for (let c = 0; c < Math.min(row.length, 6); c++) {
           const s = String(row[c] ?? '').replace(/\s+/g, '');
-          if (s === '지점' || s === '지점코드') branchCol = c;
-          else if (s === '매장코드' || s === '점코드') codeCol = c;
-          else if (s === '매장명' || s === '점포명') nameCol = c;
+          if (s === '지점' || s === '지점코드') {
+            branchCol = c;
+            if (headerStartRow === -1) headerStartRow = r;
+          } else if (s.includes('매장코드') || s.includes('점코드')) {
+            codeCol = c;
+            if (headerStartRow === -1) headerStartRow = r;
+          } else if (s === '매장명' || s === '점포명') {
+            nameCol = c;
+            if (headerStartRow === -1) headerStartRow = r;
+          }
         }
       }
+      if (headerStartRow === -1) headerStartRow = 2;
 
-      for (let r = 0; r < Math.min(rows.length, 30); r++) {
+      const startDataCol = Math.max(branchCol, codeCol, nameCol) + 1;
+      let headerEndRow = Math.min(headerStartRow + 6, rows.length);
+
+      // 9행('합계'/'등급별'/'지점별') 또는 수치 행 시작 직전까지만 헤더로 절단
+      for (let r = headerStartRow + 1; r < Math.min(rows.length, headerStartRow + 12); r++) {
         const row = rows[r] || [];
-        const b = String(row[branchCol] ?? '').trim();
-        const cd = String(row[codeCol] ?? '').trim();
-        const nm = String(row[nameCol] ?? '').trim();
-        const looksLikeStoreCode = /^[A-Za-z0-9]{4,}$/.test(cd) && !cd.startsWith('#');
-        const looksLikeBranch = /^[A-Za-z가-힣]{1,4}$/.test(b) && !['지점', '합계', '전체', '등급별', '지점별', '소계', '구분'].includes(b);
-        if (looksLikeBranch && looksLikeStoreCode && nm && nm !== '매장명') {
-          dataStartRow = r;
+        const leftText = [row[branchCol], row[codeCol], row[nameCol]]
+          .map(v => String(v ?? '').replace(/\s+/g, ''))
+          .join('');
+        if (leftText.includes('합계') || leftText.includes('등급별') || leftText.includes('지점별')) {
+          headerEndRow = r;
+          break;
+        }
+        let numCount = 0;
+        for (let c = startDataCol; c < Math.min(row.length, startDataCol + 25); c++) {
+          if (typeof row[c] === 'number' && !isNaN(row[c])) numCount++;
+        }
+        if (numCount >= 3) {
+          headerEndRow = r;
           break;
         }
       }
 
-      if (dataStartRow === -1) dataStartRow = Math.min(6, rows.length);
-      return { branchCol, codeCol, nameCol, dataStartRow };
+      return { branchCol, codeCol, nameCol, headerStartRow, headerEndRow };
     }
 
     function buildDynamicSheetSchema(rows) {
-      const { branchCol, codeCol, nameCol, dataStartRow } = detectBaseColumnsAndDataStart(rows);
-      const headerRows = rows.slice(0, dataStartRow);
+      const { branchCol, codeCol, nameCol, headerStartRow, headerEndRow } = detectHeaderAndBaseCols(rows);
+      const headerRows = rows.slice(headerStartRow, headerEndRow);
       if (headerRows.length === 0) return null;
 
       const maxCols = Math.max(...headerRows.map(r => (r ? r.length : 0)));
       const startCol = Math.max(branchCol, codeCol, nameCol) + 1;
 
-      // 병합 셀 복원 (상위 행이 바뀌면 하위 행 carry-forward 초기화)
       const rawGrid = headerRows.map(r => {
         const arr = new Array(maxCols).fill('');
         for (let c = 0; c < maxCols; c++) {
@@ -305,6 +322,7 @@
         return arr;
       });
 
+      // 병합 셀 가로 복원 (상위 행에 새 값이 나타난 열은 복원 차단)
       const filledGrid = rawGrid.map(row => [...row]);
       for (let r = 0; r < rawGrid.length; r++) {
         for (let c = startCol; c < maxCols; c++) {
@@ -322,11 +340,6 @@
         }
       }
 
-      const getColTexts = (c, useFilled = true) => {
-        const src = useFilled ? filledGrid : rawGrid;
-        return src.map(r => r[c] || '');
-      };
-
       const findLastNonEmpty = (c) => {
         for (let r = rawGrid.length - 1; r >= 0; r--) {
           if (rawGrid[r][c]) return { row: r, text: rawGrid[r][c] };
@@ -341,44 +354,52 @@
 
       let c = startCol;
       while (c < maxCols) {
-        const filledStack = getColTexts(c, true);
-        const rawStack = getColTexts(c, false);
+        const filledStack = filledGrid.map(r => r[c] || '');
+        const rawStack = rawGrid.map(r => r[c] || '');
 
-        // 현재 열의 시즌·브랜드 추정
         let colSeason = null;
-        let colBrand = null;
         for (const t of filledStack) {
           const s = matchSeasonText(t);
-          if (s) colSeason = s;
-        }
-        for (const t of filledStack) {
-          const b = matchBrandText(t);
-          if (b) colBrand = b;
+          if (s) { colSeason = s; break; }
         }
         if (colSeason) lastSeason = colSeason;
-        if (colBrand) lastBrand = colBrand;
 
-        // 1) 아이템 3열 묶음(출고 / 판매 / 판매율) 감지
-        const bot0 = findLastNonEmpty(c).text;
-        const bot1 = c + 1 < maxCols ? findLastNonEmpty(c + 1).text : '';
-        const bot2 = c + 2 < maxCols ? findLastNonEmpty(c + 2).text : '';
+        // 1) 아이템 3열 묶음 (출고 / 판매 / 판매율) 감지
+        const bot0Info = findLastNonEmpty(c);
+        const bot1Info = c + 1 < maxCols ? findLastNonEmpty(c + 1) : { row: -1, text: '' };
+        const bot2Info = c + 2 < maxCols ? findLastNonEmpty(c + 2) : { row: -1, text: '' };
 
-        if (matchItemMetricText(bot0) === 'out' && matchItemMetricText(bot1) === 'sale') {
-          const hasRateCol = matchItemMetricText(bot2) === 'rate';
-          const metricRowIdx = findLastNonEmpty(c).row;
+        if (matchItemMetricText(bot0Info.text) === 'out' && matchItemMetricText(bot1Info.text) === 'sale') {
+          const hasRateCol = matchItemMetricText(bot2Info.text) === 'rate';
+          const metricRowIdx = bot0Info.row;
 
-          // 아이템 코드 & 복종명 추출 (출고/판매/판매율 바로 위 헤더 행들 탐색)
+          // 브랜드는 복종 코드(DL/BF)보다 항상 위 행에 있으므로 최상단(첫 번째) 브랜드만 채택
+          let itemBrand = null;
+          let brandEndRow = -1;
+          for (let r = 0; r < metricRowIdx; r++) {
+            const cellTxt = filledStack[r];
+            if (!cellTxt || matchSeasonText(cellTxt)) continue;
+            const b = matchBrandText(cellTxt, false);
+            if (b) {
+              itemBrand = b;
+              brandEndRow = r;
+              // 바로 아래 행에 동일 브랜드(코드 -> 국문명)가 이어지면 함께 건너뜀
+              if (r + 1 < metricRowIdx) {
+                const nextB = matchBrandText(filledStack[r + 1], false);
+                if (nextB && nextB.code === b.code) brandEndRow = r + 1;
+              }
+              break;
+            }
+          }
+          if (itemBrand) lastBrand = itemBrand;
+          else itemBrand = lastBrand;
+
+          // 브랜드 아래 ~ 출고/판매 위 행에서만 복종코드·복종명 추출
           let itemCode = '';
           let itemName = '';
-          for (let r = metricRowIdx - 1; r >= 0; r--) {
+          for (let r = brandEndRow + 1; r < metricRowIdx; r++) {
             const cellTxt = (filledGrid[r][c] || rawGrid[r][c] || '').trim();
-            if (!cellTxt) continue;
-            if (matchSeasonText(cellTxt) || matchSummaryMetricText(cellTxt)) continue;
-
-            const isExactBrand = BRAND_ALIAS_MAP.some(b =>
-              b.code !== '합계' && b.keys.some(k => cellTxt.replace(/\s+/g, '').toUpperCase() === k)
-            );
-            if (isExactBrand) continue;
+            if (!cellTxt || matchSeasonText(cellTxt) || matchSummaryMetricText(cellTxt)) continue;
 
             if (cellTxt === '합계' || cellTxt === '소계') {
               itemCode = '합계';
@@ -386,7 +407,6 @@
               break;
             }
 
-            // "AL 티셔츠 긴팔" 또는 "AL(티셔츠)" 형태 분리
             const combinedMatch = cellTxt.match(/^([A-Z0-9]{2,3})\s*[\(\-\/:]?\s*(.+?)\)?$/);
             if (combinedMatch && !itemCode && !itemName) {
               itemCode = combinedMatch[1];
@@ -405,8 +425,6 @@
           if (!itemName && itemCode) itemName = itemCode;
 
           if (itemCode && itemName) {
-            // 아이템 행에서 브랜드가 합계로 잘못 덮였을 때 이전 유효 브랜드 유지
-            const itemBrand = (colBrand && colBrand.code !== '합계') ? colBrand : lastBrand;
             itemMeta.push({
               colOut: c,
               colSale: c + 1,
@@ -422,20 +440,24 @@
           continue;
         }
 
-        // 2) 브랜드 요약 컬럼 (등급 / 공급금액 / 판매금액 / 매출금액 / 판매율) 감지
+        // 2) 상단 요약 컬럼 (등급 / 공급금액 / 판매금액 / 매출금액 / 판매율) 감지
         let summaryMetric = null;
         for (const t of filledStack) {
           const m = matchSummaryMetricText(t);
-          if (m) summaryMetric = m;
+          if (m) { summaryMetric = m; break; }
         }
 
-        // 하단 셀에서 브랜드명/코드 우선 탐색
         let sumBrand = null;
         for (let r = rawStack.length - 1; r >= 0; r--) {
-          const b = matchBrandText(rawStack[r]);
+          const b = matchBrandText(rawStack[r], true);
           if (b) { sumBrand = b; break; }
         }
-        if (!sumBrand) sumBrand = colBrand;
+        if (!sumBrand) {
+          for (let r = filledStack.length - 1; r >= 0; r--) {
+            const b = matchBrandText(filledStack[r], true);
+            if (b) { sumBrand = b; break; }
+          }
+        }
 
         if (summaryMetric && sumBrand && (colSeason || lastSeason)) {
           summaryMeta.push({
@@ -449,7 +471,6 @@
         c += 1;
       }
 
-      // 유효성 검증: 최소 요약 10컬럼, 아이템 5개, 2개 이상 시즌 확보 시 동적 스키마 채택
       const uniqueSeasons = new Set(summaryMeta.map(m => m.season));
       if (summaryMeta.length >= 10 && itemMeta.length >= 5 && uniqueSeasons.size >= 2) {
         return {
@@ -458,7 +479,7 @@
           branchCol,
           codeCol,
           nameCol,
-          dataStartRow,
+          headerEndRow,
           mode: '동적 매핑'
         };
       }
@@ -466,7 +487,7 @@
     }
 
     // =========================================================================
-    // [2] 폴백용 고정 스키마 (헤더 구조가 비표준일 때 안전장치)
+    // [2] 폴백용 고정 스키마 (헤더가 비표준일 때 안전장치)
     // =========================================================================
     function buildExactSheetSchema() {
       const mainBrands4 = [['IN', '인디안'], ['BF', '브루노바피'], ['DL', '데일리스트'], ['RE', '더레이블']];
@@ -511,11 +532,11 @@
         });
       });
 
-      return { summaryMeta, itemMeta, branchCol: 0, codeCol: 1, nameCol: 2, dataStartRow: 0, mode: '기본 스키마' };
+      return { summaryMeta, itemMeta, branchCol: 0, codeCol: 1, nameCol: 2, headerEndRow: 8, mode: '기본 스키마' };
     }
 
     // =========================================================================
-    // [3] JSONP 응답 파싱 (전국 전체 allStores와 중부 stores 분리 저장)
+    // [3] JSONP 응답 파싱 (본사 공식 합계행 + 전국 allStores + 중부 stores)
     // =========================================================================
     window.handleGoogleSheetJSONP = function(response) {
       try {
@@ -529,17 +550,26 @@
           if (found) baseDate = String(found).replace(/기준일자\s*:\s*/g, '').trim();
         }
 
-        // 동적 스키마 우선 적용, 실패 시 기본 스키마 폴백
         const schema = buildDynamicSheetSchema(rows) || buildExactSheetSchema();
-        const { summaryMeta, itemMeta, branchCol, codeCol, nameCol, dataStartRow, mode } = schema;
+        const { summaryMeta, itemMeta, branchCol, codeCol, nameCol, headerEndRow, mode } = schema;
 
-        const allStores = []; // 전국평균 산출용 (시트 내 모든 유효 매장)
-        const stores = [];    // WM중부 화면 표시용 (서울 F, 경기 G, 강원 H)
+        // 9행 본사 공식 전체 '합계' 행 추출 (전국평균 정확도 100% 일치용)
+        let officialNatRow = null;
+        for (let r = headerEndRow; r < Math.min(rows.length, headerEndRow + 5); r++) {
+          const row = rows[r] || [];
+          const bStr = String(row[branchCol] ?? '').replace(/\s+/g, '');
+          if (bStr === '합계' || bStr === '전체' || bStr === '총계') {
+            officialNatRow = row;
+            break;
+          }
+        }
+
+        const allStores = [];
+        const stores = [];
         const branches = new Set();
-
         const INVALID_BRANCH_WORDS = new Set(['지점', '지점코드', '합계', '총계', '전체', '등급별', '지점별', '소계', '평균', '구분']);
 
-        for (let r = dataStartRow; r < rows.length; r++) {
+        for (let r = headerEndRow; r < rows.length; r++) {
           const row = rows[r];
           if (!row) continue;
           const branch = row[branchCol] ? String(row[branchCol]).trim() : '';
@@ -569,11 +599,12 @@
         if (stores.length === 0) {
           allStores.forEach(s => branches.add(s.branch));
         }
-        const hasNationwide = allStores.length > displayStores.length;
+        const hasNationwide = Boolean(officialNatRow) || (allStores.length > displayStores.length);
 
         parsedData = {
           summaryMeta,
           itemMeta,
+          officialNatRow,
           allStores,
           stores: displayStores,
           branches: Array.from(branches).sort(),
@@ -680,9 +711,10 @@
       }
     }
 
-    // 전국평균은 allStores 기준, 지점평균은 해당 지점(ALL 선택 시 중부 전체) 기준으로 정확히 분리 산출
+    // 전국평균: 시트 9행 공식 합계 우선 사용 (누락 시 allStores 합산), 지점평균: 해당 지점(ALL 시 중부)
     function calcAverages(seasonSummaryCols, seasonItems, branchCode) {
       const natBr = {}, brBr = {}, natIt = {}, brIt = {};
+      const natRow = parsedData.officialNatRow;
       const natPool = parsedData.allStores;
       const brPool = (branchCode && branchCode !== 'ALL')
         ? parsedData.allStores.filter(s => s.branch === branchCode)
@@ -692,18 +724,33 @@
         if (m.metric === '공급금액') {
           const cSale = seasonSummaryCols.find(x => x.brandCode === m.brandCode && x.season === m.season && x.metric === '판매금액');
           if (!cSale) return;
-          let nSup = 0, nSal = 0, bSup = 0, bSal = 0;
-          natPool.forEach(s => { nSup += parseNum(s.raw[m.col]); nSal += parseNum(s.raw[cSale.col]); });
+
+          let nSup = natRow ? parseNum(natRow[m.col]) : 0;
+          let nSal = natRow ? parseNum(natRow[cSale.col]) : 0;
+          if (nSup <= 0) {
+            nSup = 0; nSal = 0;
+            natPool.forEach(s => { nSup += parseNum(s.raw[m.col]); nSal += parseNum(s.raw[cSale.col]); });
+          }
+
+          let bSup = 0, bSal = 0;
           brPool.forEach(s => { bSup += parseNum(s.raw[m.col]); bSal += parseNum(s.raw[cSale.col]); });
+
           natBr[m.brandCode] = nSup > 0 ? (nSal / nSup) * 100 : 0;
           brBr[m.brandCode] = bSup > 0 ? (bSal / bSup) * 100 : 0;
         }
       });
 
       seasonItems.forEach(m => {
-        let nOut = 0, nSal = 0, bOut = 0, bSal = 0;
-        natPool.forEach(s => { nOut += parseNum(s.raw[m.colOut]); nSal += parseNum(s.raw[m.colSale]); });
+        let nOut = natRow ? parseNum(natRow[m.colOut]) : 0;
+        let nSal = natRow ? parseNum(natRow[m.colSale]) : 0;
+        if (nOut <= 0) {
+          nOut = 0; nSal = 0;
+          natPool.forEach(s => { nOut += parseNum(s.raw[m.colOut]); nSal += parseNum(s.raw[m.colSale]); });
+        }
+
+        let bOut = 0, bSal = 0;
         brPool.forEach(s => { bOut += parseNum(s.raw[m.colOut]); bSal += parseNum(s.raw[m.colSale]); });
+
         natIt[m.itemCode + '_' + m.brandCode] = nOut > 0 ? (nSal / nOut) * 100 : 0;
         brIt[m.itemCode + '_' + m.brandCode] = bOut > 0 ? (bSal / bOut) * 100 : 0;
       });
@@ -718,7 +765,6 @@
       const sItm = parsedData.itemMeta.filter(m => m.season === currentSeason);
       const avgs = calcAverages(sSum, sItm, target.branchCode);
 
-      // 비교 라벨 동적 보정
       const brAvgLabel = (target.branchCode && target.branchCode !== 'ALL') ? '지점평균' : '중부평균';
       const natAvgLabel = parsedData.hasNationwide ? '전국평균' : '중부평균';
 
@@ -726,7 +772,6 @@
       document.getElementById('natAvgColHeader').innerText = natAvgLabel;
       document.getElementById('itemSubTitle').innerText = `출고수량 대비 판매수량 및 ${brAvgLabel}/${natAvgLabel} 비교`;
 
-      // 개별 매장 등급을 동적 스키마의 등급 컬럼에서 추출
       let gradeBannerText = `${currentSeason} 등급: 합계`;
       if (target.rows.length === 1) {
         const gradeCols = sSum.filter(m => m.metric === '등급');
@@ -750,7 +795,6 @@
       const brands = [];
       sSum.forEach(m => { if (m.brandCode && !brands.find(b => b.code === m.brandCode)) brands.push({ code: m.brandCode, name: m.brandName }); });
 
-      // 파트 1: 브랜드 카드 렌더링
       const brandCardsHtml = brands.map(b => {
         const cSup = sSum.find(m => m.brandCode === b.code && m.metric === '공급금액');
         const cSal = sSum.find(m => m.brandCode === b.code && m.metric === '판매금액');
@@ -788,7 +832,6 @@
       }).join('');
       document.getElementById('brandSummaryGrid').innerHTML = brandCardsHtml;
 
-      // 브랜드 필터 버튼
       const itemBrands = [];
       sItm.forEach(m => { if (m.brandCode && !itemBrands.find(b => b.code === m.brandCode)) itemBrands.push({ code: m.brandCode, name: m.brandName }); });
       let filterBtnsHtml = `<button onclick="setBrandFilter('ALL')" class="px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition ${currentBrand === 'ALL' ? 'bg-[#18181B] text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}">전체보기</button>`;
@@ -798,7 +841,6 @@
       });
       document.getElementById('brandFilterBtns').innerHTML = filterBtnsHtml;
 
-      // 파트 2: 테이블 렌더링
       let fItm = currentBrand === 'ALL' ? sItm : sItm.filter(m => m.brandCode === currentBrand);
       let rData = fItm.map(m => {
         let outQ = 0, salQ = 0;
