@@ -44,7 +44,7 @@
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
           <div class="min-w-0">
             <div class="text-[14.5px] font-extrabold tracking-tight truncate">WM중부 통합 포털</div>
-            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES DASHBOARD</div>
+            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES REPORT HUB</div>
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@
         </button>
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="text" id="sidebarSearchInput" oninput="renderDesktopSidebar()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 focus:outline-none transition" />
+          <input type="text" id="sidebarSearchInput" oninput="renderSide()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 focus:outline-none transition" />
         </div>
       </div>
       <div id="sidebarMenuGroups" class="flex-1 overflow-y-auto thin-scrollbar px-3 py-2 space-y-4"></div>
@@ -109,8 +109,8 @@
 
       <!-- 뷰어 화면 -->
       <section id="viewerView" class="hidden flex-1 flex flex-col min-h-0 bg-white">
+        <div id="quickBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"></div>
         <div id="singleView" class="flex-1 flex flex-col min-h-0">
-          <div id="quickBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"></div>
           <div id="singleBody" class="flex-1 relative bg-white overflow-hidden"></div>
         </div>
         <div id="splitView" class="hidden flex-1 min-h-0 grid gap-3 p-3 bg-[#E7E5DF]" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
@@ -125,7 +125,7 @@
         <div class="pt-3 pb-1 flex justify-center shrink-0"><div class="w-10 h-1 rounded-full bg-zinc-300"></div></div>
         <div class="px-5 py-2 flex items-center justify-between shrink-0">
           <h3 class="text-[17px] font-extrabold">전체 메뉴 <span id="drawCount" class="ml-1 text-[11px] bg-amber-500/15 text-amber-800 px-2 py-0.5 rounded-full"></span></h3>
-          <button onclick="toggleDrawer(false)" class="w-8 h-8 rounded-full bg-white border text-zinc-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="toggleDrawer(false)" class="w-8 h-8 rounded-full bg-white border text-zinc-500 flex justify-center items-center"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="drawerList" class="flex-1 overflow-y-auto no-scrollbar px-5 pb-4 space-y-4"></div>
         <div class="px-5 py-3.5 bg-white border-t flex justify-between shrink-0">
@@ -161,22 +161,29 @@
       "ansrod1199@gmail.com",
       "geacha111@gmail.com"
     ];
-    const PIN_KEY = 'wm_portal_pinned_menus_v4';
+    const PIN_KEY = 'wm_portal_pinned_menus_v5';
     
     const MENU = [
-      { id: 'dashboard', title: '통합 대시보드', subtitle: '매장별 실시간 매출 및 상권 분석', url: './dashboard.html', cat: '매출·실적', badge: 'MAIN', icon: 'fa-solid fa-gauge-high', acc: 'amber' },
-      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', cat: '매출·실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', acc: 'amber' },
-      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', cat: '매출·실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', acc: 'blue' },
-      { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', cat: '매출·실적', badge: 'SEASON', icon: 'fa-solid fa-shirt', acc: 'amber' },
-      { id: 'complex', title: '복합점 실적현황', subtitle: '복합 매장 브랜드별 상세 실적', url: './complex.html', cat: '매출·실적', badge: 'COMPLEX', icon: 'fa-solid fa-layer-group', acc: 'blue' },
-      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', cat: '시장·상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', acc: 'indigo' },
-      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장·관리', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' }
+      // 매출/실적
+      { id: 'dashboard', title: '통합 대시보드', subtitle: '매장별 실시간 매출 및 상권 분석', url: './dashboard.html', cat: '매출/실적', badge: 'MAIN', icon: 'fa-solid fa-gauge-high', acc: 'amber' },
+      { id: 'daily', title: '일일 매출장', subtitle: '당일·당월·연누계 실시간 마감 현황', url: './daily.html', cat: '매출/실적', badge: 'LIVE', icon: 'fa-solid fa-table-list', acc: 'amber' },
+      { id: 'weekly', title: '주간 실적 리포트', subtitle: 'CFM 주간 매출·객수·브랜드별 분석', url: './weekly.html', cat: '매출/실적', badge: 'WEEKLY', icon: 'fa-solid fa-chart-simple', acc: 'blue' },
+      { id: 'complex', title: '복합점 실적현황', subtitle: '복합 매장 브랜드별 상세 실적', url: './complex.html', cat: '매출/실적', badge: 'COMPLEX', icon: 'fa-solid fa-layer-group', acc: 'blue' },
+      { id: 'season', title: '시즌별 매출장', subtitle: '봄·여름·가을·겨울·사계절 시즌별 매출 현황', url: './season.html', cat: '매출/실적', badge: 'SEASONAL', icon: 'fa-solid fa-calendar-days', acc: 'amber' },
+      { id: 'restore', title: '점정비점 매출', subtitle: '점정비 유형별 변경 전·후 매출 추이 비교', url: './restore.html', cat: '매출/실적', badge: 'RENEWAL', icon: 'fa-solid fa-store', acc: 'amber' },
+
+      // 시장/상품
+      { id: 'competitor', title: '동업계 현황', subtitle: '상권 내 타브랜드 매출·순위 비교', url: './competitor.html', cat: '시장/상품', badge: 'MARKET', icon: 'fa-solid fa-chart-line', acc: 'indigo' },
+
+      // 매장/재고
+      { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장/재고', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' },
+      { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', cat: '매장/재고', badge: 'SEASON', icon: 'fa-solid fa-shirt', acc: 'amber' }
     ];
     
     const ACC = {
-      amber: { bg: 'bg-amber-500/15', txt: 'text-amber-700', bdg: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
-      blue:  { bg: 'bg-blue-500/12', txt: 'text-blue-700', bdg: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
-      indigo:{ bg: 'bg-indigo-500/12', txt: 'text-indigo-700', bdg: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
+      amber:  { bg: 'bg-amber-500/15', txt: 'text-amber-700', bdg: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
+      blue:   { bg: 'bg-blue-500/12', txt: 'text-blue-700', bdg: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
+      indigo: { bg: 'bg-indigo-500/12', txt: 'text-indigo-700', bdg: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
     };
 
     // State
@@ -387,8 +394,8 @@
 
     window.onload = () => {
       try { pins = (JSON.parse(localStorage.getItem(PIN_KEY)) || pins).filter(id => MENU.some(m => m.id === id)); } catch(e){}
-      isPrev = (window.self !== window.top) || location.hostname.includes('localhost') || !location.hostname;
-      if (isPrev) { user = { email: ALLOWED[0], name: '미리보기' }; initPortal(); }
+      isPrev = (window.self !== window.top) || location.hostname.includes('localhost') || location.hostname === '127.0.0.1' || !location.hostname;
+      if (isPrev) { user = { email: ALLOWED[0], name: '로컬 실행' }; initPortal(); }
       else {
         try { user = JSON.parse(localStorage.getItem('wm_user')); } catch(e){}
         if(user && ALLOWED.includes(user.email)) initPortal();
