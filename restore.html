@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta name="robots" content="noindex, nofollow">
+  <!-- [직접 접속 차단 보안 코드] -->
+  <script>
+    if (window.self === window.top) {
+      window.location.replace('./index.html');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>중부영업팀 점정비점 매출장</title>
@@ -171,55 +178,7 @@
     // =========================================================================
     // [2. 기본 스냅샷 데이터 (34개 매장 전체 - 숫자 한 자리도 오차 없이 정확히 반영)]
     // =========================================================================
-    const INITIAL_RENEWAL_DATA = [
-      // 대리점 전환 (4)
-      { idx: 0,  category: "대리점 전환", date26: "2026-03-11", date25: "2025-03-11", store: "길동점",         pre_y26: 56814,  pre_daily: 812,  pre_y25: 57353,  pre_gr: -0.009, post_y26: 334422, post_daily: 1338, post_y25: 264438, post_gr: 0.265,  tot_y26: 391236, tot_daily: 1226, tot_y25: 321792, tot_gr: 0.216 },
-      { idx: 1,  category: "대리점 전환", date26: "2026-04-01", date25: "2025-04-01", store: "원주중앙점",     pre_y26: 109004, pre_daily: 1198, pre_y25: 130267, pre_gr: -0.163, post_y26: 482749, post_daily: 2108, post_y25: 328280, post_gr: 0.471,  tot_y26: 591753, tot_daily: 1855, tot_y25: 458547, tot_gr: 0.290 },
-      { idx: 2,  category: "대리점 전환", date26: "2026-04-20", date25: "2025-04-20", store: "응암점",         pre_y26: 105608, pre_daily: 960,  pre_y25: 109823, pre_gr: -0.038, post_y26: 231969, post_daily: 1105, post_y25: 221188, post_gr: 0.049,  tot_y26: 337578, tot_daily: 1058, tot_y25: 331011, tot_gr: 0.020 },
-      { idx: 3,  category: "대리점 전환", date26: "2026-08-16", date25: "2025-08-16", store: "화성남양점",     pre_y26: 113639, pre_daily: 498,  pre_y25: 111159, pre_gr: 0.022,  post_y26: 57459,  post_daily: 625,  post_y25: 47254,  post_gr: 0.216,  tot_y26: 171099, tot_daily: 536,  tot_y25: 158414, tot_gr: 0.080 },
-
-      // 점주 교체 (3)
-      { idx: 4,  category: "점주 교체",   date26: "2026-02-20", date25: "2025-02-20", store: "중곡점",         pre_y26: 33965,  pre_daily: 666,  pre_y25: 34540,  pre_gr: -0.017, post_y26: 204040, post_daily: 759,  post_y25: 217221, post_gr: -0.061, tot_y26: 238006, tot_daily: 746,  tot_y25: 251761, tot_gr: -0.055 },
-      { idx: 5,  category: "점주 교체",   date26: "2026-02-25", date25: "2025-02-25", store: "상도점",         pre_y26: 91486,  pre_daily: 1634, pre_y25: 98325,  pre_gr: -0.070, post_y26: 524740, post_daily: 1988, post_y25: 502755, post_gr: 0.044,  tot_y26: 616225, tot_daily: 1932, tot_y25: 601080, tot_gr: 0.025 },
-      { idx: 6,  category: "점주 교체",   date26: "2026-07-23", date25: "2025-07-23", store: "문막광터직영점", pre_y26: 214631, pre_daily: 1052, pre_y25: 235349, pre_gr: -0.088, post_y26: 140561, post_daily: 1212, post_y25: 126074, post_gr: 0.115,  tot_y26: 355192, tot_daily: 1113, tot_y25: 361423, tot_gr: -0.017 },
-
-      // 관리자 교체 (1)
-      { idx: 7,  category: "관리자 교체", date26: "2026-02-28", date25: "2025-02-28", store: "일산덕이직영점", pre_y26: 29223,  pre_daily: 495,  pre_y25: 19757,  pre_gr: 0.479,  post_y26: 176669, post_daily: 677,  post_y25: 163121, post_gr: 0.083,  tot_y26: 205892, tot_daily: 645,  tot_y25: 182878, tot_gr: 0.126 },
-
-      // 신규 오픈 (9)
-      { idx: 8,  category: "신규 오픈",   date26: "2026-03-17", date25: "2025-03-17", store: "화곡점",         pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 280792, post_daily: 1151, post_y25: null,   post_gr: 0,      tot_y26: 280792, tot_daily: 880,  tot_y25: null,   tot_gr: 0 },
-      { idx: 9,  category: "신규 오픈",   date26: "2026-03-24", date25: "2025-03-24", store: "연신내점",       pre_y26: null,   pre_daily: null, pre_y25: 71087,  pre_gr: -1.000, post_y26: 146579, post_daily: 618,  post_y25: 207573, post_gr: -0.294, tot_y26: 146579, tot_daily: 459,  tot_y25: 278660, tot_gr: -0.474 },
-      { idx: 10, category: "신규 오픈",   date26: "2026-04-28", date25: "2025-04-28", store: "서울시흥점",     pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 176112, post_daily: 872,  post_y25: null,   post_gr: 0,      tot_y26: 176112, tot_daily: 552,  tot_y25: null,   tot_gr: 0 },
-      { idx: 11, category: "신규 오픈",   date26: "2026-05-07", date25: "2025-05-07", store: "평내점",         pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 110098, post_daily: 570,  post_y25: null,   post_gr: 0,      tot_y26: 110098, tot_daily: 345,  tot_y25: null,   tot_gr: 0 },
-      { idx: 12, category: "신규 오픈",   date26: "2026-05-09", date25: "2025-05-09", store: "동탄직영점",     pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 196133, post_daily: 1027, post_y25: null,   post_gr: 0,      tot_y26: 196133, tot_daily: 615,  tot_y25: null,   tot_gr: 0 },
-      { idx: 13, category: "신규 오픈",   date26: "2026-09-01", date25: "2025-09-01", store: "장현점",         pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 124520, post_daily: 1638, post_y25: null,   post_gr: 0,      tot_y26: 124520, tot_daily: 390,  tot_y25: null,   tot_gr: 0 },
-      { idx: 14, category: "신규 오픈",   date26: "2026-09-04", date25: "2025-09-04", store: "홍천점",         pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 118670, post_daily: 1626, post_y25: null,   post_gr: 0,      tot_y26: 118670, tot_daily: 372,  tot_y25: null,   tot_gr: 0 },
-      { idx: 15, category: "신규 오픈",   date26: "2026-09-11", date25: "2025-09-11", store: "구로고대점",     pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 54995,  post_daily: 833,  post_y25: null,   post_gr: 0,      tot_y26: 54995,  tot_daily: 172,  tot_y25: null,   tot_gr: 0 },
-      { idx: 16, category: "신규 오픈",   date26: "2026-11-07", date25: "2025-11-07", store: "곤지암점",       pre_y26: null,   pre_daily: null, pre_y25: null,   pre_gr: 0,      post_y26: 16012,  post_daily: 1779, post_y25: null,   post_gr: 0,      tot_y26: 16012,  tot_daily: 50,   tot_y25: null,   tot_gr: 0 },
-
-      // 매장 이전 (3)
-      { idx: 17, category: "매장 이전",   date26: "2026-03-14", date25: "2025-03-14", store: "경기광주점",     pre_y26: 57219,  pre_daily: 784,  pre_y25: 54314,  pre_gr: 0.053,  post_y26: 221020, post_daily: 895,  post_y25: 222103, post_gr: -0.005, tot_y26: 278239, tot_daily: 872,  tot_y25: 276417, tot_gr: 0.007 },
-      { idx: 18, category: "매장 이전",   date26: "2026-08-01", date25: "2025-08-01", store: "계산점",         pre_y26: 437910, pre_daily: 2056, pre_y25: 422530, pre_gr: 0.036,  post_y26: 189039, post_daily: 1767, post_y25: 218401, post_gr: -0.134, tot_y26: 626949, tot_daily: 1965, tot_y25: 640931, tot_gr: -0.022 },
-      { idx: 19, category: "매장 이전",   date26: "2026-09-12", date25: "2025-09-12", store: "안성점",         pre_y26: 190362, pre_daily: 747,  pre_y25: 222288, pre_gr: -0.144, post_y26: 79563,  post_daily: 1224, post_y25: 59457,  post_gr: 0.338,  tot_y26: 269926, tot_daily: 846,  tot_y25: 281744, tot_gr: -0.042 },
-
-      // 환경 개선 (3)
-      { idx: 20, category: "환경 개선",   date26: "2026-04-01", date25: "2025-04-01", store: "시화점",         pre_y26: 47175,  pre_daily: 518,  pre_y25: 83056,  pre_gr: -0.432, post_y26: 120817, post_daily: 528,  post_y25: 162219, post_gr: -0.255, tot_y26: 167992, tot_daily: 527,  tot_y25: 245275, tot_gr: -0.315 },
-      { idx: 21, category: "환경 개선",   date26: "2026-04-16", date25: "2025-04-16", store: "서수원직영점",   pre_y26: 90048,  pre_daily: 850,  pre_y25: 107183, pre_gr: -0.160, post_y26: 318518, post_daily: 1488, post_y25: 191619, post_gr: 0.662,  tot_y26: 408567, tot_daily: 1281, tot_y25: 298802, tot_gr: 0.367 },
-      { idx: 22, category: "환경 개선",   date26: "2026-10-09", date25: "2025-10-09", store: "삼선교직영점",   pre_y26: 367998, pre_daily: 1305, pre_y25: 345889, pre_gr: 0.064,  post_y26: 65197,  post_daily: 1716, post_y25: 72143,  post_gr: -0.096, tot_y26: 433195, tot_daily: 1358, tot_y25: 418032, tot_gr: 0.036 },
-
-      // 파사드 교체 (11)
-      { idx: 23, category: "파사드 교체", date26: "2026-01-18", date25: "2025-01-18", store: "하남점",         pre_y26: 13775,  pre_daily: 765,  pre_y25: 12892,  pre_gr: 0.068,  post_y26: 290164, post_daily: 961,  post_y25: 258061, post_gr: 0.124,  tot_y26: 303939, tot_daily: 953,  tot_y25: 270952, tot_gr: 0.122 },
-      { idx: 24, category: "파사드 교체", date26: "2026-01-26", date25: "2025-01-26", store: "명일점",         pre_y26: 32345,  pre_daily: 1244, pre_y25: 38100,  pre_gr: -0.151, post_y26: 443858, post_daily: 1510, post_y25: 415785, post_gr: 0.068,  tot_y26: 476203, tot_daily: 1493, tot_y25: 453884, tot_gr: 0.049 },
-      { idx: 25, category: "파사드 교체", date26: "2026-02-05", date25: "2025-02-05", store: "동두천점",       pre_y26: 26828,  pre_daily: 745,  pre_y25: 29784,  pre_gr: -0.099, post_y26: 246011, post_daily: 866,  post_y25: 274487, post_gr: -0.104, tot_y26: 272839, tot_daily: 855,  tot_y25: 304271, tot_gr: -0.103 },
-      { idx: 26, category: "파사드 교체", date26: "2026-02-20", date25: "2025-02-20", store: "안중점",         pre_y26: 31225,  pre_daily: 612,  pre_y25: 24605,  pre_gr: 0.269,  post_y26: 147092, post_daily: 547,  post_y25: 147311, post_gr: -0.001, tot_y26: 178316, tot_daily: 559,  tot_y25: 171916, tot_gr: 0.037 },
-      { idx: 27, category: "파사드 교체", date26: "2026-03-23", date25: "2025-03-23", store: "송우점",         pre_y26: 74852,  pre_daily: 913,  pre_y25: 68767,  pre_gr: 0.088,  post_y26: 208991, post_daily: 878,  post_y25: 213973, post_gr: -0.023, tot_y26: 283842, tot_daily: 890,  tot_y25: 282740, tot_gr: 0.004 },
-      { idx: 28, category: "파사드 교체", date26: "2026-06-09", date25: "2025-06-09", store: "영월점",         pre_y26: 109741, pre_daily: 686,  pre_y25: 101531, pre_gr: 0.081,  post_y26: 107018, post_daily: 669,  post_y25: 109400, post_gr: -0.022, tot_y26: 216759, tot_daily: 679,  tot_y25: 210932, tot_gr: 0.028 },
-      { idx: 29, category: "파사드 교체", date26: "2026-09-05", date25: "2025-09-05", store: "신포점",         pre_y26: 218198, pre_daily: 880,  pre_y25: 226084, pre_gr: -0.035, post_y26: 63720,  post_daily: 885,  post_y25: 70250,  post_gr: -0.093, tot_y26: 281918, tot_daily: 884,  tot_y25: 296334, tot_gr: -0.049 },
-      { idx: 30, category: "파사드 교체", date26: "2026-09-10", date25: "2025-09-10", store: "송림점",         pre_y26: 176296, pre_daily: 697,  pre_y25: 169322, pre_gr: 0.041,  post_y26: 57669,  post_daily: 861,  post_y25: 48076,  post_gr: 0.200,  tot_y26: 233965, tot_daily: 733,  tot_y25: 217398, tot_gr: 0.076 },
-      { idx: 31, category: "파사드 교체", date26: "2026-09-12", date25: "2025-09-12", store: "수원북문점",     pre_y26: 255648, pre_daily: 1003, pre_y25: 293475, pre_gr: -0.129, post_y26: 75447,  post_daily: 1161, post_y25: 95201,  post_gr: -0.207, tot_y26: 331095, tot_daily: 1038, tot_y25: 388675, tot_gr: -0.148 },
-      { idx: 32, category: "파사드 교체", date26: "2026-09-19", date25: "2025-09-19", store: "춘천점",         pre_y26: 201588, pre_daily: 769,  pre_y25: 204746, pre_gr: -0.015, post_y26: 67097,  post_daily: 1157, post_y25: 61166,  post_gr: 0.097,  tot_y26: 268685, tot_daily: 842,  tot_y25: 265912, tot_gr: 0.010 },
-      { idx: 33, category: "파사드 교체", date26: "2026-09-23", date25: "2025-09-23", store: "여주점",         pre_y26: 323358, pre_daily: 1216, pre_y25: 333898, pre_gr: -0.032, post_y26: 66287,  post_daily: 1228, post_y25: 95228,  post_gr: -0.304, tot_y26: 389645, tot_daily: 1221, tot_y25: 429127, tot_gr: -0.092 }
-    ];
+    const INITIAL_RENEWAL_DATA = [];
 
     // =========================================================================
     // 애플리케이션 전역 상태
