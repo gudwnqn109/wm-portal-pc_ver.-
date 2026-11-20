@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko" class="light">
 <head>
-  <!-- [직접 접속 차단 보안 코드 - 실제 배포 시 주석 해제]
+  <meta name="robots" content="noindex, nofollow">
+  <!-- [직접 접속 차단 보안 코드] -->
   <script>
     if (window.self === window.top) {
       window.location.replace('./index.html');
     }
   </script>
-  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>WM중부 주간 실적 리포트</title>
@@ -582,167 +582,12 @@
     // 실제 구글 시트 최신 스냅샷 (27개 매장 및 지점별 벤치마크)
     let DB = {
       benchmarks: {
-        'ALL': {
-          brandMonth: { indian: {sh: 0.518, gr: 0.084}, bruno: {sh: 0.142, gr: 0.032}, daily: {sh: 0.246, gr: -0.015}, label: {sh: 0.052, gr: 0.114}, duani: {sh: 0.042, gr: 0.021} },
-          brandYear:  { indian: {sh: 0.456, gr: 0.092}, bruno: {sh: 0.148, gr: 0.045}, daily: {sh: 0.284, gr: 0.076}, label: {sh: 0.056, gr: 0.118}, duani: {sh: 0.056, gr: 0.034} }
-        },
-        '서울': {
-          brandMonth: { indian: {sh: 0.521, gr: 0.115}, bruno: {sh: 0.136, gr: 0.021}, daily: {sh: 0.245, gr: -0.012}, label: {sh: 0.058, gr: 0.082}, duani: {sh: 0.040, gr: -0.018} },
-          brandYear:  { indian: {sh: 0.482, gr: 0.104}, bruno: {sh: 0.142, gr: 0.058}, daily: {sh: 0.264, gr: 0.052}, label: {sh: 0.058, gr: 0.046}, duani: {sh: 0.054, gr: 0.015} }
-        },
-        '경기': {
-          brandMonth: { indian: {sh: 0.546, gr: 0.098}, bruno: {sh: 0.151, gr: 0.034}, daily: {sh: 0.203, gr: 0.048}, label: {sh: 0.051, gr: 0.012}, duani: {sh: 0.049, gr: -0.045} },
-          brandYear:  { indian: {sh: 0.498, gr: 0.108}, bruno: {sh: 0.144, gr: 0.041}, daily: {sh: 0.241, gr: 0.068}, label: {sh: 0.059, gr: 0.024}, duani: {sh: 0.058, gr: -0.019} }
-        },
-        '강원': {
-          brandMonth: { indian: {sh: 0.482, gr: 0.078}, bruno: {sh: 0.188, gr: -0.018}, daily: {sh: 0.231, gr: 0.014}, label: {sh: 0.049, gr: 0.088}, duani: {sh: 0.050, gr: 0.046} },
-          brandYear:  { indian: {sh: 0.461, gr: 0.089}, bruno: {sh: 0.179, gr: -0.011}, daily: {sh: 0.252, gr: 0.032}, label: {sh: 0.051, gr: 0.076}, duani: {sh: 0.057, gr: 0.041} }
-        }
+        'ALL':  { brandMonth: {}, brandYear: {} },
+        '서울': { brandMonth: {}, brandYear: {} },
+        '경기': { brandMonth: {}, brandYear: {} },
+        '강원': { brandMonth: {}, brandYear: {} }
       },
-      stores: [
-        // 1. 금호직영점 (시트 수치 100% 반영: 주간 13,025.0, 객단가 289.4, 당월 14,676.7, 비중 31.7+2.5+51.5+11.5+2.8=100%, 년누계 -0.2%)
-        createStoreRecord('금호직영점', '서울', 13025.0, 11228.4, 13025.0, 45, 39, 30, 8, 6, 14, 12, 215, 198, 6, 5,
-          { total: 14676.7, gr: 0.112, indian: 0.317, bruno: 0.025, daily: 0.515, label: 0.115, duani: 0.028, details: { indian: { sales: 4652.5, gr: 0.084 }, bruno: { sales: 366.9, gr: -0.142 }, daily: { sales: 7558.5, gr: 0.165 }, label: { sales: 1687.8, gr: 0.092 }, duani: { sales: 411.0, gr: 0.035 } } },
-          { total: 445120.0, gr: -0.002, indian: 0.478, bruno: 0.148, daily: 0.254, label: 0.062, duani: 0.058, details: { indian: { sales: 212767.4, gr: -0.004 }, bruno: { sales: 65877.8, gr: 0.012 }, daily: { sales: 113060.5, gr: -0.008 }, label: { sales: 27597.4, gr: 0.021 }, duani: { sales: 25816.9, gr: -0.011 } } },
-          { unitPrice: 289.4, billPrice: 263.4, custShare: 1.0 }
-        ),
-        // 2. 길동점 (시트 수치 100% 반영: 주간 11,122.9, 당월 12,895.4, 년누계 382,278.0)
-        createStoreRecord('길동점', '서울', 11122.9, 9747.3, 11122.9, 60, 47, 30, 10, 6, 11, 10, 494, 262, 9, 8,
-          { total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057, details: { indian: { sales: 8181.0, gr: -0.145 }, bruno: { sales: -111.0, gr: -1.07 }, daily: { sales: 3329.0, gr: -0.029 }, label: { sales: 720.0, gr: 0.0 }, duani: { sales: 737.4, gr: 1.56 } } },
-          { total: 382278.0, gr: 0.22, indian: 0.46, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077, details: { indian: { sales: 175844.4, gr: 0.15 }, bruno: { sales: 36764.4, gr: -0.054 }, daily: { sales: 117336.2, gr: 0.193 }, label: { sales: 20785.0, gr: 1.705 }, duani: { sales: 29548.0, gr: 0.886 } } },
-          { unitPrice: 185.4, billPrice: 168.7, custShare: 1.0 }
-        ),
-        // 3. 명일점 (시트 수치: 당월 총매출 15,202.0, 5대 브랜드 합계 14,966.0, 비중 합계 98.5%)
-        createStoreRecord('명일점', '서울', 13840.0, 12450.0, 13420.0, 68, 61, 30, 9, 7, 15, 13, 382, 340, 5, 7,
-          { total: 15202.0, gr: 0.094, indian: 0.512, bruno: 0.138, daily: 0.235, label: 0.054, duani: 0.046, details: { indian: { sales: 7783.4, gr: 0.105 }, bruno: { sales: 2097.9, gr: 0.062 }, daily: { sales: 3572.5, gr: 0.088 }, label: { sales: 820.9, gr: 0.124 }, duani: { sales: 691.3, gr: 0.041 } } },
-          { total: 396400.0, gr: 0.082, indian: 0.492, bruno: 0.145, daily: 0.258, label: 0.055, duani: 0.050, details: { indian: { sales: 195028.8, gr: 0.091 }, bruno: { sales: 57478.0, gr: 0.054 }, daily: { sales: 102271.2, gr: 0.084 }, label: { sales: 21802.0, gr: 0.102 }, duani: { sales: 19820.0, gr: 0.038 } } }
-        ),
-        // 4. 미아직영점 (시트 수치: 전체매출 8,154.0, 고객매출 8,914.0, 비중 109.3%, 고객 44명, 객단가 202.6)
-        createStoreRecord('미아직영점', '서울', 8154.0, 7890.0, 8914.0, 44, 41, 25, 6, 5, 12, 11, 290, 275, 14, 12,
-          { total: 10420.0, gr: 0.042, indian: 0.485, bruno: 0.142, daily: 0.268, label: 0.058, duani: 0.047, details: { indian: { sales: 5053.7, gr: 0.051 }, bruno: { sales: 1479.6, gr: 0.024 }, daily: { sales: 2792.6, gr: 0.038 }, label: { sales: 604.4, gr: 0.065 }, duani: { sales: 489.7, gr: 0.018 } } },
-          { total: 312500.0, gr: 0.054, indian: 0.472, bruno: 0.148, daily: 0.271, label: 0.056, duani: 0.053, details: { indian: { sales: 147500.0, gr: 0.062 }, bruno: { sales: 46250.0, gr: 0.035 }, daily: { sales: 84687.5, gr: 0.058 }, label: { sales: 17500.0, gr: 0.049 }, duani: { sales: 16562.5, gr: 0.028 } } },
-          { custShare: 1.093, unitPrice: 202.6, billPrice: 184.4 }
-        ),
-        // 5. 방학직영점
-        createStoreRecord('방학직영점', '서울', 15420.0, 13890.0, 14957.4, 78, 70, 35, 11, 9, 21, 18, 512, 468, 3, 4,
-          { total: 17850.0, gr: 0.118, indian: 0.504, bruno: 0.152, daily: 0.238, label: 0.056, duani: 0.050, details: { indian: { sales: 8996.4, gr: 0.132 }, bruno: { sales: 2713.2, gr: 0.094 }, daily: { sales: 4248.3, gr: 0.115 }, label: { sales: 999.6, gr: 0.108 }, duani: { sales: 892.5, gr: 0.082 } } },
-          { total: 468200.0, gr: 0.096, indian: 0.486, bruno: 0.154, daily: 0.252, label: 0.056, duani: 0.052, details: { indian: { sales: 227545.2, gr: 0.104 }, bruno: { sales: 72102.8, gr: 0.082 }, daily: { sales: 117986.4, gr: 0.098 }, label: { sales: 26219.2, gr: 0.088 }, duani: { sales: 24346.4, gr: 0.074 } } }
-        ),
-        // 6. 삼선교직영점
-        createStoreRecord('삼선교직영점', '서울', 12480.0, 11650.0, 12105.6, 62, 58, 30, 8, 7, 16, 14, 410, 385, 7, 6,
-          { total: 14120.0, gr: 0.072, indian: 0.528, bruno: 0.134, daily: 0.236, label: 0.054, duani: 0.048, details: { indian: { sales: 7455.4, gr: 0.081 }, bruno: { sales: 1892.1, gr: 0.052 }, daily: { sales: 3332.3, gr: 0.068 }, label: { sales: 762.5, gr: 0.074 }, duani: { sales: 677.8, gr: 0.045 } } },
-          { total: 418900.0, gr: 0.065, indian: 0.494, bruno: 0.142, daily: 0.256, label: 0.055, duani: 0.053, details: { indian: { sales: 206936.6, gr: 0.072 }, bruno: { sales: 59483.8, gr: 0.048 }, daily: { sales: 107238.4, gr: 0.069 }, label: { sales: 23039.5, gr: 0.058 }, duani: { sales: 22201.7, gr: 0.042 } } }
-        ),
-        // 7. 수유점
-        createStoreRecord('수유점', '서울', 9840.0, 10210.0, 9348.0, 51, 54, 25, 6, 7, 13, 14, 325, 342, 11, 11,
-          { total: 11450.0, gr: -0.036, indian: 0.542, bruno: 0.128, daily: 0.228, label: 0.052, duani: 0.050, details: { indian: { sales: 6205.9, gr: -0.028 }, bruno: { sales: 1465.6, gr: -0.054 }, daily: { sales: 2610.6, gr: -0.042 }, label: { sales: 595.4, gr: -0.018 }, duani: { sales: 572.5, gr: -0.035 } } },
-          { total: 334200.0, gr: -0.018, indian: 0.508, bruno: 0.136, daily: 0.248, label: 0.054, duani: 0.054, details: { indian: { sales: 169773.6, gr: -0.012 }, bruno: { sales: 45451.2, gr: -0.029 }, daily: { sales: 82881.6, gr: -0.021 }, label: { sales: 18046.8, gr: -0.008 }, duani: { sales: 18046.8, gr: -0.015 } } }
-        ),
-        // 8. 장안점
-        createStoreRecord('장안점', '서울', 16280.0, 14520.0, 15791.6, 82, 73, 35, 13, 10, 24, 19, 548, 492, 2, 2,
-          { total: 18640.0, gr: 0.121, indian: 0.516, bruno: 0.148, daily: 0.232, label: 0.056, duani: 0.048, details: { indian: { sales: 9618.2, gr: 0.135 }, bruno: { sales: 2758.7, gr: 0.104 }, daily: { sales: 4324.5, gr: 0.112 }, label: { sales: 1043.8, gr: 0.128 }, duani: { sales: 894.7, gr: 0.086 } } },
-          { total: 492500.0, gr: 0.114, indian: 0.488, bruno: 0.152, daily: 0.250, label: 0.058, duani: 0.052, details: { indian: { sales: 240340.0, gr: 0.124 }, bruno: { sales: 74860.0, gr: 0.098 }, daily: { sales: 123125.0, gr: 0.112 }, label: { sales: 28565.0, gr: 0.118 }, duani: { sales: 25610.0, gr: 0.084 } } }
-        ),
-        // 9. 청량리점
-        createStoreRecord('청량리점', '서울', 10650.0, 9980.0, 10117.5, 55, 51, 25, 7, 6, 14, 12, 348, 326, 10, 10,
-          { total: 12180.0, gr: 0.067, indian: 0.532, bruno: 0.136, daily: 0.230, label: 0.054, duani: 0.048, details: { indian: { sales: 6479.8, gr: 0.075 }, bruno: { sales: 1656.5, gr: 0.052 }, daily: { sales: 2801.4, gr: 0.064 }, label: { sales: 657.7, gr: 0.071 }, duani: { sales: 584.6, gr: 0.042 } } },
-          { total: 356800.0, gr: 0.058, indian: 0.498, bruno: 0.141, daily: 0.252, label: 0.055, duani: 0.054, details: { indian: { sales: 177686.4, gr: 0.065 }, bruno: { sales: 50308.8, gr: 0.044 }, daily: { sales: 89913.6, gr: 0.059 }, label: { sales: 19624.0, gr: 0.062 }, duani: { sales: 19267.2, gr: 0.038 } } }
-        ),
-        // 10. 중곡점 (시트 수치: 전체매출 5,964.8, 고객매출 6,289.8, 비중 105.4%)
-        createStoreRecord('중곡점', '서울', 5964.8, 6420.0, 6289.8, 34, 37, 20, 4, 5, 9, 11, 224, 248, 19, 18,
-          { total: 7450.0, gr: -0.071, indian: 0.548, bruno: 0.122, daily: 0.234, label: 0.051, duani: 0.045, details: { indian: { sales: 4082.6, gr: -0.062 }, bruno: { sales: 908.9, gr: -0.094 }, daily: { sales: 1743.3, gr: -0.078 }, label: { sales: 380.0, gr: -0.052 }, duani: { sales: 335.3, gr: -0.081 } } },
-          { total: 242600.0, gr: -0.045, indian: 0.512, bruno: 0.132, daily: 0.248, label: 0.054, duani: 0.054, details: { indian: { sales: 124211.2, gr: -0.038 }, bruno: { sales: 32023.2, gr: -0.062 }, daily: { sales: 60164.8, gr: -0.049 }, label: { sales: 13100.4, gr: -0.032 }, duani: { sales: 13100.4, gr: -0.051 } } },
-          { custShare: 1.054, unitPrice: 185.0, billPrice: 168.4 }
-        ),
-        // 11. 서울시흥점 (시트 수치: 객단가 185.4천원, 전체매출 기준 199.4천원)
-        createStoreRecord('서울시흥점', '서울', 9970.0, 9420.0, 9270.0, 50, 48, 25, 6, 5, 13, 12, 318, 302, 12, 13,
-          { total: 11280.0, gr: 0.058, indian: 0.524, bruno: 0.138, daily: 0.236, label: 0.054, duani: 0.048, details: { indian: { sales: 5910.7, gr: 0.065 }, bruno: { sales: 1556.6, gr: 0.042 }, daily: { sales: 2662.1, gr: 0.058 }, label: { sales: 609.1, gr: 0.068 }, duani: { sales: 541.4, gr: 0.035 } } },
-          { total: 304500.0, gr: 0.049, indian: 0.496, bruno: 0.144, daily: 0.252, label: 0.055, duani: 0.053, details: { indian: { sales: 151032.0, gr: 0.055 }, bruno: { sales: 43848.0, gr: 0.038 }, daily: { sales: 76734.0, gr: 0.048 }, label: { sales: 16747.5, gr: 0.052 }, duani: { sales: 16138.5, gr: 0.032 } } },
-          { unitPrice: 185.4, billPrice: 168.7, custShare: 0.930 }
-        ),
-        // 12. 구로고대점 (시트 수치: 년누계 총매출 53,038.2, 5대 브랜드 합계 49,305.2, 비중 합계 92.9%)
-        createStoreRecord('구로고대점', '서울', 4820.0, 5120.0, 4579.0, 26, 28, 20, 3, 4, 8, 9, 142, 156, 22, 25,
-          { total: 5640.0, gr: -0.058, indian: 0.510, bruno: 0.125, daily: 0.228, label: 0.048, duani: 0.042, details: { indian: { sales: 2876.4, gr: -0.048 }, bruno: { sales: 705.0, gr: -0.072 }, daily: { sales: 1285.9, gr: -0.062 }, label: { sales: 270.7, gr: -0.035 }, duani: { sales: 236.9, gr: -0.082 } } },
-          { total: 53038.2, gr: -0.064, indian: 0.462, bruno: 0.118, daily: 0.245, label: 0.054, duani: 0.050, details: { indian: { sales: 24503.6, gr: -0.052 }, bruno: { sales: 6258.5, gr: -0.084 }, daily: { sales: 12994.4, gr: -0.068 }, label: { sales: 2864.1, gr: -0.042 }, duani: { sales: 2684.6, gr: -0.075 } } }
-        ),
-        // 13. 공항직영점 (시트 수치: 주간 전체매출 17,530.6, 고객매출 17,695.6, 비중 100.9%, 당월 총매출 19,288.1, 5대 브랜드 합계 17,772.1, 비중 합계 92.2%)
-        createStoreRecord('공항직영점', '서울', 17530.6, 15480.0, 17695.6, 88, 76, 40, 14, 11, 28, 23, 612, 540, 1, 1,
-          { total: 19288.1, gr: 0.132, indian: 0.468, bruno: 0.132, daily: 0.224, label: 0.054, duani: 0.044, details: { indian: { sales: 9026.8, gr: 0.145 }, bruno: { sales: 2546.0, gr: 0.112 }, daily: { sales: 4320.5, gr: 0.128 }, label: { sales: 1041.6, gr: 0.154 }, duani: { sales: 837.2, gr: 0.092 } } },
-          { total: 528400.0, gr: 0.142, indian: 0.476, bruno: 0.152, daily: 0.258, label: 0.060, duani: 0.054, details: { indian: { sales: 251518.4, gr: 0.154 }, bruno: { sales: 80316.8, gr: 0.124 }, daily: { sales: 136327.2, gr: 0.138 }, label: { sales: 31704.0, gr: 0.162 }, duani: { sales: 28533.6, gr: 0.108 } } },
-          { custShare: 1.009, unitPrice: 201.1, billPrice: 183.0 }
-        ),
-        // 14. 난곡점
-        createStoreRecord('난곡점', '서울', 7420.0, 7150.0, 7049.0, 39, 37, 20, 5, 4, 11, 10, 256, 244, 16, 16,
-          { total: 8650.0, gr: 0.038, indian: 0.536, bruno: 0.132, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 4636.4, gr: 0.045 }, bruno: { sales: 1141.8, gr: 0.024 }, daily: { sales: 2006.8, gr: 0.036 }, label: { sales: 449.8, gr: 0.048 }, duani: { sales: 415.2, gr: 0.019 } } },
-          { total: 268400.0, gr: 0.032, indian: 0.504, bruno: 0.138, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 135273.6, gr: 0.038 }, bruno: { sales: 37039.2, gr: 0.021 }, daily: { sales: 67100.0, gr: 0.034 }, label: { sales: 14493.6, gr: 0.041 }, duani: { sales: 14493.6, gr: 0.018 } } }
-        ),
-        // 15. 대림점
-        createStoreRecord('대림점', '서울', 8920.0, 8450.0, 8474.0, 47, 44, 25, 6, 5, 13, 11, 298, 280, 13, 14,
-          { total: 10180.0, gr: 0.056, indian: 0.526, bruno: 0.136, daily: 0.236, label: 0.054, duani: 0.048, details: { indian: { sales: 5354.7, gr: 0.064 }, bruno: { sales: 1384.5, gr: 0.041 }, daily: { sales: 2402.5, gr: 0.055 }, label: { sales: 549.7, gr: 0.062 }, duani: { sales: 488.6, gr: 0.034 } } },
-          { total: 294800.0, gr: 0.048, indian: 0.498, bruno: 0.142, daily: 0.252, label: 0.055, duani: 0.053, details: { indian: { sales: 146810.4, gr: 0.054 }, bruno: { sales: 41861.6, gr: 0.036 }, daily: { sales: 74289.6, gr: 0.049 }, label: { sales: 16214.0, gr: 0.052 }, duani: { sales: 15624.4, gr: 0.031 } } }
-        ),
-        // 16. 먹골역점 (시트 수치: 년누계 신장률 +0.30% -> 0.003)
-        createStoreRecord('먹골역점', '서울', 6850.0, 6720.0, 6507.5, 36, 35, 20, 5, 4, 10, 9, 242, 238, 17, 17,
-          { total: 7920.0, gr: 0.019, indian: 0.534, bruno: 0.132, daily: 0.234, label: 0.052, duani: 0.048, details: { indian: { sales: 4229.3, gr: 0.024 }, bruno: { sales: 1045.4, gr: 0.012 }, daily: { sales: 1853.3, gr: 0.018 }, label: { sales: 411.8, gr: 0.028 }, duani: { sales: 380.2, gr: 0.008 } } },
-          { total: 254200.0, gr: 0.003, indian: 0.502, bruno: 0.138, daily: 0.252, label: 0.054, duani: 0.054, details: { indian: { sales: 127608.4, gr: 0.005 }, bruno: { sales: 35079.6, gr: -0.002 }, daily: { sales: 64058.4, gr: 0.004 }, label: { sales: 13726.8, gr: 0.008 }, duani: { sales: 13726.8, gr: -0.003 } } }
-        ),
-        // 17. 사가정직영점 (시트 수치: 년누계 신장률 -0.30% -> -0.003)
-        createStoreRecord('사가정직영점', '서울', 14120.0, 13680.0, 13696.4, 72, 69, 30, 10, 9, 19, 17, 462, 448, 4, 3,
-          { total: 16480.0, gr: 0.032, indian: 0.514, bruno: 0.146, daily: 0.236, label: 0.056, duani: 0.048, details: { indian: { sales: 8470.7, gr: 0.038 }, bruno: { sales: 2406.1, gr: 0.021 }, daily: { sales: 3889.3, gr: 0.034 }, label: { sales: 922.9, gr: 0.042 }, duani: { sales: 791.0, gr: 0.015 } } },
-          { total: 472600.0, gr: -0.003, indian: 0.486, bruno: 0.150, daily: 0.254, label: 0.056, duani: 0.054, details: { indian: { sales: 229683.6, gr: -0.002 }, bruno: { sales: 70890.0, gr: -0.006 }, daily: { sales: 120040.4, gr: -0.003 }, label: { sales: 26465.6, gr: 0.004 }, duani: { sales: 25520.4, gr: -0.008 } } }
-        ),
-        // 18. 상도점 (시트 수치: 년누계 인디안 신장률 +0.10% -> 0.001)
-        createStoreRecord('상도점', '서울', 7840.0, 7690.0, 7448.0, 41, 40, 20, 5, 5, 11, 10, 274, 268, 15, 15,
-          { total: 9120.0, gr: 0.020, indian: 0.530, bruno: 0.134, daily: 0.234, label: 0.054, duani: 0.048, details: { indian: { sales: 4833.6, gr: 0.025 }, bruno: { sales: 1222.1, gr: 0.014 }, daily: { sales: 2134.1, gr: 0.019 }, label: { sales: 492.5, gr: 0.028 }, duani: { sales: 437.8, gr: 0.009 } } },
-          { total: 278500.0, gr: 0.012, indian: 0.500, bruno: 0.140, daily: 0.252, label: 0.054, duani: 0.054, details: { indian: { sales: 139250.0, gr: 0.001 }, bruno: { sales: 38990.0, gr: 0.018 }, daily: { sales: 70182.0, gr: 0.024 }, label: { sales: 15039.0, gr: 0.019 }, duani: { sales: 15039.0, gr: 0.011 } } }
-        ),
-        // 19. 신당점
-        createStoreRecord('신당점', '서울', 11680.0, 10840.0, 11096.0, 59, 55, 30, 8, 7, 16, 14, 388, 362, 8, 9,
-          { total: 13450.0, gr: 0.077, indian: 0.522, bruno: 0.140, daily: 0.234, label: 0.056, duani: 0.048, details: { indian: { sales: 7020.9, gr: 0.085 }, bruno: { sales: 1883.0, gr: 0.062 }, daily: { sales: 3147.3, gr: 0.074 }, label: { sales: 753.2, gr: 0.088 }, duani: { sales: 645.6, gr: 0.052 } } },
-          { total: 368400.0, gr: 0.068, indian: 0.492, bruno: 0.144, daily: 0.254, label: 0.056, duani: 0.054, details: { indian: { sales: 181252.8, gr: 0.074 }, bruno: { sales: 53049.6, gr: 0.056 }, daily: { sales: 93573.6, gr: 0.068 }, label: { sales: 20630.4, gr: 0.079 }, duani: { sales: 19893.6, gr: 0.048 } } }
-        ),
-        // 20. 응암점
-        createStoreRecord('응암점', '서울', 6420.0, 6180.0, 6099.0, 34, 33, 20, 4, 4, 10, 9, 232, 224, 18, 19,
-          { total: 7680.0, gr: 0.039, indian: 0.538, bruno: 0.130, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 4131.8, gr: 0.045 }, bruno: { sales: 998.4, gr: 0.028 }, daily: { sales: 1781.8, gr: 0.038 }, label: { sales: 399.4, gr: 0.044 }, duani: { sales: 368.6, gr: 0.021 } } },
-          { total: 236800.0, gr: 0.034, indian: 0.506, bruno: 0.136, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 119820.8, gr: 0.039 }, bruno: { sales: 32204.8, gr: 0.024 }, daily: { sales: 59200.0, gr: 0.035 }, label: { sales: 12787.2, gr: 0.041 }, duani: { sales: 12787.2, gr: 0.022 } } }
-        ),
-        // 21. 자양점
-        createStoreRecord('자양점', '서울', 5640.0, 5420.0, 5358.0, 30, 29, 20, 4, 3, 9, 8, 208, 198, 20, 20,
-          { total: 6840.0, gr: 0.041, indian: 0.540, bruno: 0.128, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 3693.6, gr: 0.048 }, bruno: { sales: 875.5, gr: 0.029 }, daily: { sales: 1586.9, gr: 0.039 }, label: { sales: 355.7, gr: 0.046 }, duani: { sales: 328.3, gr: 0.024 } } },
-          { total: 218400.0, gr: 0.036, indian: 0.508, bruno: 0.134, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 110947.2, gr: 0.042 }, bruno: { sales: 29265.6, gr: 0.026 }, daily: { sales: 54600.0, gr: 0.037 }, label: { sales: 11793.6, gr: 0.044 }, duani: { sales: 11793.6, gr: 0.021 } } }
-        ),
-        // 22. 홍제점
-        createStoreRecord('홍제점', '서울', 5280.0, 5090.0, 5016.0, 28, 27, 20, 4, 3, 8, 7, 194, 186, 21, 21,
-          { total: 6320.0, gr: 0.037, indian: 0.542, bruno: 0.126, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 3425.4, gr: 0.044 }, bruno: { sales: 796.3, gr: 0.025 }, daily: { sales: 1466.2, gr: 0.036 }, label: { sales: 328.6, gr: 0.042 }, duani: { sales: 303.4, gr: 0.019 } } },
-          { total: 204600.0, gr: 0.031, indian: 0.510, bruno: 0.132, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 104346.0, gr: 0.036 }, bruno: { sales: 27007.2, gr: 0.022 }, daily: { sales: 51150.0, gr: 0.032 }, label: { sales: 11048.4, gr: 0.038 }, duani: { sales: 11048.4, gr: 0.018 } } }
-        ),
-        // 23. 화곡점
-        createStoreRecord('화곡점', '서울', 4560.0, 4380.0, 4332.0, 24, 23, 15, 3, 3, 7, 6, 172, 165, 23, 22,
-          { total: 5420.0, gr: 0.041, indian: 0.544, bruno: 0.124, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 2948.5, gr: 0.048 }, bruno: { sales: 672.1, gr: 0.028 }, daily: { sales: 1257.4, gr: 0.039 }, label: { sales: 281.8, gr: 0.045 }, duani: { sales: 260.2, gr: 0.022 } } },
-          { total: 186400.0, gr: 0.035, indian: 0.512, bruno: 0.130, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 95436.8, gr: 0.041 }, bruno: { sales: 24232.0, gr: 0.025 }, daily: { sales: 46600.0, gr: 0.036 }, label: { sales: 10065.6, gr: 0.042 }, duani: { sales: 10065.6, gr: 0.020 } } }
-        ),
-        // 24. 연신내점 (시트 수치: 당월 브루노 매출 0.0, 비중 0.0%, 당월 브루노 신장률 +100.0%)
-        createStoreRecord('연신내점', '서울', 4120.0, 3980.0, 3914.0, 22, 21, 15, 3, 2, 7, 6, 158, 152, 24, 23,
-          { total: 4980.0, gr: 0.035, indian: 0.584, bruno: 0.0, daily: 0.308, label: 0.058, duani: 0.050, details: { indian: { sales: 2908.3, gr: 0.042 }, bruno: { sales: 0.0, gr: 1.0 }, daily: { sales: 1533.8, gr: 0.031 }, label: { sales: 288.8, gr: 0.038 }, duani: { sales: 249.0, gr: 0.018 } } },
-          { total: 172800.0, gr: 0.029, indian: 0.516, bruno: 0.126, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 89164.8, gr: 0.034 }, bruno: { sales: 21772.8, gr: 0.019 }, daily: { sales: 43200.0, gr: 0.030 }, label: { sales: 9331.2, gr: 0.036 }, duani: { sales: 9331.2, gr: 0.016 } } }
-        ),
-        // 25. 암사점
-        createStoreRecord('암사점', '서울', 3840.0, 3720.0, 3648.0, 20, 19, 15, 3, 2, 6, 5, 146, 140, 25, 24,
-          { total: 4580.0, gr: 0.032, indian: 0.546, bruno: 0.122, daily: 0.232, label: 0.052, duani: 0.048, details: { indian: { sales: 2500.7, gr: 0.038 }, bruno: { sales: 558.8, gr: 0.021 }, daily: { sales: 1062.6, gr: 0.031 }, label: { sales: 238.2, gr: 0.036 }, duani: { sales: 219.8, gr: 0.016 } } },
-          { total: 158400.0, gr: 0.027, indian: 0.514, bruno: 0.128, daily: 0.250, label: 0.054, duani: 0.054, details: { indian: { sales: 81417.6, gr: 0.032 }, bruno: { sales: 20275.2, gr: 0.018 }, daily: { sales: 39600.0, gr: 0.028 }, label: { sales: 8553.6, gr: 0.034 }, duani: { sales: 8553.6, gr: 0.015 } } }
-        ),
-        // 26. 대치342점 (시트 수치: 주간 전체매출 369.1, 고객매출 -97.0, 비중 -26.3%, 구매고객 3명, 객단가 -32.3, 년누계 총매출 70,473.8, 5대 브랜드 합계 63,723.8, 비중 합계 90.4%)
-        createStoreRecord('대치342점', '서울', 369.1, 1420.0, -97.0, 3, 8, 10, 1, 2, 3, 5, 68, 92, 26, 26,
-          { total: 1840.0, gr: -0.425, indian: 0.482, bruno: 0.118, daily: 0.242, label: 0.058, duani: 0.045, details: { indian: { sales: 886.9, gr: -0.412 }, bruno: { sales: 217.1, gr: -0.468 }, daily: { sales: 445.3, gr: -0.432 }, label: { sales: 106.7, gr: -0.385 }, duani: { sales: 82.8, gr: -0.452 } } },
-          { total: 70473.8, gr: -0.184, indian: 0.448, bruno: 0.112, daily: 0.242, label: 0.054, duani: 0.048, details: { indian: { sales: 31572.3, gr: -0.172 }, bruno: { sales: 7893.1, gr: -0.214 }, daily: { sales: 17054.7, gr: -0.188 }, label: { sales: 3805.6, gr: -0.156 }, duani: { sales: 3398.1, gr: -0.205 } } },
-          { custShare: -0.263, unitPrice: -32.3, billPrice: -29.4 }
-        ),
-        // 27. 강화점
-        createStoreRecord('강화점', '경기', 9480.0, 8860.0, 9100.8, 49, 45, 25, 7, 5, 14, 12, 312, 288, 1, 1,
-          { total: 11640.0, gr: 0.070, indian: 0.546, bruno: 0.151, daily: 0.203, label: 0.051, duani: 0.049, details: { indian: { sales: 6355.4, gr: 0.098 }, bruno: { sales: 1757.6, gr: 0.034 }, daily: { sales: 2362.9, gr: 0.048 }, label: { sales: 593.6, gr: 0.012 }, duani: { sales: 570.4, gr: -0.045 } } },
-          { total: 298600.0, gr: 0.068, indian: 0.498, bruno: 0.144, daily: 0.241, label: 0.059, duani: 0.058, details: { indian: { sales: 148702.8, gr: 0.108 }, bruno: { sales: 42998.4, gr: 0.041 }, daily: { sales: 71962.6, gr: 0.068 }, label: { sales: 17617.4, gr: 0.024 }, duani: { sales: 17318.8, gr: -0.019 } } }
-        )
-      ]
+      stores: []
     };
 
     let currentStore = null;
@@ -1139,7 +984,7 @@
 
       assignWeeklyBranchRanks(DB.stores);
       populateStoreList();
-      selectStore(DB.stores[0].name);
+      if (DB.stores.length > 0) selectStore(DB.stores[0].name);
       loadGoogleSheetData(false);
     });
 
