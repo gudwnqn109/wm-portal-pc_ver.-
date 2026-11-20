@@ -44,7 +44,7 @@
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
           <div class="min-w-0">
             <div class="text-[14.5px] font-extrabold tracking-tight truncate">WM중부 통합 포털</div>
-            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES REPORT HUB</div>
+            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES HUB</div>
           </div>
         </div>
       </div>
@@ -56,6 +56,17 @@
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass text-zinc-500 text-[11px] absolute left-3 top-1/2 -translate-y-1/2"></i>
           <input type="text" id="sidebarSearchInput" oninput="renderSide()" placeholder="메뉴 검색..." class="w-full bg-zinc-900 border border-zinc-800 focus:border-amber-400/60 rounded-xl pl-8 pr-3 py-2 text-xs text-zinc-200 focus:outline-none transition" />
+        </div>
+        <!-- 전체 메뉴 / 즐겨찾기 전환 탭 -->
+        <div class="grid grid-cols-2 gap-1 p-1 bg-zinc-900/95 rounded-xl border border-zinc-800">
+          <button id="sideTabAll" onclick="setSideTab('all')" class="py-1.5 px-2 rounded-lg text-[11px] font-bold bg-zinc-800 text-white transition flex items-center justify-center gap-1.5">
+            <span>전체 메뉴</span>
+          </button>
+          <button id="sideTabFav" onclick="setSideTab('fav')" class="py-1.5 px-2 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-zinc-200 transition flex items-center justify-center gap-1.5">
+            <i id="sideTabFavIcon" class="fa-solid fa-star text-[10px] text-amber-400"></i>
+            <span>즐겨찾기</span>
+            <span id="sideFavCount" class="text-[10px] opacity-80">0</span>
+          </button>
         </div>
       </div>
       <div id="sidebarMenuGroups" class="flex-1 overflow-y-auto thin-scrollbar px-3 py-2 space-y-4"></div>
@@ -109,8 +120,10 @@
 
       <!-- 뷰어 화면 -->
       <section id="viewerView" class="hidden flex-1 flex flex-col min-h-0 bg-white">
-        <div id="quickBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0"></div>
+        <!-- 실행 중인 메뉴 탭 바 -->
+        <div id="quickBar" class="bg-[#F7F6F2] border-b border-[#E6E4DD] px-4 py-2 flex items-center justify-between gap-2 shrink-0"></div>
         <div id="singleView" class="flex-1 flex flex-col min-h-0">
+          <!-- 열린 탭들의 iframe이 상태 유지된 채로 쌓이는 컨테이너 -->
           <div id="singleBody" class="flex-1 relative bg-white overflow-hidden"></div>
         </div>
         <div id="splitView" class="hidden flex-1 min-h-0 grid gap-3 p-3 bg-[#E7E5DF]" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
@@ -181,6 +194,7 @@
     ];
     
     const ACC = {
+      emerald:{ bg: 'bg-emerald-500/15', txt: 'text-emerald-700', bdg: 'bg-emerald-500/10 text-emerald-800 border-emerald-500/20' },
       amber:  { bg: 'bg-amber-500/15', txt: 'text-amber-700', bdg: 'bg-amber-500/10 text-amber-800 border-amber-500/20' },
       blue:   { bg: 'bg-blue-500/12', txt: 'text-blue-700', bdg: 'bg-blue-500/10 text-blue-700 border-blue-500/20' },
       indigo: { bg: 'bg-indigo-500/12', txt: 'text-indigo-700', bdg: 'bg-indigo-500/10 text-indigo-700 border-indigo-500/20' }
@@ -190,6 +204,8 @@
     const $ = id => document.getElementById(id);
     
     let pins = ['dashboard', 'daily', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
+    let sideTab = 'all'; // 'all' (전체 메뉴) | 'fav' (즐겨찾기)
+    let openTabs = []; // 현재 실행(열림) 중인 메뉴 ID 목록
     let smId = 'dashboard', lmId = 'dashboard', rmId = 'daily';
     let user = null, isPrev = false;
     let isSidebarOpen = true;
@@ -200,6 +216,11 @@
     const sortM = arr => [...arr].sort((a,b) => (pins.indexOf(a.id)>-1?-1:1) - (pins.indexOf(b.id)>-1?-1:1));
     const groupBy = arr => arr.reduce((acc, m) => ((acc[m.cat] = acc[m.cat] || []).push(m), acc), {});
     const toggleDrawer = show => $('drawer').classList[show?'remove':'add']('hidden');
+
+    function setSideTab(tab) {
+      sideTab = tab;
+      renderSide();
+    }
 
     function togglePin(id, e) {
       if(e) e.stopPropagation();
@@ -249,19 +270,82 @@
       }
     }
 
+    function renderSideItem(m, showCategorySub = false) {
+      const act = view==='viewer' && (split===1 ? smId===m.id : (lmId===m.id||rmId===m.id));
+      const isOpen = openTabs.includes(m.id);
+      const starClass = isPin(m.id)
+        ? 'text-amber-400'
+        : 'opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-amber-300';
+
+      return `<div onclick="openM('${m.id}')" class="group flex justify-between items-center px-3 py-2 rounded-xl cursor-pointer transition ${act?'bg-zinc-800/95 text-white font-bold ring-1 ring-amber-400':'text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-200'}">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <i class="${m.icon} text-xs w-4 text-center shrink-0 ${act?'text-amber-400':''}"></i>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs truncate">${m.title}</span>
+              ${isOpen && !act ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" title="실행 중"></span>' : ''}
+            </div>
+            ${showCategorySub ? `<div class="text-[10px] text-zinc-500 font-normal truncate">${m.cat}</div>` : ''}
+          </div>
+        </div>
+        <button onclick="togglePin('${m.id}', event)" title="${isPin(m.id)?'즐겨찾기 해제':'즐겨찾기 추가'}" class="w-6 h-6 flex justify-center items-center shrink-0 transition ${starClass}">
+          <i class="fa-solid fa-star text-[10px]"></i>
+        </button>
+      </div>`;
+    }
+
     function renderSide() {
       const q = ($('sidebarSearchInput')?.value || '').trim().toLowerCase();
+
+      // 상단 전환 탭 UI 업데이트
+      $('sideFavCount').innerText = pins.length;
+      if (sideTab === 'all') {
+        $('sideTabAll').className = 'py-1.5 px-2 rounded-lg text-[11px] font-bold bg-zinc-800 text-white shadow-sm transition flex items-center justify-center gap-1.5';
+        $('sideTabFav').className = 'py-1.5 px-2 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-zinc-200 transition flex items-center justify-center gap-1.5';
+        $('sideTabFavIcon').className = 'fa-solid fa-star text-[10px] text-amber-400';
+      } else {
+        $('sideTabAll').className = 'py-1.5 px-2 rounded-lg text-[11px] font-semibold text-zinc-400 hover:text-zinc-200 transition flex items-center justify-center gap-1.5';
+        $('sideTabFav').className = 'py-1.5 px-2 rounded-lg text-[11px] font-extrabold bg-amber-400 text-zinc-950 shadow-sm transition flex items-center justify-center gap-1.5';
+        $('sideTabFavIcon').className = 'fa-solid fa-star text-[10px] text-zinc-950';
+      }
+
+      if (sideTab === 'fav') {
+        const favItems = pins
+          .map(id => MENU.find(m => m.id === id))
+          .filter(m => m && (!q || m.title.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q)));
+
+        if (favItems.length === 0) {
+          $('sidebarMenuGroups').innerHTML = `
+            <div class="px-3 py-8 text-center space-y-2.5">
+              <div class="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-500 flex items-center justify-center mx-auto">
+                <i class="fa-regular fa-star text-sm"></i>
+              </div>
+              <div class="text-xs font-bold text-zinc-400">${q ? '검색된 즐겨찾기가 없습니다' : '즐겨찾기한 메뉴가 없습니다'}</div>
+              ${!q ? `<p class="text-[11px] text-zinc-500 leading-relaxed">전체 메뉴에서 메뉴 우측의<br><span class="text-amber-400 font-semibold">★ 아이콘</span>을 눌러 추가하세요.</p>
+              <button onclick="setSideTab('all')" class="mt-1 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[11px] font-bold text-zinc-200 transition">전체 메뉴 보기</button>` : ''}
+            </div>
+          `;
+        } else {
+          $('sidebarMenuGroups').innerHTML = `
+            <div class="space-y-1">
+              <div class="px-2.5 pb-0.5 flex items-center justify-between text-[10.5px] font-bold text-amber-400/90">
+                <span>즐겨찾기 메뉴</span>
+                <span class="text-zinc-500">${favItems.length}개</span>
+              </div>
+              <div class="space-y-0.5">${favItems.map(m => renderSideItem(m, true)).join('')}</div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      // 전체 메뉴 모드 (평소 화면)
       const groups = groupBy(MENU.filter(m => !q || m.title.toLowerCase().includes(q) || m.cat.toLowerCase().includes(q)));
-      
       $('sidebarMenuGroups').innerHTML = Object.entries(groups).map(([cat, items]) => `
-        <div class="space-y-1"><div class="px-2.5 pb-0.5 text-[10.5px] font-bold text-zinc-500">${cat}</div>
-          <div class="space-y-0.5">${sortM(items).map(m => {
-            const act = view==='viewer' && (split===1 ? smId===m.id : (lmId===m.id||rmId===m.id));
-            return `<div onclick="openM('${m.id}')" class="group flex justify-between px-3 py-2 rounded-xl cursor-pointer ${act?'bg-zinc-800/95 text-white font-bold ring-1 ring-amber-400':'text-zinc-400 hover:bg-zinc-900/80'}">
-              <div class="flex items-center gap-2.5"><i class="${m.icon} text-xs w-4 text-center ${act?'text-amber-400':''}"></i><span class="text-xs">${m.title}</span></div>
-              <button onclick="togglePin('${m.id}', event)" class="w-6 h-6 flex justify-center items-center ${isPin(m.id)?'text-amber-400':'opacity-0 group-hover:opacity-100'}"><i class="fa-solid fa-star text-[10px]"></i></button>
-            </div>`;
-          }).join('')}</div></div>
+        <div class="space-y-1">
+          <div class="px-2.5 pb-0.5 text-[10.5px] font-bold text-zinc-500">${cat}</div>
+          <div class="space-y-0.5">${items.map(m => renderSideItem(m, false)).join('')}</div>
+        </div>
       `).join('');
     }
 
@@ -287,11 +371,32 @@
       `).join('');
     }
 
+    // 현재 실행 중인 메뉴만 탭으로 표시 + 닫기(X) 버튼 제공
     function renderQuick() {
-      $('quickBar').innerHTML = sortM(MENU).map(m => `
-        <button onclick="openM('${m.id}')" class="shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs transition ${m.id===smId?'bg-[#18181B] text-white font-bold':'bg-white text-zinc-600 border'}">
-          <i class="${m.icon} text-[10px] ${m.id===smId?'text-amber-400':''}"></i><span>${m.title}</span>${isPin(m.id)&&m.id!==smId?'<i class="fa-solid fa-star text-[8px] text-amber-500"></i>':''}
-        </button>`).join('');
+      const tabsHtml = openTabs.map(id => {
+        const m = getM(id);
+        const act = split === 1 ? m.id === smId : (m.id === lmId || m.id === rmId);
+        return `
+          <div onclick="openM('${m.id}')" class="group shrink-0 flex items-center gap-1.5 pl-3.5 pr-2 py-1.5 rounded-full text-xs cursor-pointer select-none transition ${act ? 'bg-[#18181B] text-white font-bold shadow-sm' : 'bg-white text-zinc-700 border border-[#E6E4DD] hover:border-zinc-300 hover:bg-zinc-50 font-medium'}">
+            <i class="${m.icon} text-[10px] ${act ? 'text-amber-400' : 'text-zinc-400'}"></i>
+            <span>${m.title}</span>
+            <button onclick="closeTab('${m.id}', event)" title="탭 닫기" class="ml-0.5 w-4 h-4 rounded-full inline-flex items-center justify-center text-[10px] transition ${act ? 'text-zinc-400 hover:bg-zinc-700 hover:text-white' : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-800'}">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      const clearAllHtml = openTabs.length >= 2
+        ? `<button onclick="closeAllTabs()" class="shrink-0 text-[11px] font-semibold text-zinc-400 hover:text-rose-600 px-2.5 py-1 rounded-lg hover:bg-rose-50 transition">전체 닫기</button>`
+        : '';
+
+      $('quickBar').innerHTML = `
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar flex-1 min-w-0">
+          ${tabsHtml}
+        </div>
+        ${clearAllHtml}
+      `;
     }
 
     function renderDrawer() {
@@ -305,6 +410,50 @@
             <button onclick="togglePin('${m.id}', event)" class="${isPin(m.id)?'text-amber-500':'text-zinc-300'}"><i class="fa-solid fa-star text-[11px]"></i></button>
           </div>`).join('')}</div></div>
       `).join('');
+    }
+
+    // 탭 닫기 (기존 데이터 파기 후 인접 탭 이동 또는 홈 복귀)
+    function closeTab(id, e) {
+      if (e) e.stopPropagation();
+      const idx = openTabs.indexOf(id);
+      if (idx === -1) return;
+
+      openTabs.splice(idx, 1);
+
+      const frameWrap = $('frame-wrap-' + id);
+      if (frameWrap) frameWrap.remove();
+
+      if (openTabs.length === 0) {
+        goHome();
+        return;
+      }
+
+      if (split === 1) {
+        if (smId === id) {
+          const nextId = openTabs[Math.min(idx, openTabs.length - 1)];
+          openM(nextId);
+        } else {
+          syncUI();
+        }
+      } else {
+        if (lmId === id || rmId === id) {
+          if (openTabs.length === 1) {
+            smId = openTabs[0];
+            setSplitMode(1);
+            return;
+          }
+          if (lmId === id) lmId = openTabs.find(t => t !== rmId) || openTabs[0];
+          if (rmId === id) rmId = openTabs.find(t => t !== lmId) || openTabs[0];
+        }
+        syncUI();
+      }
+    }
+
+    function closeAllTabs() {
+      openTabs = [];
+      const container = $('singleBody');
+      if (container) container.innerHTML = '';
+      goHome();
     }
 
     // Split Pane Logic
@@ -326,13 +475,43 @@
       $('splitView').innerHTML = getPaneHtml('L', lmId) + getPaneHtml('R', rmId);
       loadIframe('paneBodyL', lmId); loadIframe('paneBodyR', rmId);
     }
-    function changeSplit(s, id) { s==='L' ? lmId=id : rmId=id; renderSplitPanes(); updateHeader(); renderSide(); }
+    function changeSplit(s, id) {
+      if (!openTabs.includes(id)) openTabs.push(id);
+      s==='L' ? lmId=id : rmId=id;
+      renderSplitPanes(); updateHeader(); renderSide(); renderQuick();
+    }
     function swapSplit() { [lmId, rmId] = [rmId, lmId]; renderSplitPanes(); updateHeader(); }
 
     function loadIframe(containerId, mId) {
       const c = $(containerId); if(!c) return;
       c.innerHTML = `<div class="absolute inset-0 bg-white/80 flex flex-col justify-center items-center z-10 loader"><i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-600"></i></div>
                      <iframe src="${getM(mId).url}" onload="this.previousElementSibling.style.display='none'"></iframe>`;
+    }
+
+    // 1분할 화면용 상태 보존형 iframe 전환 (기존 데이터/필터/스크롤 유지)
+    function showSingleFrame(mId) {
+      const container = $('singleBody');
+      if (!container) return;
+
+      Array.from(container.children).forEach(child => {
+        child.classList.add('hidden');
+      });
+
+      let wrap = $('frame-wrap-' + mId);
+      if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.id = 'frame-wrap-' + mId;
+        wrap.className = 'w-full h-full relative bg-white';
+        wrap.innerHTML = `
+          <div class="absolute inset-0 bg-white/80 flex flex-col justify-center items-center z-10 loader">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl text-zinc-600"></i>
+          </div>
+          <iframe src="${getM(mId).url}" onload="this.previousElementSibling.style.display='none'"></iframe>
+        `;
+        container.appendChild(wrap);
+      } else {
+        wrap.classList.remove('hidden');
+      }
     }
 
     // Navigation & Auth
@@ -351,12 +530,28 @@
     function openM(id) {
       if(!user && !isPrev) return $('authOverlay').classList.remove('hidden');
       toggleDrawer(false); view = 'viewer';
-      if(split === 1) { smId = lmId = id; window.location.hash = id; } 
-      else { lmId = id; if(rmId===lmId) rmId = MENU.find(m=>m.id!==id)?.id; }
+
+      if (!openTabs.includes(id)) openTabs.push(id);
+
+      if(split === 1) {
+        smId = lmId = id;
+        window.location.hash = id;
+      } else {
+        lmId = id;
+        if(rmId === lmId) rmId = MENU.find(m=>m.id!==id)?.id;
+        if (rmId && !openTabs.includes(rmId)) openTabs.push(rmId);
+      }
       
       $('homeView').classList.add('hidden'); $('viewerView').classList.remove('hidden');
-      if(split === 1) { $('splitView').classList.add('hidden'); $('singleView').classList.remove('hidden'); loadIframe('singleBody', smId); }
-      else { $('singleView').classList.add('hidden'); $('splitView').classList.remove('hidden'); renderSplitPanes(); }
+      if(split === 1) {
+        $('splitView').classList.add('hidden');
+        $('singleView').classList.remove('hidden');
+        showSingleFrame(smId);
+      } else {
+        $('singleView').classList.add('hidden');
+        $('splitView').classList.remove('hidden');
+        renderSplitPanes();
+      }
       syncUI();
     }
 
