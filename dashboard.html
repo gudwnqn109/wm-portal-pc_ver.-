@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta name="robots" content="noindex, nofollow">
+  <!-- [직접 접속 차단 보안 코드] -->
+  <script>
+    if (window.self === window.top) {
+      window.location.replace('./index.html');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WM중부 매장 통합 대시보드</title>
@@ -28,9 +35,9 @@
         <h1 class="text-sm lg:text-[15px] font-extrabold tracking-tight text-slate-900 whitespace-nowrap">WM중부 매장 통합 대시보드</h1>
         <span class="text-slate-300">|</span>
         <div class="flex items-center gap-2 min-w-0">
-          <span id="hdrBranchBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded bg-indigo-600 text-white whitespace-nowrap shrink-0">서울지점</span>
-          <span id="hdrStoreName" class="text-sm font-black text-slate-900 whitespace-nowrap">길동점</span>
-          <span id="hdrStoreMeta" class="text-xs text-slate-500 font-medium truncate hidden sm:inline">강동구 (49.9만) · 담당 신현호</span>
+          <span id="hdrBranchBadge" class="text-[11px] font-extrabold px-2 py-0.5 rounded bg-indigo-600 text-white whitespace-nowrap shrink-0">-</span>
+          <span id="hdrStoreName" class="text-sm font-black text-slate-900 whitespace-nowrap">-</span>
+          <span id="hdrStoreMeta" class="text-xs text-slate-500 font-medium truncate hidden sm:inline">데이터 불러오는 중...</span>
         </div>
         <button onclick="loadAllSheets(true)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-600 transition whitespace-nowrap shrink-0" title="일일매출장·주간리포트·동업계 시트 실시간 동기화">
           <span id="syncDot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -82,7 +89,7 @@
           <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white p-4 shadow-sm border border-slate-800 flex flex-col justify-between relative overflow-hidden">
             <div class="flex items-center justify-between gap-1.5">
               <div class="flex items-center gap-1.5 min-w-0">
-                <span id="dBranchBadge" class="text-[10.5px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">서울지점</span>
+                <span id="dBranchBadge" class="text-[10.5px] font-extrabold px-2 py-0.5 rounded bg-amber-400 text-slate-950 shrink-0">-</span>
                 <span id="dDayLabel" class="text-xs font-bold text-slate-200 truncate">당일 매출 (-)</span>
               </div>
               <span id="dDayRateBadge" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-white/15 text-amber-300 shrink-0">0.0% 달성</span>
@@ -284,7 +291,7 @@
                   <span class="w-2 h-2 rounded-full bg-amber-400"></span>당월 누계 브랜드 매출
                   <span id="brandMonthPeriod" class="text-[10px] font-medium text-amber-100/70 ml-1"></span>
                 </span>
-                <span id="wBmRank" class="text-[10.5px] font-extrabold text-amber-400 bg-slate-800 px-2 py-0.5 rounded">서울 내 -위</span>
+                <span id="wBmRank" class="text-[10.5px] font-extrabold text-amber-400 bg-slate-800 px-2 py-0.5 rounded">- 내 -위</span>
               </div>
               <div class="flex items-baseline justify-between">
                 <span id="wBmTotal" class="text-lg font-black text-white">- 천원</span>
@@ -303,7 +310,7 @@
                   <span class="w-2 h-2 rounded-full bg-indigo-400"></span>년 누계 브랜드 매출
                   <span id="brandYearPeriod" class="text-[10px] font-medium text-indigo-200/70 ml-1"></span>
                 </span>
-                <span id="wByRank" class="text-[10.5px] font-extrabold text-indigo-200 bg-white/10 px-2 py-0.5 rounded">서울 내 -위</span>
+                <span id="wByRank" class="text-[10.5px] font-extrabold text-indigo-200 bg-white/10 px-2 py-0.5 rounded">- 내 -위</span>
               </div>
               <div class="flex items-baseline justify-between">
                 <span id="wByTotal" class="text-lg font-black text-white">- 천원</span>
@@ -327,13 +334,13 @@
           <div>
             <div class="flex items-center justify-between gap-2">
               <div class="flex items-center gap-2 min-w-0">
-                <span id="cBranchBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-white/15 text-white shrink-0">서울지점</span>
-                <span id="cRegionInfo" class="text-xs text-indigo-200 font-medium truncate">강동구 · 인구 49.9만 · 웰메이드 기준</span>
+                <span id="cBranchBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-white/15 text-white shrink-0">-</span>
+                <span id="cRegionInfo" class="text-xs text-indigo-200 font-medium truncate">-</span>
               </div>
               <span id="cClose25Badge" class="text-xs font-bold text-emerald-300 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30 shrink-0">전년 마감 -</span>
             </div>
             <div class="mt-3 flex items-center gap-2 flex-wrap">
-              <h2 id="cStoreName" class="text-xl lg:text-2xl font-extrabold tracking-tight text-white">길동점</h2>
+              <h2 id="cStoreName" class="text-xl lg:text-2xl font-extrabold tracking-tight text-white">-</h2>
               <span id="cStoreRank" class="text-xs font-bold text-indigo-100 bg-indigo-700/80 px-2 py-1 rounded-md">상권 -위</span>
               <span id="cStoreShareBadge" class="text-xs font-bold text-amber-300 bg-amber-500/15 border border-amber-400/30 px-2 py-1 rounded-md">점유율 -%</span>
             </div>
@@ -431,17 +438,14 @@
     const SHEET_WEEKLY_ID = '1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w';
     const SHEET_COMP_ID = '1ml4qhwd0axGXdozyd1m7thOiZEuzi1_cnFyvPaMfQAc';
 
-    // 현재 시각 기준 초기화 (시트 로드 시 시트 헤더 기준으로 자동 갱신)
     const _nowInit = new Date();
     let currentYear = _nowInit.getFullYear();
     let currentMonth = _nowInit.getMonth() + 1;
     let currentDay = _nowInit.getDate();
-
-    // 동업계 시트 기준 연도 (2자리, 시트 파싱 시 자동 갱신)
     let compShortYear = Number(String(currentYear).slice(-2));
 
     let currentBranch = 'ALL';
-    let currentStoreName = '길동점';
+    let currentStoreName = '';
     let compPeriod = 'accum';
     let compSort = 'sales';
     let compView = 'card';
@@ -451,28 +455,15 @@
     const STORE_MAP = {};
 
     const BENCHMARKS = {
-      'ALL': {
-        brandMonth: { indian:{sh:0.536,gr:-0.082}, bruno:{sh:0.213,gr:0.004}, daily:{sh:0.163,gr:-0.226}, label:{sh:0.052,gr:-0.025}, duani:{sh:0.036,gr:0.021} },
-        brandYear:  { indian:{sh:0.469,gr:-0.001}, bruno:{sh:0.218,gr:0.047}, daily:{sh:0.201,gr:0.016}, label:{sh:0.059,gr:0.067}, duani:{sh:0.053,gr:0.034} }
-      },
-      '서울': {
-        brandMonth: { indian:{sh:0.438,gr:-0.206}, bruno:{sh:0.105,gr:-0.269}, daily:{sh:0.355,gr:-0.005}, label:{sh:0.038,gr:-0.021}, duani:{sh:0.064,gr:0.012} },
-        brandYear:  { indian:{sh:0.395,gr:-0.098}, bruno:{sh:0.128,gr:-0.061}, daily:{sh:0.371,gr:-0.055}, label:{sh:0.046,gr:-0.019}, duani:{sh:0.060,gr:0.015} }
-      },
-      '경기': {
-        brandMonth: { indian:{sh:0.546,gr:0.098}, bruno:{sh:0.151,gr:0.034}, daily:{sh:0.203,gr:0.048}, label:{sh:0.051,gr:0.012}, duani:{sh:0.049,gr:-0.045} },
-        brandYear:  { indian:{sh:0.498,gr:0.108}, bruno:{sh:0.144,gr:0.041}, daily:{sh:0.241,gr:0.068}, label:{sh:0.059,gr:0.024}, duani:{sh:0.058,gr:-0.019} }
-      },
-      '강원': {
-        brandMonth: { indian:{sh:0.528,gr:-0.069}, bruno:{sh:0.188,gr:-0.018}, daily:{sh:0.231,gr:0.014}, label:{sh:0.049,gr:0.088}, duani:{sh:0.050,gr:0.046} },
-        brandYear:  { indian:{sh:0.466,gr:0.023}, bruno:{sh:0.179,gr:-0.011}, daily:{sh:0.252,gr:0.032}, label:{sh:0.051,gr:0.076}, duani:{sh:0.057,gr:0.041} }
-      }
+      'ALL':  { brandMonth: {}, brandYear: {} },
+      '서울': { brandMonth: {}, brandYear: {} },
+      '경기': { brandMonth: {}, brandYear: {} },
+      '강원': { brandMonth: {}, brandYear: {} }
     };
 
     const getDaysInMonth = (year = currentYear, month = currentMonth) => new Date(year, month, 0).getDate();
     const getShortYear = (year = currentYear) => String(year).slice(-2);
 
-    // 시트 헤더(cols 및 상단 5행)에서 기준 연·월 자동 감지
     function detectYearAndMonthFromTable(table) {
       if (!table) return;
       const texts = [];
@@ -576,23 +567,6 @@
       };
     }
 
-    // 초기 시드 데이터 경량화 (로딩 전 스켈레톤 역할)
-    function initSeedStores() {
-      const s = {
-        name: '길동점', branch: '서울', region: '강동구', pop: '49.9만', sv: '신현호', openDate: '2022.02',
-        daily: { dayAct: 1850, dayTgt: 2200, mAct: 24800, mCumTgt: 28500, mFullTgt: 68000, mLy: 28600, yAct: 382278, yTgt: 410000, yLy: 313342, wkndSum: 9800, wkdySum: 15000, custAct: 11, custTgt: 30, dailySales: {}, dailyTargets: {} },
-        weekly: {
-          sales26: 11122.9, sales25: 9747.3, salesGr: 0.141, custSales26: 11122.9, custShare: 1.0, custCnt26: 60, custCnt25: 47, custGr: 0.277, unitPrice: 185.4, billPrice: 168.7,
-          firstGoal: 30, firstWeek: 10, firstWeekGr: 0.667, firstMonth: 11, firstMonthGr: 0.10, firstProg: 0.367, firstYear: 494, firstYearGr: 0.885,
-          brandMonth: { rank: 9, total: 12895.4, gr: -0.133, indian: 0.634, bruno: -0.009, daily: 0.258, label: 0.056, duani: 0.057, details: { indian:{sales:8181,gr:-0.145}, bruno:{sales:-111,gr:-1.07}, daily:{sales:3329,gr:-0.029}, label:{sales:720,gr:0}, duani:{sales:737.4,gr:1.56} } },
-          brandYear: { rank: 8, total: 382278.0, gr: 0.220, indian: 0.460, bruno: 0.096, daily: 0.307, label: 0.054, duani: 0.077, details: { indian:{sales:175844,gr:0.15}, bruno:{sales:36764,gr:-0.054}, daily:{sales:117336,gr:0.193}, label:{sales:20785,gr:1.705}, duani:{sales:29548,gr:0.886} } }
-        },
-        comp: { close25: {}, s26: { accum: {} }, s25: { accum: {} } }
-      };
-      DAILY_MASTER_ORDER = [s.name];
-      STORE_MAP[s.name] = s;
-    }
-
     const toNum = c => {
       if (!c) return 0;
       const v = c.v !== undefined && c.v !== null ? c.v : c.f;
@@ -638,15 +612,12 @@
 
     window.onDailySales = function(res) {
       if (!res || !res.table || !res.table.rows) return;
-
-      // 시트 헤더에서 기준 연·월 자동 감지
       detectYearAndMonthFromTable(res.table);
 
       const rows = res.table.rows;
       const cols = res.table.cols || [];
       let day1Col = 4;
 
-      // '1일' 컬럼 인덱스 동적 감지
       cols.forEach((col, c) => {
         if (col && col.label && String(col.label).trim() === '1일') day1Col = c;
       });
@@ -704,7 +675,6 @@
         });
       }
 
-      // 실적 입력된 마지막 영업일 자동 감지
       let latest = 1;
       for (let d = 1; d <= daysInMonth; d++) {
         if ((dayTotals[d] || 0) >= 1000) latest = d;
@@ -727,7 +697,6 @@
       let custTargetColIdx = 4;
       let day1ColIdx = 5;
 
-      // 목표 시트 컬럼 위치 동적 감지
       cols.forEach((col, c) => {
         const val = col && col.label ? String(col.label) : '';
         if (val.includes('신규고객') || val.includes('고객 목표') || val.includes('고객목표') || val.includes('첫구매')) custTargetColIdx = c;
@@ -845,7 +814,6 @@
     function parseCompData(res) {
       if (!res || !res.table || !res.table.rows) return;
 
-      // 동업계 시트에 기록된 최신 연도 자동 감지 (예: 26년 / 27년)
       let detectedMaxYr = 0;
       res.table.rows.forEach(r => {
         const c = r.c || [];
@@ -920,7 +888,7 @@
       const list = getFilteredStoreNames();
       const sel = document.getElementById('storeSelect');
       if (list.length === 0) {
-        sel.innerHTML = `<option value="">매장 없음</option>`;
+        sel.innerHTML = `<option value="">데이터 불러오는 중...</option>`;
         return;
       }
       if (!list.includes(currentStoreName)) currentStoreName = list[0];
@@ -985,18 +953,22 @@
       if (sel) { sel.innerHTML = optsHtml; sel.value = compPeriod; }
     }
 
-    function setCompPeriod(p) { compPeriod = p; renderCompPeriodChips(); renderCompetitorSection(STORE_MAP[currentStoreName]); }
+    function setCompPeriod(p) {
+      compPeriod = p;
+      renderCompPeriodChips();
+      if (STORE_MAP[currentStoreName]) renderCompetitorSection(STORE_MAP[currentStoreName]);
+    }
     function setCompSort(s) {
       compSort = s;
       document.getElementById('cSortSales').className = s === 'sales' ? 'px-3 py-1 rounded-md font-bold bg-white text-slate-900 shadow-2xs transition' : 'px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition';
       document.getElementById('cSortGrowth').className = s === 'growth' ? 'px-3 py-1 rounded-md font-bold bg-white text-slate-900 shadow-2xs transition' : 'px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition';
-      renderCompetitorSection(STORE_MAP[currentStoreName]);
+      if (STORE_MAP[currentStoreName]) renderCompetitorSection(STORE_MAP[currentStoreName]);
     }
     function setCompView(v) {
       compView = v;
       document.getElementById('cViewCard').className = v === 'card' ? 'px-3 py-1 rounded-md font-bold bg-white text-slate-900 shadow-2xs transition flex items-center gap-1' : 'px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
       document.getElementById('cViewTable').className = v === 'table' ? 'px-3 py-1 rounded-md font-bold bg-white text-slate-900 shadow-2xs transition flex items-center gap-1' : 'px-3 py-1 rounded-md font-medium text-slate-600 hover:text-slate-900 transition flex items-center gap-1';
-      renderCompetitorSection(STORE_MAP[currentStoreName]);
+      if (STORE_MAP[currentStoreName]) renderCompetitorSection(STORE_MAP[currentStoreName]);
     }
 
     function renderDashboard() {
@@ -1109,7 +1081,6 @@
       document.getElementById('wFirstWeek').innerHTML = `${fmt(w.firstWeek)}명 ${fmtParen(w.firstWeekGr)}`;
       document.getElementById('wFirstYear').innerHTML = `${fmt(w.firstYear)}명 ${fmtParen(w.firstYearGr)}`;
 
-      // 브랜드별 매출 기간 계산: 전주 일요일의 실제 월을 기준으로 시작일·종료일 일치
       const { prevSun } = getPrevWeekDates();
       const pSunMon = String(prevSun.getMonth() + 1).padStart(2, '0');
       const pSunDay = String(prevSun.getDate()).padStart(2, '0');
@@ -1137,11 +1108,11 @@
           return wPct > 0 ? `<div class="${b.stack} h-full" style="width:${wPct}%"></div>` : '';
         }).join('');
 
-        const brBench = (BENCHMARKS[st.branch] && BENCHMARKS[st.branch][modeKey]) || BENCHMARKS['ALL'][modeKey];
-        const tmBench = BENCHMARKS['ALL'][modeKey];
+        const brBench = (BENCHMARKS[st.branch] && BENCHMARKS[st.branch][modeKey]) || BENCHMARKS['ALL'][modeKey] || {};
+        const tmBench = BENCHMARKS['ALL'][modeKey] || {};
 
         const fmtBench = b => {
-          if (!b) return '-';
+          if (!b || b.sh === undefined) return '-';
           const g = Number(b.gr || 0), p = (Math.abs(g) * 100).toFixed(1);
           const gHtml = g >= 0.0005 ? `<span class="text-red-500">▲${p}%</span>` : (g <= -0.0005 ? `<span class="text-blue-500">▼${p}%</span>` : '0%');
           return `${fmtPct(b.sh)}(${gHtml})`;
@@ -1254,7 +1225,6 @@
       document.getElementById('cMetric1Val').innerText = fmt(fAcc26);
       setMetricGrowth('cMetric1Gr', 'cMetric1Prev', fAccGr, fAcc25);
 
-      // 월별 선택 시 우측 카드를 해당 월 실적으로 전환, 누계 시 월평균 표시
       if (compPeriod === 'accum') {
         const avg26 = Math.round(fAcc26 / Math.max(1, maxCompMonth));
         const avg25 = Math.round(fAcc25 / Math.max(1, maxCompMonth));
@@ -1271,7 +1241,6 @@
         setMetricGrowth('cMetric2Gr', 'cMetric2Prev', mGr, mVal25);
       }
 
-      // 월별 막대 차트 (미집계 월은 0 처리하여 왜곡 방지)
       const chartEl = document.getElementById('cMonthlyChart');
       chartEl.style.gridTemplateColumns = `repeat(${maxCompMonth}, minmax(0, 1fr))`;
       let maxBar = 1;
@@ -1381,10 +1350,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      initSeedStores();
       renderCompPeriodChips();
       refreshStoreSelector();
-      renderDashboard();
       loadAllSheets(false);
     });
   </script>
