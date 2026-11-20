@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta name="robots" content="noindex, nofollow">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>WM중부 통합 영업 포털</title>
@@ -44,7 +45,7 @@
           <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-zinc-950 font-black text-sm flex items-center justify-center shadow-md shrink-0 group-hover:scale-105 transition">WM</div>
           <div class="min-w-0">
             <div class="text-[14.5px] font-extrabold tracking-tight truncate">WM중부 통합 포털</div>
-            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES REPORT HUB</div>
+            <div class="text-[10px] font-semibold text-amber-400/90 tracking-wider truncate">SALES & ERP HUB</div>
           </div>
         </div>
       </div>
@@ -227,6 +228,7 @@
 
       // 매장/재고
       { id: 'invest', title: '투자비 현황', subtitle: '매장별 보증·권리금 및 인테리어 분담', url: './investment.html', cat: '매장/재고', badge: 'ASSET', icon: 'fa-solid fa-building-columns', acc: 'indigo' },
+      { id: 'stock', title: '실시간 재고/배분 조회', subtitle: '매장재고·배분집계·창고재고 통합 조회', url: './stock.html', cat: '매장/재고', badge: 'ERP', icon: 'fa-solid fa-boxes-stacked', acc: 'emerald' },
       { id: 'sellthru_fw', title: 'FW 매장별 판매율', subtitle: '시즌 복종별 실시간 판매율 및 등급', url: './sellthru.html', cat: '매장/재고', badge: 'SEASON', icon: 'fa-solid fa-shirt', acc: 'amber' }
     ];
     
@@ -240,7 +242,7 @@
     // State
     const $ = id => document.getElementById(id);
     
-    let pins = ['dashboard', 'daily', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
+    let pins = ['dashboard', 'daily', 'stock', 'sellthru_fw'], selCat = '전체', view = 'home', split = 1;
     let sideTab = 'all'; // 'all' (전체 메뉴) | 'fav' (즐겨찾기)
     let openTabs = [];   // 현재 실행(열림) 중인 메뉴 ID 목록
     let smId = 'dashboard', lmId = 'dashboard', rmId = 'daily';
@@ -757,7 +759,7 @@
       window.addEventListener('resize', syncFrameLayout);
 
       try { pins = (JSON.parse(localStorage.getItem(PIN_KEY)) || pins).filter(id => MENU.some(m => m.id === id)); } catch(e){}
-      isPrev = (window.self !== window.top) || location.hostname.includes('localhost') || location.hostname === '127.0.0.1' || !location.hostname;
+      isPrev = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
       if (isPrev) { user = { email: ALLOWED[0], name: '로컬 실행' }; initPortal(); }
       else {
         try { user = JSON.parse(localStorage.getItem('wm_user')); } catch(e){}
