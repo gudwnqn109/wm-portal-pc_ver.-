@@ -17,7 +17,7 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Marked.js & DOMPurify (AI 마크다운 리포트 안전 렌더링) -->
+  <!-- Marked.js & DOMPurify (폴백용) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 
@@ -28,35 +28,6 @@
     .thin-scroll::-webkit-scrollbar-track { background: transparent; }
     .thin-scroll::-webkit-scrollbar-thumb { background: rgba(113, 113, 122, 0.35); border-radius: 99px; }
     .thin-scroll::-webkit-scrollbar-thumb:hover { background: rgba(113, 113, 122, 0.6); }
-
-    /* AI 마크다운 출력 보고서 스타일 */
-    .ai-markdown { font-size: 13px; line-height: 1.7; color: #1e293b; }
-    .ai-markdown h1, .ai-markdown h2, .ai-markdown h3 {
-      font-weight: 800; color: #0f172a; margin-top: 1.15rem; margin-bottom: 0.5rem; letter-spacing: -0.01em;
-    }
-    .ai-markdown h1 { font-size: 1.05rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.35rem; }
-    .ai-markdown h2 { font-size: 0.96rem; display: flex; align-items: center; gap: 6px; }
-    .ai-markdown h3 { font-size: 0.88rem; color: #334155; }
-    .ai-markdown h1:first-child, .ai-markdown h2:first-child, .ai-markdown h3:first-child { margin-top: 0; }
-    .ai-markdown p { margin-bottom: 0.65rem; }
-    .ai-markdown ul, .ai-markdown ol { padding-left: 1.25rem; margin-bottom: 0.75rem; }
-    .ai-markdown ul { list-style-type: disc; }
-    .ai-markdown ol { list-style-type: decimal; }
-    .ai-markdown li { margin-bottom: 0.3rem; }
-    .ai-markdown strong { font-weight: 800; color: #0f172a; }
-    .ai-markdown blockquote {
-      border-left: 3px solid #6366f1; background: #eef2ff; padding: 0.6rem 0.85rem;
-      border-radius: 0 0.5rem 0.5rem 0; margin: 0.75rem 0; color: #312e81; font-size: 12.5px;
-    }
-    .ai-markdown table {
-      width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 12px;
-      border: 1px solid #e2e8f0; border-radius: 0.5rem; overflow: hidden; display: block; overflow-x: auto;
-    }
-    .ai-markdown thead { background: #18181B; color: #ffffff; }
-    .ai-markdown th { padding: 7px 10px; font-weight: 700; text-align: left; white-space: nowrap; }
-    .ai-markdown td { padding: 7px 10px; border-top: 1px solid #e2e8f0; white-space: nowrap; }
-    .ai-markdown tbody tr:nth-child(even) { background: #f8fafc; }
-    .ai-markdown code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; color: #4338ca; }
 
     @media print {
       header, #leftScannerPane, #promptControlsBox, #presetBar { display: none !important; }
@@ -109,7 +80,7 @@
       <div class="flex items-center gap-2 text-xs bg-white border border-[#E6E4DD] px-3 py-1.5 rounded-xl">
         <label class="flex items-center gap-1 font-bold text-blue-600 whitespace-nowrap">
           <span>역신장</span>
-          <input id="lowCutInput" type="number" value="-15" step="5" onchange="onFilterChanged()" class="w-12 text-center bg-blue-50 border border-blue-200 rounded-md py-0.5 text-xs font-extrabold text-blue-700 focus:outline-none">
+          <input id="lowCutInput" type="number" value="-20" step="5" onchange="onFilterChanged()" class="w-12 text-center bg-blue-50 border border-blue-200 rounded-md py-0.5 text-xs font-extrabold text-blue-700 focus:outline-none">
           <span>%↓</span>
         </label>
         <span class="text-zinc-300">|</span>
@@ -125,7 +96,7 @@
   <!-- 2. 메인 2단 레이아웃 (좌: 자동 스캐너 5컬럼 / 우: AI 에이전트 7컬럼) -->
   <main class="flex-1 min-h-0 max-w-[1800px] w-full mx-auto p-4 lg:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:overflow-hidden">
 
-    <!-- [좌측 패널] 역신장 과다점 · 고신장점 자동 스캐너 (AI 호출 없이 즉시 조회) -->
+    <!-- [좌측 패널] 역신장 과다점 · 고신장점 자동 스캐너 -->
     <section id="leftScannerPane" class="lg:col-span-5 flex flex-col min-h-[460px] lg:min-h-0 gap-3">
 
       <!-- 요약 KPI 3카드 -->
@@ -144,7 +115,7 @@
           </div>
           <div class="mt-1 flex items-baseline justify-between">
             <span id="kpiLowCnt" class="text-xl font-black text-blue-700">-</span>
-            <span id="kpiLowCutLbl" class="text-[10.5px] font-bold text-blue-500">-15% 이하</span>
+            <span id="kpiLowCutLbl" class="text-[10.5px] font-bold text-blue-500">-20% 이하</span>
           </div>
         </div>
         <div onclick="setListTab('high')" class="bg-rose-50/70 border border-rose-200/80 hover:border-rose-400 rounded-2xl p-3 shadow-2xs cursor-pointer transition">
@@ -228,13 +199,13 @@
         </div>
 
         <div class="flex items-center gap-1.5">
-          <button type="button" onclick="copyLastReport()" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="최근 리포트 마크다운 복사">
+          <button type="button" onclick="copyLastReport()" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="최근 리포트 텍스트 복사">
             <i class="fa-regular fa-copy"></i><span>리포트 복사</span>
           </button>
           <button type="button" onclick="window.print()" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer" title="인쇄 또는 PDF 저장">
             <i class="fa-solid fa-print"></i><span class="hidden sm:inline">인쇄</span>
           </button>
-          <button type="button" onclick="clearConversation()" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-rose-900/70 text-zinc-300 hover:text-rose-200 text-[11px] font-bold transition cursor-pointer" title="대화 내용 지우기">
+          <button type="button" onclick="clearConversation()" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-rose-900/70 text-zinc-300 hover:text-rose-200 text-[11px] font-bold transition cursor-pointer" title="화면 초기화">
             <i class="fa-solid fa-trash-can"></i>
           </button>
         </div>
@@ -258,23 +229,23 @@
       </div>
 
       <!-- AI 응답 리포트 출력 영역 -->
-      <div id="aiOutputScroll" class="flex-1 overflow-y-auto thin-scroll p-4 lg:p-5 space-y-4 bg-slate-50/40">
+      <div id="aiOutputScroll" class="flex-1 overflow-y-auto thin-scroll p-4 lg:p-5 space-y-5 bg-[#F8F8F6]">
         <!-- 초기 환영 상태 -->
         <div id="emptyStateBox" class="h-full flex flex-col items-center justify-center text-center py-10 px-4 max-w-md mx-auto">
           <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-robot"></i>
+            <i class="fa-solid fa-chart-pie"></i>
           </div>
-          <h2 class="text-sm font-extrabold text-slate-900">원하는 분석 조건을 입력하거나 원클릭 버튼을 눌러보세요</h2>
+          <h2 class="text-sm font-extrabold text-slate-900">원클릭 분석 버튼 또는 질문을 입력해 주세요</h2>
           <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-            좌측에서 필터링된 <strong>역신장 과다점·고신장점</strong>의 매출, 객수/객단가, 5대 브랜드, 동업계 상권 순위, 매장 평수·점정비 데이터를 묶어 한눈에 정리해 드립니다.
+            좌측에서 추출된 <strong>역신장 과다점·고신장점</strong> 데이터를 분석해<br><strong>핵심 요약 카드 · 유형별 분류 · 압축 비교표 · 액션플랜</strong>으로 한눈에 정리합니다.
           </p>
-          <div class="mt-4 w-full space-y-1.5 text-left text-[11.5px] text-slate-600 bg-white p-3.5 rounded-xl border border-slate-200/80">
-            <div class="font-extrabold text-slate-800 mb-1">질문 예시</div>
+          <div class="mt-4 w-full space-y-1.5 text-left text-[11.5px] text-slate-600 bg-white p-3.5 rounded-xl border border-[#E6E4DD]">
+            <div class="font-extrabold text-slate-800 mb-1">빠른 질문 예시</div>
             <div class="cursor-pointer hover:text-indigo-600 transition" onclick="fillAndAsk('역신장 과다점 중 상권 전체 침체가 아니라 우리 매장만 단독 부진한 곳을 추려줘.')">
               • "상권 전체 침체가 아니라 <strong>우리 매장만 단독 부진</strong>한 곳만 추려줘"
             </div>
-            <div class="cursor-pointer hover:text-indigo-600 transition" onclick="fillAndAsk('고신장점과 역신장점의 5대 브랜드(인디안·브루노·데일리스트) 신장률 차이를 표로 요약해줘.')">
-              • "고신장점과 역신장점의 <strong>5대 브랜드 신장률 차이</strong>를 표로 요약해줘"
+            <div class="cursor-pointer hover:text-indigo-600 transition" onclick="fillAndAsk('고신장점과 역신장점의 5대 브랜드(인디안·브루노·데일리스트) 신장률 차이를 정리해줘.')">
+              • "고신장점과 역신장점의 <strong>5대 브랜드 신장률 차이</strong>를 정리해줘"
             </div>
             <div class="cursor-pointer hover:text-indigo-600 transition" onclick="fillAndAsk('체크한 매장들의 핵심 문제점과 점주 미팅 시 짚어야 할 포인트 3가지를 정리해줘.')">
               • "좌측에서 체크한 매장들의 <strong>점주 미팅 핵심 포인트 3가지</strong> 정리해줘"
@@ -287,7 +258,7 @@
       <div id="promptControlsBox" class="p-3 border-t border-[#E6E4DD] bg-white shrink-0">
         <div class="flex items-end gap-2 bg-[#F7F6F2] border border-[#DFDDD4] focus-within:border-indigo-500 focus-within:bg-white rounded-2xl p-2 transition">
           <textarea id="promptInput" rows="2" onkeydown="handlePromptKeydown(event)"
-                    placeholder="분석하고 싶은 내용을 입력하세요... (예: 경기지점 역신장 매장 중 객수 하락이 심각한 곳 위주로 보고용 요약해줘) [Enter 전송 / Shift+Enter 줄바꿈]"
+                    placeholder="원하는 분석 조건을 입력하세요... (예: 경기지점 역신장 매장 중 객수 하락이 심각한 곳 위주로 요약해줘) [Enter 전송]"
                     class="flex-1 bg-transparent text-xs lg:text-[13px] font-medium text-[#18181B] placeholder-zinc-400 resize-none focus:outline-none px-2 py-1 leading-relaxed"></textarea>
           <button id="sendBtn" type="button" onclick="submitPrompt()" class="h-10 px-4 rounded-xl bg-[#18181B] hover:bg-indigo-600 disabled:bg-zinc-300 text-white text-xs font-extrabold flex items-center gap-1.5 transition shrink-0 cursor-pointer">
             <i id="sendIcon" class="fa-solid fa-paper-plane text-[11px]"></i>
@@ -307,7 +278,7 @@
 
   <script>
     // =========================================================================
-    // [1. 기존 포털과 동일한 구글 스프레드시트 ID]
+    // [1. 구글 스프레드시트 ID & 프리셋 프롬프트]
     // =========================================================================
     const SHEET_DAILY_ID  = '1F0l1o6Vr7oCRULK0RZNTGEwZpdZ6Zpf45PkdH4N82y4';
     const SHEET_WEEKLY_ID = '1WQsCBmhQxWuFVJ0iqOA1g9DM5KmWVHI5KMHhYDlNV5w';
@@ -315,10 +286,10 @@
     const SHEET_INVEST_ID = '16vaYTfcQK1sMWvL-Rf6sWwtkYYwEvc9jfbfQX7ccSvY';
 
     const PRESET_PROMPTS = {
-      low_cause: '전달된 [역신장 과다점] 데이터를 분석해서 공통 특징과 핵심 부진 원인을 정리해줘. ① 객수 이탈형 vs 객단가 하락형 분류, ② 부진 견인 브랜드(인디안·브루노바피·데일리스트 등), ③ 동업계 상권 침체 vs 당사 단독 부진 여부, ④ 매장 평수·점정비 이력 특이사항을 마크다운 표와 핵심 요약 4줄로 정리해줘.',
-      high_factor: '전달된 [고신장점] TOP 매장들의 공통 성공 요인을 분석해줘. ① 매출을 견인한 핵심 브랜드, ② 구매고객수/객단가/첫구매 특징, ③ 동일 상권 내 경쟁력(순위·점유율·타사 대비 신장 우위), ④ 부진 매장에 바로 벤치마킹할 수 있는 실무 포인트 3가지를 정리해줘.',
-      compare: '전달된 [역신장 과다점]과 [고신장점] 두 그룹의 평균 지표와 구조적 차이를 한눈에 비교하는 보고서를 작성해줘. 신장률·주말비중·회원비중·객단가·첫구매달성률·5대 브랜드 신장률·상권경쟁력 항목으로 비교 마크다운 표를 먼저 제시하고, 핵심 인사이트 3가지를 덧붙여줘.',
-      sv_action: '역신장 과다점을 담당자(SV)별로 그룹핑해서 정리하고, 각 담당자별로 최우선 집중 관리해야 할 핵심 매장 2~3곳과 점주 미팅 시 짚어야 할 구체적인 개선 포인트(브랜드/객수/첫구매/상권 대응)를 액션플랜 표로 만들어줘.'
+      low_cause: '역신장 과다점들의 공통 원인을 유형별로 분류해줘. (객수 이탈형 vs 객단가 하락형, 핵심 부진 브랜드, 동업계 타사 대비 단독 부진 여부, 평수·정비 특이사항 중심)',
+      high_factor: '고신장점 TOP 매장들의 핵심 성공 요인을 유형별로 정리해줘. (견인 브랜드, 객수·객단가·첫구매 강점, 상권 내 경쟁 우위, 타 매장 벤치마킹 포인트)',
+      compare: '역신장 과다점과 고신장점 두 그룹의 핵심 지표 차이와 구조적 원인을 한눈에 비교해줘.',
+      sv_action: '역신장 과다점을 담당자(SV)별로 묶어 최우선 관리 매장과 점주 미팅 시 짚어야 할 즉시 실행 포인트를 정리해줘.'
     };
 
     // =========================================================================
@@ -337,10 +308,10 @@
     let pendingInvest = null;
 
     let currentBranch = 'ALL';
-    let currentListTab = 'low'; // 'low' | 'high' | 'all'
+    let currentListTab = 'low';
     let pinnedStores = new Set();
     let isRequestingAi = false;
-    let lastReportMarkdown = '';
+    let lastReportCopyText = '';
     let toastTimer = null;
 
     const getDaysInMonth = (y = currentYear, m = currentMonth) => new Date(y, m, 0).getDate();
@@ -359,6 +330,7 @@
       const s = String(c.f !== undefined && c.f !== null && String(c.f).trim() !== '' ? c.f : c.v).trim();
       return s || '-';
     };
+    const round1 = v => (v === null || v === undefined || isNaN(v)) ? null : Math.round(Number(v) * 10) / 10;
 
     function showToast(msg) {
       const box = document.getElementById('toastBox');
@@ -622,7 +594,6 @@
       if (maxYr > 0) compShortYear = maxYr;
       const curYrStr = String(compShortYear);
 
-      // 기존 comp 초기화 후 재파싱
       DAILY_MASTER_ORDER.forEach(k => { STORE_MAP[k].comp = { hasData: false, rank: null, totalBrands: 0, share: null, wmGr: null, othersGr: null, s26: {}, s25: {} }; });
 
       res.table.rows.forEach(r => {
@@ -649,7 +620,6 @@
         target[brand] = (acc !== '' && !isNaN(acc)) ? parseFloat(acc) : sumM;
       });
 
-      // 상권 순위·점유율·타브랜드 평균 신장률 산출
       const priority = ['웰메이드', 'WM상설', 'WM백화점', 'OL'];
       DAILY_MASTER_ORDER.forEach(k => {
         const st = STORE_MAP[k];
@@ -673,11 +643,12 @@
           if (v25 > 0) { oth26 += v26; oth25 += v25; }
         });
 
+        const rawWmGr = fVal25 > 0 ? round1(((fVal26 - fVal25) / fVal25) * 100) : null;
         st.comp.hasData = true;
         st.comp.rank = focusIdx + 1;
         st.comp.totalBrands = entries.length;
         st.comp.share = totalSales > 0 ? round1((fVal26 / totalSales) * 100) : null;
-        st.comp.wmGr = fVal25 > 0 ? round1(((fVal26 - fVal25) / fVal25) * 100) : null;
+        st.comp.wmGr = (rawWmGr !== null && Math.abs(rawWmGr) <= 200) ? rawWmGr : null;
         st.comp.othersGr = oth25 > 0 ? round1(((oth26 - oth25) / oth25) * 100) : null;
       });
     }
@@ -734,12 +705,8 @@
       }
     }
 
-    function round1(v) {
-      return (v === null || v === undefined || isNaN(v)) ? null : Math.round(Number(v) * 10) / 10;
-    }
-
     // =========================================================================
-    // [4. 역신장 과다점 · 고신장점 자동 계산 및 UI 렌더링]
+    // [4. 좌측 역신장·고신장 자동 스캐너]
     // =========================================================================
     function getStoreSummaryRow(st) {
       const d = st.daily;
@@ -950,7 +917,7 @@
     }
 
     // =========================================================================
-    // [5. AI 전송용 경량 JSON 패킹 & /api/analyze 호출]
+    // [5. AI 전송용 경량 JSON 패킹]
     // =========================================================================
     function compressStoreForAi(row) {
       const st = row.st;
@@ -979,14 +946,12 @@
         out.동업계상권 = {
           순위: `${st.comp.rank}/${st.comp.totalBrands}위`,
           점유율: st.comp.share,
-          당사상권신장: st.comp.wmGr,
           타사평균신장: st.comp.othersGr
         };
       }
       if (st.invest.hasData) {
         out.매장제원 = {
           평수: st.invest.area,
-          오픈: st.invest.open,
           최근정비: st.invest.maint,
           정비내역: st.invest.maintDesc,
           운영형태: st.invest.opType
@@ -1029,6 +994,172 @@
       };
     }
 
+    // =========================================================================
+    // [6. 포털 네이티브 대시보드 UI 렌더러]
+    // =========================================================================
+    const TONE_STYLES = {
+      blue:   { card: 'bg-blue-50/40 border-blue-200/80',   badge: 'bg-blue-600 text-white',       val: 'text-blue-700',   dot: 'bg-blue-500',   chip: 'bg-blue-50 text-blue-700 border-blue-200' },
+      rose:   { card: 'bg-rose-50/40 border-rose-200/80',   badge: 'bg-rose-600 text-white',       val: 'text-rose-700',   dot: 'bg-rose-500',   chip: 'bg-rose-50 text-rose-700 border-rose-200' },
+      amber:  { card: 'bg-amber-50/50 border-amber-200/80', badge: 'bg-amber-500 text-zinc-950',   val: 'text-amber-800',  dot: 'bg-amber-500',  chip: 'bg-amber-50 text-amber-800 border-amber-200' },
+      indigo: { card: 'bg-indigo-50/40 border-indigo-200/80', badge: 'bg-indigo-600 text-white',   val: 'text-indigo-700', dot: 'bg-indigo-500', chip: 'bg-indigo-50 text-indigo-700 border-indigo-200' }
+    };
+
+    function formatCellBadge(text) {
+      const safe = escapeHtml(String(text || '-'));
+      // +xx.x% / -xx.x% 수치가 포함된 셀에 포털과 동일한 등락 컬러 자동 적용
+      return safe
+        .replace(/(\+[0-9]+(?:\.[0-9]+)?%)/g, '<span class="font-extrabold text-rose-600">$1</span>')
+        .replace(/(-[0-9]+(?:\.[0-9]+)?%)/g, '<span class="font-extrabold text-blue-600">$1</span>');
+    }
+
+    function renderDashboardReportHtml(r, scopeTag, nowStr) {
+      // 1) 상단 핵심 결론 다크 배너
+      const headlineHtml = `
+        <div class="rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white p-4 shadow-sm border border-slate-800">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-amber-400 text-zinc-950 text-[10.5px] font-black tracking-tight">핵심 진단</span>
+              <span class="text-[11px] font-bold text-indigo-200">${escapeHtml(scopeTag)}</span>
+            </div>
+            <span class="text-[10.5px] text-slate-400">${nowStr}</span>
+          </div>
+          <p class="text-[13.5px] lg:text-sm font-extrabold leading-relaxed text-white">${escapeHtml(r.headline || '')}</p>
+        </div>
+      `;
+
+      // 2) 핵심 지표 3칸 KPI 스트립
+      const kpisHtml = Array.isArray(r.kpis) && r.kpis.length > 0 ? `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          ${r.kpis.slice(0, 3).map(k => {
+            const st = TONE_STYLES[k.tone] || TONE_STYLES.indigo;
+            return `
+              <div class="bg-white border border-[#E6E4DD] rounded-xl p-3 shadow-2xs flex flex-col justify-between">
+                <div class="text-[11px] font-bold text-zinc-500">${escapeHtml(k.label)}</div>
+                <div class="text-base lg:text-[17px] font-black ${st.val} mt-1 tracking-tight">${escapeHtml(k.value)}</div>
+                <div class="text-[11px] text-zinc-500 font-medium mt-1 truncate">${escapeHtml(k.sub)}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : '';
+
+      // 3) 유형별 특징 카드 (2열 그리드)
+      const cardsHtml = Array.isArray(r.cards) && r.cards.length > 0 ? `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          ${r.cards.map(c => {
+            const st = TONE_STYLES[c.tone] || TONE_STYLES.indigo;
+            const pts = (c.points || []).map(p => `
+              <li class="flex items-start gap-2 text-xs text-slate-700 leading-relaxed">
+                <span class="w-1.5 h-1.5 rounded-full ${st.dot} mt-1.5 shrink-0"></span>
+                <span>${formatCellBadge(p)}</span>
+              </li>
+            `).join('');
+            const chips = (c.stores || []).map(s => `
+              <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold border ${st.chip}">${formatCellBadge(s)}</span>
+            `).join('');
+            return `
+              <div class="rounded-2xl border p-3.5 shadow-2xs flex flex-col justify-between gap-2.5 bg-white ${st.card}">
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <h4 class="text-[13px] font-extrabold text-[#18181B]">${escapeHtml(c.title)}</h4>
+                    <span class="px-2 py-0.5 rounded-md text-[10.5px] font-extrabold shrink-0 ${st.badge}">${escapeHtml(c.badge)}</span>
+                  </div>
+                  <ul class="space-y-1.5">${pts}</ul>
+                </div>
+                ${chips ? `<div class="pt-2 border-t border-slate-200/70 flex flex-wrap gap-1">${chips}</div>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      ` : '';
+
+      // 4) 가로 스크롤 없는 압축 비교 테이블
+      let tableHtml = '';
+      if (r.table && Array.isArray(r.table.headers) && Array.isArray(r.table.rows) && r.table.rows.length > 0) {
+        const headers = r.table.headers.slice(0, 5);
+        const ths = headers.map((h, i) => `
+          <th class="py-2 px-3 font-extrabold text-[11px] ${i === 0 ? 'text-left' : 'text-left'} whitespace-nowrap">${escapeHtml(h)}</th>
+        `).join('');
+        const trs = r.table.rows.slice(0, 8).map(row => `
+          <tr class="border-t border-[#F0EEE9] hover:bg-zinc-50/80 transition">
+            ${headers.map((_, idx) => `
+              <td class="py-2 px-3 text-xs ${idx === 0 ? 'font-extrabold text-[#18181B] whitespace-nowrap' : 'text-slate-700 font-medium'}">
+                ${formatCellBadge(row[idx] ?? '-')}
+              </td>
+            `).join('')}
+          </tr>
+        `).join('');
+
+        tableHtml = `
+          <div class="bg-white rounded-2xl border border-[#E6E4DD] shadow-2xs overflow-hidden">
+            <div class="px-3.5 py-2.5 bg-zinc-50/80 border-b border-[#E6E4DD] flex items-center justify-between">
+              <span class="text-xs font-extrabold text-[#18181B] flex items-center gap-1.5">
+                <i class="fa-solid fa-table-list text-indigo-600"></i>
+                <span>${escapeHtml(r.table.title || '핵심 매장 비교 요약')}</span>
+              </span>
+              <span class="text-[10.5px] text-zinc-400 font-semibold">주요 ${r.table.rows.slice(0, 8).length}개점</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse">
+                <thead class="bg-[#18181B] text-white"><tr>${ths}</tr></thead>
+                <tbody>${trs}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      // 5) 즉시 실행 액션플랜 카드
+      const actionsHtml = Array.isArray(r.actions) && r.actions.length > 0 ? `
+        <div class="bg-gradient-to-r from-amber-50/90 to-orange-50/50 border border-amber-200/90 rounded-2xl p-3.5 space-y-2">
+          <div class="text-xs font-extrabold text-amber-950 flex items-center gap-1.5">
+            <i class="fa-solid fa-bullseye text-amber-600"></i>
+            <span>현장 즉시 실행 포인트</span>
+          </div>
+          <div class="space-y-1.5">
+            ${r.actions.map(a => `
+              <div class="flex items-center gap-2 bg-white/85 px-3 py-2 rounded-xl border border-amber-200/60 text-xs">
+                <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-900 font-extrabold text-[10.5px] shrink-0">${escapeHtml(a.target)}</span>
+                <span class="font-bold text-slate-800">${formatCellBadge(a.text)}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      return `<div class="space-y-3">${headlineHtml}${kpisHtml}${cardsHtml}${tableHtml}${actionsHtml}</div>`;
+    }
+
+    function buildCopyTextFromResult(r, scopeTag) {
+      const lines = [
+        `[WM중부 영업 인사이트 요약] (${scopeTag})`,
+        `■ 핵심 진단: ${r.headline}`,
+        ''
+      ];
+      if (Array.isArray(r.kpis)) {
+        lines.push('■ 주요 지표');
+        r.kpis.forEach(k => lines.push(`- ${k.label}: ${k.value} (${k.sub})`));
+        lines.push('');
+      }
+      if (Array.isArray(r.cards)) {
+        lines.push('■ 유형별 특징');
+        r.cards.forEach(c => {
+          lines.push(`[${c.title} · ${c.badge}]`);
+          (c.points || []).forEach(p => lines.push(`  • ${p}`));
+          if (c.stores?.length) lines.push(`  → 해당매장: ${c.stores.join(', ')}`);
+        });
+        lines.push('');
+      }
+      if (Array.isArray(r.actions)) {
+        lines.push('■ 실행 포인트');
+        r.actions.forEach(a => lines.push(`- [${a.target}] ${a.text}`));
+      }
+      return lines.join('\n');
+    }
+
+    // =========================================================================
+    // [7. /api/analyze 호출 및 인터랙션]
+    // =========================================================================
     function getUserEmail() {
       try {
         const raw = localStorage.getItem('wm_user');
@@ -1085,21 +1216,21 @@
       const outBox = document.getElementById('aiOutputScroll');
       const reqId = 'ai-msg-' + Date.now();
       const scopeTag = pinnedStores.size > 0
-        ? `선택 ${pinnedStores.size}점`
+        ? `선택 ${pinnedStores.size}점 집중`
         : `${payload.메타.조회권역} · 역신장 ${payload.역신장과다점_상위15.length}점 / 고신장 ${payload.고신장점_상위15.length}점`;
 
       outBox.insertAdjacentHTML('beforeend', `
-        <div class="space-y-2.5">
+        <div class="space-y-3">
           <div class="flex justify-end">
-            <div class="max-w-[85%] bg-[#18181B] text-white rounded-2xl rounded-tr-sm px-4 py-2.5 shadow-2xs">
-              <div class="text-[10px] text-amber-400 font-bold mb-1">${scopeTag}</div>
-              <div class="text-xs lg:text-[13px] leading-relaxed whitespace-pre-wrap">${escapeHtml(prompt)}</div>
+            <div class="max-w-[85%] bg-white border border-[#DFDDD4] text-[#18181B] rounded-2xl rounded-tr-sm px-3.5 py-2.5 shadow-2xs">
+              <div class="text-[10px] text-indigo-600 font-extrabold mb-0.5">${escapeHtml(scopeTag)}</div>
+              <div class="text-xs font-semibold leading-relaxed whitespace-pre-wrap">${escapeHtml(prompt)}</div>
             </div>
           </div>
-          <div id="${reqId}" class="bg-white border border-[#E6E4DD] rounded-2xl rounded-tl-sm p-4 shadow-2xs">
+          <div id="${reqId}" class="bg-white border border-[#E6E4DD] rounded-2xl p-4 shadow-2xs">
             <div class="flex items-center gap-2 text-xs font-bold text-indigo-600">
               <i class="fa-solid fa-spinner fa-spin"></i>
-              <span>매장 데이터를 교차 분석하여 리포트를 정리하고 있습니다...</span>
+              <span>데이터를 교차 분석해 대시보드 카드로 정리하는 중...</span>
             </div>
           </div>
         </div>
@@ -1120,32 +1251,29 @@
         const targetCard = document.getElementById(reqId);
         if (!res.ok) {
           const errMsg = data?.error || `요청 실패 (HTTP ${res.status})`;
-          targetCard.innerHTML = `
-            <div class="text-xs text-rose-600 font-bold flex items-start gap-2">
+          targetCard.outerHTML = `
+            <div class="bg-rose-50 border border-rose-200 rounded-2xl p-4 text-xs text-rose-700 font-bold flex items-start gap-2">
               <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
               <div>
                 <div>AI 분석 요청 중 오류가 발생했습니다.</div>
-                <div class="text-[11px] font-medium text-rose-500 mt-1">${escapeHtml(errMsg)}</div>
+                <div class="text-[11px] font-medium text-rose-600 mt-1">${escapeHtml(errMsg)}</div>
               </div>
             </div>
           `;
           return;
         }
 
-        const mdText = data.answer || '응답 내용이 비어 있습니다.';
-        lastReportMarkdown = mdText;
-        const safeHtml = DOMPurify.sanitize(marked.parse(mdText));
         const nowStr = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
 
-        targetCard.innerHTML = `
-          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100 text-[11px] text-slate-400">
-            <span class="font-extrabold text-indigo-600 flex items-center gap-1.5">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> AI 분석 리포트
-            </span>
-            <span>${nowStr} · ${scopeTag}</span>
-          </div>
-          <div class="ai-markdown">${safeHtml}</div>
-        `;
+        if (data.result) {
+          lastReportCopyText = buildCopyTextFromResult(data.result, scopeTag);
+          targetCard.outerHTML = renderDashboardReportHtml(data.result, scopeTag, nowStr);
+        } else {
+          const mdText = data.answer || '응답 내용이 비어 있습니다.';
+          lastReportCopyText = mdText;
+          const safeHtml = DOMPurify.sanitize(marked.parse(mdText));
+          targetCard.innerHTML = `<div class="text-xs leading-relaxed">${safeHtml}</div>`;
+        }
         outBox.scrollTop = outBox.scrollHeight;
       } catch (err) {
         const targetCard = document.getElementById(reqId);
@@ -1153,7 +1281,7 @@
           targetCard.innerHTML = `
             <div class="text-xs text-rose-600 font-bold">
               <i class="fa-solid fa-circle-xmark mr-1"></i>
-              네트워크 오류: Vercel 배포 환경(wm-portal-pcver.vercel.app)에서 실행 중인지 확인해 주세요. (${escapeHtml(err.message)})
+              네트워크 오류: ${escapeHtml(err.message)}
             </div>
           `;
         }
@@ -1182,17 +1310,17 @@
     }
 
     function copyLastReport() {
-      if (!lastReportMarkdown) {
+      if (!lastReportCopyText) {
         showToast('복사할 분석 리포트가 아직 없습니다.');
         return;
       }
-      navigator.clipboard.writeText(lastReportMarkdown)
-        .then(() => showToast('최근 AI 분석 리포트가 복사되었습니다!'))
+      navigator.clipboard.writeText(lastReportCopyText)
+        .then(() => showToast('리포트 요약문이 클립보드에 복사되었습니다!'))
         .catch(() => showToast('복사에 실패했습니다.'));
     }
 
     function clearConversation() {
-      lastReportMarkdown = '';
+      lastReportCopyText = '';
       location.reload();
     }
 
